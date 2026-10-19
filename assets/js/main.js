@@ -570,17 +570,21 @@
     let x = 0, v = 0, dragging = false, startX = 0, startPos = 0, lastX = 0, moved = 0;
     const bounds = () => -(track.scrollWidth - gallery.clientWidth);
     gallery.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0) return; // só o botão principal arrasta
       dragging = true; moved = 0; startX = lastX = e.clientX; startPos = x;
       gallery.setPointerCapture(e.pointerId);
     });
+    const end = () => { dragging = false; };
     gallery.addEventListener("pointermove", (e) => {
       if (!dragging) return;
+      // o navegador às vezes perde o "soltar" do mouse; sem botão pressionado, o arraste termina
+      if (e.pointerType === "mouse" && e.buttons === 0) return end();
       v = e.clientX - lastX; lastX = e.clientX; moved += Math.abs(v);
       x = startPos + (e.clientX - startX);
     });
-    const end = () => { dragging = false; };
-    gallery.addEventListener("pointerup", end);
-    gallery.addEventListener("pointercancel", end);
+    ["pointerup", "pointercancel", "lostpointercapture"].forEach((t) => gallery.addEventListener(t, end));
+    window.addEventListener("blur", end);
+    gallery.addEventListener("dragstart", (e) => e.preventDefault());
     let dir = -1; // deriva lenta que inverte nas pontas
     gsap.ticker.add(() => {
       if (!dragging) {
@@ -600,23 +604,34 @@
     const box = $(".hoverimg"), img = $("img", box);
     const xTo = gsap.quickTo(box, "x", { duration: 0.6, ease: "power3" });
     const yTo = gsap.quickTo(box, "y", { duration: 0.6, ease: "power3" });
-    let timer = null;
-    $$(".brands li").forEach((li) => {
+    // a imagem aparece só enquanto o ponteiro está de fato sobre um nome de marca.
+    // A checagem usa elementFromPoint também no scroll: rolando com a roda o mouse
+    // "sai" do nome sem disparar mouseleave, e a imagem ficava grudada no cursor.
+    let timer = null, active = null, px = -1, py = -1;
+    const show = (li) => {
       const imgs = li.dataset.imgs.split(",");
-      li.dataset.cursor = "ver";
-      li.addEventListener("mouseenter", () => {
-        let k = 0;
-        img.src = src(imgs[0]);
-        gsap.to(box, { opacity: 1, scale: 1, rotate: gsap.utils.random(-6, 6), duration: 0.5, ease: "expo.out" });
-        clearInterval(timer);
-        timer = setInterval(() => { k = (k + 1) % imgs.length; img.src = src(imgs[k]); }, 750);
-      });
-      li.addEventListener("mouseleave", () => {
-        clearInterval(timer);
-        gsap.to(box, { opacity: 0, scale: 0.6, duration: 0.4, ease: "power3.in" });
-      });
-    });
-    window.addEventListener("pointermove", (e) => { xTo(e.clientX); yTo(e.clientY); });
+      let k = 0;
+      img.src = src(imgs[0]);
+      gsap.to(box, { opacity: 1, scale: 1, rotate: gsap.utils.random(-6, 6), duration: 0.5, ease: "expo.out", overwrite: "auto" });
+      clearInterval(timer);
+      timer = setInterval(() => { k = (k + 1) % imgs.length; img.src = src(imgs[k]); }, 750);
+    };
+    const hide = () => {
+      clearInterval(timer);
+      gsap.to(box, { opacity: 0, scale: 0.6, duration: 0.35, ease: "power3.in", overwrite: "auto" });
+    };
+    const check = () => {
+      const el = px < 0 ? null : document.elementFromPoint(px, py);
+      const li = el ? el.closest(".brands li") : null;
+      if (li === active) return;
+      active = li;
+      if (li) show(li); else hide();
+    };
+    $$(".brands li").forEach((li) => { li.dataset.cursor = "ver"; });
+    window.addEventListener("pointermove", (e) => { px = e.clientX; py = e.clientY; xTo(px); yTo(py); check(); }, { passive: true });
+    window.addEventListener("scroll", check, { passive: true });
+    document.addEventListener("pointerleave", () => { px = -1; check(); });
+    window.addEventListener("blur", () => { px = -1; check(); });
     gallery.dataset.cursor = "arraste";
   })();
 
@@ -713,14 +728,23 @@
     const cur = $(".cursor"), dot = $(".cursor__dot"), ring = $(".cursor__ring"), label = $(".cursor__label");
     const dx = gsap.quickTo(dot, "x", { duration: 0.08 }), dy = gsap.quickTo(dot, "y", { duration: 0.08 });
     const rx = gsap.quickTo(ring, "x", { duration: 0.45, ease: "power3" }), ry = gsap.quickTo(ring, "y", { duration: 0.45, ease: "power3" });
-    window.addEventListener("pointermove", (e) => {
-      dx(e.clientX); dy(e.clientY); rx(e.clientX); ry(e.clientY);
-      const t = e.target.closest("[data-cursor]");
-      const link = e.target.closest("a, button, summary, .chips button, input, label");
+    let cx = -1, cy = -1;
+    // estado do cursor pelo elemento sob o ponteiro; refeito também no scroll,
+    // senão o rótulo ("ver", "arraste") fica preso ao rolar sem mexer o mouse
+    const updateCursor = () => {
+      const el = cx < 0 ? null : document.elementFromPoint(cx, cy);
+      const t = el && el.closest("[data-cursor]");
+      const link = el && el.closest("a, button, summary, .chips button, input, label");
       cur.classList.toggle("is-label", !!t);
       cur.classList.toggle("is-link", !t && !!link);
       if (t) label.textContent = t.dataset.cursor;
-    });
+    };
+    window.addEventListener("pointermove", (e) => {
+      cx = e.clientX; cy = e.clientY;
+      dx(cx); dy(cy); rx(cx); ry(cy);
+      updateCursor();
+    }, { passive: true });
+    window.addEventListener("scroll", updateCursor, { passive: true });
     document.addEventListener("pointerleave", () => gsap.to(cur, { opacity: 0, duration: 0.2 }));
     document.addEventListener("pointerenter", () => gsap.to(cur, { opacity: 1, duration: 0.2 }));
 
