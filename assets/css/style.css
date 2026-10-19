@@ -276,7 +276,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .chapter {
   position: absolute; z-index: 3;
-  top: 50%; transform: translateY(-50%);
+  /* centralização pela propriedade `translate`: o GSAP anima `transform` (y) sem apagar este deslocamento */
+  top: 50%; translate: 0 -50%;
   width: min(520px, 40vw);
   opacity: 0; visibility: hidden;
 }
@@ -290,7 +291,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .chapter .lead { margin-top: 20px; }
 .chapter--left { left: var(--pad); }
 .chapter--right { right: var(--pad); }
-.chapter--center { left: 50%; top: auto; bottom: 7vh; transform: translateX(-50%); text-align: center; width: min(760px, 90vw); }
+.chapter--center { left: 50%; top: auto; bottom: 7vh; translate: -50% 0; text-align: center; width: min(760px, 90vw); }
 .chapter--center .btn { margin-top: 30px; }
 .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 38px; }
 .scrollhint { display: flex; align-items: center; gap: 12px; margin-top: 56px; font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: var(--muted); }
@@ -585,7 +586,7 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
   .story__canvas { width: min(80vw, 40vh); height: min(80vw, 40vh); top: 34%; }
   .story__halo { top: 34%; }
   .chapter, .chapter--hero, .chapter--left, .chapter--right {
-    left: 20px; right: 20px; width: auto; top: auto; bottom: 7vh; transform: none;
+    left: 20px; right: 20px; width: auto; top: auto; bottom: 7vh; translate: none;
   }
   .chapter--hero { bottom: 5vh; }
   .chapter--hero .display { font-size: 38px; }
@@ -630,7 +631,7 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
 .reduced .story__canvas { position: relative; left: auto; top: auto; transform: none; margin: 0 auto; width: min(80vw, 520px); height: min(80vw, 520px); }
 .reduced .story__halo, .reduced .story__progress, .reduced .scrollhint { display: none; }
 .reduced .trustbar { position: relative; }
-.reduced .chapter { position: relative; inset: auto; transform: none; opacity: 1; visibility: visible; width: auto; max-width: 720px; }
+.reduced .chapter { position: relative; inset: auto; transform: none; translate: none; opacity: 1; visibility: visible; width: auto; max-width: 720px; }
 .reduced .reveal { opacity: 1; transform: none; }
 .reduced .manifesto__text .w { opacity: 1; }
 .reduced .steps li { opacity: 1; }
