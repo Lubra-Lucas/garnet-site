@@ -112,7 +112,6 @@
       // anima a escala pelo objeto pos (e não pelo transform do canvas, que é controlado pelo scroll)
       .fromTo(pos, { s: 0.7 }, { s: 1, duration: 1.4, ease: "expo.out" }, "-=0.55")
       .from(canvas, { opacity: 0, duration: 1, ease: "power2.out" }, "<")
-      .fromTo(".chapter--hero", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.01 }, "<")
       .from(".chapter--hero > *", { y: 40, opacity: 0, stagger: 0.09, duration: 1.1, ease: "expo.out" }, "<0.1")
       .from(".trustbar", { y: 30, opacity: 0, duration: 1, ease: "expo.out" }, "-=0.7");
   }
@@ -201,16 +200,17 @@
 
       // posição do estojo acompanha o lado livre de cada capítulo
       // o estojo atravessa a tela só quando nenhum texto está visível
-      tl.fromTo(pos, { x: side(0.2), s: 1, y: 0 }, { x: side(-0.2), duration: 0.08, ease: "power2.inOut" }, 0.09)
+      tl.fromTo(pos, { x: side(0.2), s: 1, y: 0 }, { x: side(-0.2), duration: 0.07, ease: "power2.inOut" }, 0.12)
         .to(pos, { x: side(0.2), duration: 0.05, ease: "power2.inOut" }, 0.36)
         .to(pos, { x: side(-0.2), duration: 0.05, ease: "power2.inOut" }, 0.635)
         .to(pos, { x: 0, y: () => (desktop ? -H() * 0.13 : -H() * 0.04), s: desktop ? 0.72 : 0.9, duration: 0.05, ease: "power2.inOut" }, 0.85);
 
       const show = (el, at, dur = 0.05) => tl.fromTo(el, { autoAlpha: 0, y: 50 }, { autoAlpha: 1, y: 0, duration: dur, ease: "power2.out" }, at);
       const hide = (el, at, dur = 0.05) => tl.fromTo(el, { autoAlpha: 1, y: 0 }, { autoAlpha: 0, y: -50, duration: dur, ease: "power2.in", immediateRender: false }, at);
-      hide(chapters[0], 0.03, 0.06);
-      hide($(".trustbar"), 0.03, 0.06); // faixa de marcas sai junto com a abertura
-      show(chapters[1], 0.18); hide(chapters[1], 0.32, 0.04);
+      // a abertura fica parada por um trecho do scroll antes de sair (antes sumia quase de imediato)
+      hide(chapters[0], 0.07, 0.06);
+      hide($(".trustbar"), 0.07, 0.06); // faixa de marcas sai junto com a abertura
+      show(chapters[1], 0.19); hide(chapters[1], 0.32, 0.04);
       show(chapters[2], 0.41); hide(chapters[2], 0.6, 0.035);
       show(chapters[3], 0.69); hide(chapters[3], 0.81, 0.04);
       show(chapters[4], 0.9);

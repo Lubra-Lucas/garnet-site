@@ -283,6 +283,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .chapter--hero { left: var(--pad); width: min(640px, 46vw); }
 .chapter--hero .display { font-size: clamp(36px, min(5.4vw, 8.4vh), 86px); }
 .chapter--hero { top: 46%; }
+/* a abertura nasce visível: não depende de nenhuma animação para aparecer */
+.chapter.chapter--hero { opacity: 1; visibility: visible; }
 @media (max-height: 780px) and (min-width: 761px) { .chapter--hero .lead { margin-top: 16px; font-size: 15px; } .chapter--hero .actions { margin-top: 24px; } .scrollhint { display: none; } }
 .chapter:not(.chapter--hero) .display { font-size: clamp(34px, min(4.2vw, 7.4vh), 64px); }
 .chapter .lead { margin-top: 20px; }
