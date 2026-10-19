@@ -261,7 +261,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .menu-open .mnav { clip-path: inset(0 0 0 0); }
 
 /* ---------- história com sequência ---------- */
-.story { position: relative; height: 640vh; z-index: 2; }
+.story { position: relative; height: 520vh; z-index: 2; }
 .story__sticky { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
 .story__halo {
   position: absolute; left: 50%; top: 52%; width: min(90vw, 980px); aspect-ratio: 1; transform: translate(-50%, -50%);
@@ -281,7 +281,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   opacity: 0; visibility: hidden;
 }
 .chapter--hero { left: var(--pad); width: min(640px, 46vw); }
-.chapter--hero .display { font-size: clamp(40px, 5.4vw, 86px); }
+.chapter--hero .display { font-size: clamp(36px, min(5.4vw, 8.4vh), 86px); }
+.chapter--hero { top: 46%; }
+@media (max-height: 780px) and (min-width: 761px) { .chapter--hero .lead { margin-top: 16px; font-size: 15px; } .chapter--hero .actions { margin-top: 24px; } .scrollhint { display: none; } }
 .chapter:not(.chapter--hero) .display { font-size: clamp(34px, min(4.2vw, 7.4vh), 64px); }
 .chapter .lead { margin-top: 20px; }
 .chapter--left { left: var(--pad); }
@@ -293,6 +295,16 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .scrollhint span { width: 1px; height: 46px; background: var(--line); position: relative; overflow: hidden; }
 .scrollhint span::after { content: ""; position: absolute; left: 0; top: -40%; width: 1px; height: 40%; background: var(--gold); animation: drip 1.8s var(--ease) infinite; }
 @keyframes drip { to { top: 110%; } }
+.trustbar { position: absolute; z-index: 4; left: 0; right: 0; bottom: 0; display: flex; align-items: center; gap: 24px; padding: 18px 250px 18px var(--pad); border-top: 1px solid var(--line); background: linear-gradient(transparent, rgba(247, 244, 239, .85) 40%); }
+.trustbar__label { flex: none; font-size: 10px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); }
+.trustbar__viewport { flex: 1; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+.trustbar__track { display: flex; width: max-content; animation: trust 38s linear infinite; }
+.trustbar:hover .trustbar__track { animation-play-state: paused; }
+.trustbar__track p { margin: 0; display: flex; align-items: center; gap: clamp(18px, 2.4vw, 36px); padding-right: clamp(18px, 2.4vw, 36px); white-space: nowrap; }
+.trustbar__track a { font-family: var(--serif); font-style: italic; font-size: clamp(22px, 2.3vw, 36px); color: var(--ink); transition: color .3s; }
+.trustbar__track a:hover { color: var(--gold); }
+.trustbar__track i { font-style: normal; font-size: 11px; color: var(--gold); }
+@keyframes trust { to { transform: translateX(-50%); } }
 .swatches { list-style: none; padding: 0; margin: 34px 0 0; display: flex; flex-wrap: wrap; gap: 10px; }
 .swatches li { display: flex; align-items: center; gap: 8px; padding: 7px 14px 7px 7px; border: 1px solid var(--line); border-radius: 99px; font-size: 12px; font-weight: 500; transition: background-color .4s, border-color .4s, transform .4s var(--ease); }
 .swatches li i { width: 20px; height: 20px; border-radius: 50%; background: var(--c); box-shadow: inset 0 -3px 6px rgba(0,0,0,.18); }
@@ -547,9 +559,12 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
 @media (max-width: 760px) {
   body { font-size: 15px; }
   .header { padding-left: 20px; }
-  .story { height: 560vh; }
-  .story__canvas { width: min(84vw, 46vh); height: min(84vw, 46vh); top: 30%; }
-  .story__halo { top: 30%; }
+  .story { height: 460vh; }
+  .trustbar { top: 64px; bottom: auto; flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 0 10px 20px; padding-right: 0; border-top: 0; background: none; }
+  .trustbar__viewport { width: 100%; }
+  .trustbar__track a { font-size: 19px; }
+  .story__canvas { width: min(80vw, 40vh); height: min(80vw, 40vh); top: 34%; }
+  .story__halo { top: 34%; }
   .chapter, .chapter--hero, .chapter--left, .chapter--right {
     left: 20px; right: 20px; width: auto; top: auto; bottom: 7vh; transform: none;
   }
@@ -559,8 +574,9 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
   .chapter .lead { font-size: 15px; margin-top: 14px; }
   .chapter--hero .lead { display: none; }
   .actions { margin-top: 24px; }
-  .actions .btn { flex: 1; padding: 0 12px; --h: 48px; font-size: 10px; letter-spacing: .08em; white-space: nowrap; }
+  .actions .btn { flex: 1 1 auto; padding: 0 16px; --h: 46px; font-size: 10px; letter-spacing: .08em; white-space: nowrap; }
   .scrollhint { display: none; }
+  .chapter--hero .actions { margin-top: 18px; }
   .layers { margin-top: 18px; gap: 6px; }
   .layers li { padding: 8px 0 8px 16px; }
   .story__progress { display: none; }
@@ -587,6 +603,9 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
 
 /* ---------- movimento reduzido ---------- */
 @media (prefers-reduced-motion: reduce) {
+  .trustbar__track { animation: none; flex-wrap: wrap; width: auto; }
+  .trustbar__track p[aria-hidden] { display: none; }
+  .trustbar__track p { flex-wrap: wrap; white-space: normal; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   .grain { display: none; }
 }
@@ -594,6 +613,7 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
 .reduced .story__sticky { position: relative; height: auto; min-height: 100vh; padding: 140px var(--pad) 80px; display: grid; gap: 70px; }
 .reduced .story__canvas { position: relative; left: auto; top: auto; transform: none; margin: 0 auto; width: min(80vw, 520px); height: min(80vw, 520px); }
 .reduced .story__halo, .reduced .story__progress, .reduced .scrollhint { display: none; }
+.reduced .trustbar { position: relative; }
 .reduced .chapter { position: relative; inset: auto; transform: none; opacity: 1; visibility: visible; width: auto; max-width: 720px; }
 .reduced .reveal { opacity: 1; transform: none; }
 .reduced .manifesto__text .w { opacity: 1; }

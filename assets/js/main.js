@@ -113,7 +113,8 @@
       .fromTo(pos, { s: 0.7 }, { s: 1, duration: 1.4, ease: "expo.out" }, "-=0.55")
       .from(canvas, { opacity: 0, duration: 1, ease: "power2.out" }, "<")
       .fromTo(".chapter--hero", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.01 }, "<")
-      .from(".chapter--hero > *", { y: 40, opacity: 0, stagger: 0.09, duration: 1.1, ease: "expo.out" }, "<0.1");
+      .from(".chapter--hero > *", { y: 40, opacity: 0, stagger: 0.09, duration: 1.1, ease: "expo.out" }, "<0.1")
+      .from(".trustbar", { y: 30, opacity: 0, duration: 1, ease: "expo.out" }, "-=0.7");
   }
 
   /* ---------- scroll suave (Lenis) ---------- */
@@ -208,6 +209,7 @@
       const show = (el, at, dur = 0.05) => tl.fromTo(el, { autoAlpha: 0, y: 50 }, { autoAlpha: 1, y: 0, duration: dur, ease: "power2.out" }, at);
       const hide = (el, at, dur = 0.05) => tl.fromTo(el, { autoAlpha: 1, y: 0 }, { autoAlpha: 0, y: -50, duration: dur, ease: "power2.in", immediateRender: false }, at);
       hide(chapters[0], 0.03, 0.06);
+      hide($(".trustbar"), 0.03, 0.06); // faixa de marcas sai junto com a abertura
       show(chapters[1], 0.18); hide(chapters[1], 0.32, 0.04);
       show(chapters[2], 0.41); hide(chapters[2], 0.6, 0.035);
       show(chapters[3], 0.69); hide(chapters[3], 0.81, 0.04);
@@ -729,12 +731,12 @@
     };
     const check = () => {
       const el = px < 0 ? null : document.elementFromPoint(px, py);
-      const li = el ? el.closest(".brands li") : null;
+      const li = el ? el.closest(".brands li[data-imgs]") : null; // marcas sem foto ainda não abrem imagem
       if (li === active) return;
       active = li;
       if (li) show(li); else hide();
     };
-    $$(".brands li").forEach((li) => { li.dataset.cursor = "ver"; });
+    $$(".brands li[data-imgs]").forEach((li) => { li.dataset.cursor = "ver"; });
     window.addEventListener("pointermove", (e) => { px = e.clientX; py = e.clientY; xTo(px); yTo(py); check(); }, { passive: true });
     window.addEventListener("scroll", check, { passive: true });
     document.addEventListener("pointerleave", () => { px = -1; check(); });

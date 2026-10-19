@@ -15,6 +15,10 @@ na página; esta lista registra o que ainda é ilustrativo e deve ser trocado qu
 - Fundação em 1992, +30 anos, especialista em maquiagem compactada.
 - **1.000 m²** de área fabril, **50 mil unidades por mês**, **+150 marcas atendidas**, **BPF**.
 - 6 categorias, 5 modelos de produção, 8 etapas do processo, FAQ.
-- 12 cases com fotos (Karen Bachini Beauty, John John, Boca Rosa, Fran) e o Pó Facial Chocolate.
+- Cases com fotos: Boca Rosa, Karen Bachini Beauty, John John e Fran, além do Pó Facial Chocolate.
+- Cases citados pela Garnet, aguardando fotos no site: Alice Salazar, Max Weber, Alê de Souza
+  (paletas Roses for us! e It's Brown!, com Payot) e Estrela Beauty (Paleta 12 Cores, Kit Mar de Cores,
+  sombra unitária). Ao receber as fotos, adicionar `data-imgs` no item da lista `.brands` e as
+  imagens em `assets/img/cases/`.
 - Veículos: Vogue, Elle, Forbes, Marie Claire, Sephora e Riachuelo.
 - WhatsApp, Instagram, e-mail, endereço e CNPJ.
