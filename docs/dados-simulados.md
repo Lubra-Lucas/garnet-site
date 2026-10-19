@@ -14,7 +14,7 @@ na página; esta lista registra o que ainda é ilustrativo e deve ser trocado qu
 - Fundação em 1992, +30 anos, especialista em maquiagem compactada.
 - **1.000 m²** de área fabril, **50 mil unidades por mês**, **+150 marcas atendidas**, **BPF**.
 - 6 categorias, 5 modelos de produção, 8 etapas do processo, FAQ.
-- Vitrine com 46 produtos fotografados (branch `fotos`): Boca Rosa, Karen Bachini Beauty, Fran,
+- Vitrine com 111 fotos de produtos (branch `fotos`): Boca Rosa, Karen Bachini Beauty, Fran,
   John John, Alê de Souza × Payot, Estrela Beauty, Alice Salazar, Max Weber Beauty e linha Garnet.
 - Veículos: Vogue, Elle, Forbes, Marie Claire, Sephora e Riachuelo.
 - WhatsApp, Instagram, e-mail, endereço e CNPJ.

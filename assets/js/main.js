@@ -666,13 +666,8 @@
     let current = "all";
     let list = [];
 
-    // "Todas": intercala as marcas para nenhuma dominar uma fileira
-    const mixed = () => {
-      const byBrand = data.brands.map((b) => data.items.filter((it) => it.brand === b.id));
-      const out = [];
-      for (let i = 0; out.length < data.items.length; i++) byBrand.forEach((arr) => arr[i] && out.push(arr[i]));
-      return out;
-    };
+    // "Todas": a ordem já vem pronta em vitrine-data.js (marcas espalhadas, mesmo produto separado)
+    const mixed = () => data.items.slice();
     const itemsFor = (f) => (f === "all" ? mixed() : data.items.filter((it) => it.brand === f));
 
     // filtros e índice de marcas
@@ -706,7 +701,8 @@
         if (row.dir > 0) row.x = -row.half;
         row.track.style.setProperty("--dur", (row.half / 38).toFixed(1) + "s"); // ~38 px/s no modo CSS
       }));
-      $(".vitrine__count").textContent = `${list.length} ${list.length === 1 ? "produto" : "produtos"}${current === "all" ? "" : " · " + brandOf[current].label}`;
+      // conta fotos (um mesmo produto pode ter mais de uma foto)
+      $(".vitrine__count").textContent = `${list.length} ${list.length === 1 ? "foto" : "fotos"} de produtos${current === "all" ? "" : " · " + brandOf[current].label}`;
     }
     const setFilter = (f) => {
       current = f;
