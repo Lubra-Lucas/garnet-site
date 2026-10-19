@@ -594,3 +594,5 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
 .reduced .hscroll__intro { margin-bottom: 40px; }
 .reduced .hscroll__track { width: auto; overflow-x: auto; }
 .reduced .hscroll__bar { display: none; }
+
+[hidden] { display: none !important; }

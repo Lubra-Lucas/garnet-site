@@ -657,7 +657,9 @@
       i = n;
       $(".brief__progress i", form).style.width = (n + 1) * 25 + "%";
       back.disabled = n === 0;
-      next.textContent = n === steps.length - 1 ? "Enviar pelo WhatsApp" : "Continuar";
+      next.textContent = n === steps.length - 1 ? "Revisar e enviar" : "Continuar";
+      send.hidden = true;
+      next.hidden = false;
       err.textContent = "";
     };
     const validators = [
@@ -688,8 +690,20 @@
         `Categorias: ${picked("categoria").join(", ")}`, `Modelo: ${picked("modelo").join(", ")}`, `Volume: ${picked("volume").join(", ")}`,
         f("mensagem") ? `Mensagem: ${f("mensagem")}` : "",
       ].filter(Boolean).join("\n");
-      window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+      // link real (e não window.open) para funcionar em qualquer navegador e app
+      send.href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`;
+      send.hidden = false;
+      next.hidden = true;
+      err.textContent = "";
     });
+    const send = document.createElement("a");
+    send.className = "btn btn--gold magnetic brief__send";
+    send.target = "_blank";
+    send.rel = "noopener";
+    send.textContent = "Abrir conversa no WhatsApp";
+    send.hidden = true;
+    next.after(send);
+    form.addEventListener("input", () => { if (!send.hidden) { send.hidden = true; next.hidden = false; } });
     back.addEventListener("click", () => i > 0 && go(i - 1));
   })();
 
