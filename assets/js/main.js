@@ -434,38 +434,6 @@
     });
   })();
 
-  /* ---------- linha de produção "ao vivo" (dados simulados) ---------- */
-  (function live() {
-    const tbody = $(".live__table tbody");
-    const stages = ["Pesagem", "Mistura", "Prensagem", "Envase", "Controle de qualidade", "Expedição"];
-    const products = [
-      ["Pó compacto · Nude", "#c4876a"], ["Blush · Rosa", "#d75c78"], ["Sombra quarteto", "#8a4526"],
-      ["Iluminador · Dourado", "#d2a65e"], ["Batom matte · Vinho", "#651c2e"], ["Body splash", "#c9b6e4"],
-      ["Sérum facial", "#a7c9bb"], ["Paleta 12 cores", "#b06f8a"], ["Gloss holográfico", "#f2b8c6"],
-    ];
-    let lot = 412;
-    const rand = (a, b) => a + Math.random() * (b - a);
-    const newRow = () => {
-      const [name, c] = products[Math.floor(Math.random() * products.length)];
-      return { id: `GRN-26-${String(lot++).padStart(4, "0")}`, name, c, stage: Math.floor(rand(0, 3)), units: Math.round(rand(3, 60)) * 500, p: rand(5, 40) };
-    };
-    const rows = Array.from({ length: 5 }, newRow);
-    const html = (r) => `<td>${r.id}</td><td><span class="chip"><i style="--c:${r.c}"></i>${r.name}</span></td><td class="stage">${stages[r.stage]}</td><td class="hide-sm">${fmt.format(r.units)}</td><td><div class="bar"><i style="--w:${r.p.toFixed(0)}%"></i></div></td>`;
-    tbody.innerHTML = rows.map((r) => `<tr>${html(r)}</tr>`).join("");
-    setInterval(() => {
-      const i = Math.floor(Math.random() * rows.length);
-      const r = rows[i];
-      r.p += rand(18, 40);
-      if (r.p >= 100) {
-        if (r.stage < stages.length - 1) { r.stage++; r.p = rand(4, 15); } else { rows[i] = newRow(); }
-      }
-      const tr = tbody.children[i];
-      tr.innerHTML = html(rows[i]);
-      tr.classList.add("flash");
-      setTimeout(() => tr.classList.remove("flash"), 900);
-    }, 3000);
-  })();
-
   /* ---------- configurador ---------- */
   (function configurator() {
     const svg = $(".cfg");

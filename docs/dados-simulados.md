@@ -6,7 +6,6 @@ na página; esta lista registra o que ainda é ilustrativo e deve ser trocado qu
 | Onde | Situação atual | Para trocar |
 |---|---|---|
 | O que fabricamos | Imagens de **Perfumaria, Skincare e Cabelos** são ilustrações em CSS | Fotos reais dessas categorias |
-| Acompanhamento de lotes | Tabela apresentada como **exemplo ilustrativo** (lotes, produtos e etapas fictícios) | Manter como exemplo ou ligar a dados reais |
 | Depoimentos | **Fora do ar.** O bloco está comentado em `index.html` (os textos antigos não eram de clientes reais) | Depoimentos reais com autorização; depois é só descomentar e trocar os textos |
 | Estojo 3D | Animação gerada por código (`tools/render-sequence`) | Render profissional, se desejarem |
 
