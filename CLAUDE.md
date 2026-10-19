@@ -11,8 +11,8 @@
   variáveis CSS (ex.: `.story__canvas`, que usa `--cx/--cy/--cs`).
 - Cards com efeito de vidro + tilt: adicione as classes `glass` (ou `glass glass--dark`) e o atributo
   `data-tilt` (opcional: `data-tilt-max`).
-- Dados ainda não confirmados pela Garnet levam a classe `sim` e a etiqueta `<em class="simtag">`.
-  Ao substituir por um dado real, remova os dois e atualize `docs/dados-simulados.md`.
+- O site é público. Nunca publique número, certificação ou depoimento que a Garnet não tenha
+  confirmado. Conteúdo ilustrativo deve ser apresentado como exemplo e registrado em `docs/dados-simulados.md`.
 - Contato: todos os formulários terminam no WhatsApp `5511981531188`. Não há backend.
 - Imagens: WebP, no máximo ~1400px no lado maior, em `assets/img/`.
 - Não mexa no domínio nem no ambiente de produção sem autorização do dono do projeto.

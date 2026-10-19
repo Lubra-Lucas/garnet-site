@@ -4,9 +4,8 @@ Novo site da Garnet, feito do zero em HTML, CSS e JavaScript puros, sem React e 
 Do site antigo foram aproveitados só os textos e as imagens. As técnicas de animação foram estudadas
 nas referências descritas em [`docs/referencias.md`](docs/referencias.md).
 
-> **Protótipo.** Alguns números, imagens e depoimentos são **simulados** para mostrar como o site
-> ficará. O botão "Protótipo" no canto inferior esquerdo destaca tudo o que é simulado.
-> A lista completa está em [`docs/dados-simulados.md`](docs/dados-simulados.md).
+> Publicado em **https://garnetcosmeticos.com.br** (GitHub Pages). O que ainda é ilustrativo
+> está listado em [`docs/dados-simulados.md`](docs/dados-simulados.md).
 
 ## Como rodar no computador
 

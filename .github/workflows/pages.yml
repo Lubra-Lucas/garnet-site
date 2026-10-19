@@ -1,4 +1,4 @@
-# Publica o protótipo no GitHub Pages a cada push na branch padrão.
+# Publica o site no GitHub Pages (domínio garnetcosmeticos.com.br) a cada push na branch padrão.
 # Pré-requisito (uma vez): Settings → Pages → Build and deployment → Source: "GitHub Actions".
 name: Publicar no GitHub Pages
 
@@ -28,9 +28,7 @@ jobs:
       - name: Montar a pasta do site
         run: |
           mkdir _site
-          cp -r index.html assets lab _site/
-          # protótipo: não deixar o Google indexar no lugar do domínio oficial
-          sed -i 's|<meta name="theme-color"|<meta name="robots" content="noindex, nofollow" />\n  <meta name="theme-color"|' _site/index.html
+          cp -r index.html assets lab robots.txt sitemap.xml _site/
           touch _site/.nojekyll
 
       - uses: actions/configure-pages@v5

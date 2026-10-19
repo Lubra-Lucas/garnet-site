@@ -330,7 +330,7 @@
     });
     gsap.from(".stat", { y: 60, opacity: 0, duration: 1.1, ease: "expo.out", stagger: 0.07, scrollTrigger: { trigger: ".stats", start: "top 80%", once: true } });
     gsap.from(".model", { y: 70, opacity: 0, duration: 1.1, ease: "expo.out", stagger: 0.08, scrollTrigger: { trigger: ".models__grid", start: "top 80%", once: true } });
-    gsap.from(".quote", { y: 60, opacity: 0, duration: 1.1, ease: "expo.out", stagger: 0.1, scrollTrigger: { trigger: ".quotes__grid", start: "top 80%", once: true } });
+    if ($(".quotes__grid")) gsap.from(".quote", { y: 60, opacity: 0, duration: 1.1, ease: "expo.out", stagger: 0.1, scrollTrigger: { trigger: ".quotes__grid", start: "top 80%", once: true } });
     gsap.from(".footer__word", { yPercent: 40, opacity: 0, duration: 1.6, ease: "expo.out", scrollTrigger: { trigger: ".footer", start: "top 70%", once: true } });
   }
   const fmt = new Intl.NumberFormat("pt-BR");
@@ -347,7 +347,7 @@
   /* ---------- manifesto palavra por palavra ---------- */
   (function manifesto() {
     const p = $("[data-words]");
-    const gold = ["pigmento,", "pó", "ideia", "indústria", "cria."];
+    const gold = ["ideias", "indústria", "cria."];
     p.innerHTML = p.textContent.trim().split(/\s+/).map((w) => `<span class="w${gold.includes(w) ? " gold" : ""}">${w}</span>`).join(" ");
     if (reduced) return;
     gsap.to($$(".w", p), { opacity: 1, stagger: 0.1, ease: "none", scrollTrigger: { trigger: p, start: "top 78%", end: "bottom 45%", scrub: true } });
@@ -873,12 +873,6 @@
     if (!target) return;
     ScrollTrigger.create({ trigger: target, start: "top 50%", end: "bottom 50%", onToggle: (s) => a.classList.toggle("is-current", s.isActive) });
   });
-
-  /* ---------- botão "modo protótipo" ---------- */
-  const proto = $(".proto");
-  const setProto = (on) => { body.classList.toggle("proto-on", on); proto.setAttribute("aria-pressed", String(on)); store.set("garnet-proto", on ? "1" : "0"); };
-  setProto(store.get("garnet-proto") !== "0");
-  proto.addEventListener("click", () => setProto(!body.classList.contains("proto-on")));
 
   $(".year").textContent = new Date().getFullYear();
   window.addEventListener("load", () => ScrollTrigger.refresh());
