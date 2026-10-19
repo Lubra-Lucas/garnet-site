@@ -451,6 +451,47 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
 
 /* ---------- cases ---------- */
 .cases { z-index: 2; background: var(--bg); overflow: hidden; }
+.vitrine__filters { margin-bottom: 34px; }
+.chips button small { font-size: .78em; opacity: .55; margin-left: 4px; }
+.vitrine { display: grid; gap: 18px; overflow: hidden; padding-block: 6px 10px; }
+.vrow { overflow: hidden; }
+.vrow__track { display: flex; gap: 18px; width: max-content; will-change: transform; }
+.vcard { flex: 0 0 auto; width: clamp(200px, 19vw, 280px); padding: 0; text-align: left; border-radius: 20px; position: relative; transition: transform .5s var(--ease); }
+.vcard__img { display: block; aspect-ratio: 4 / 5; border-radius: 20px; overflow: hidden; background: var(--bg-2); box-shadow: 0 10px 30px rgba(60, 40, 20, .06); transition: box-shadow .5s var(--ease); }
+.vcard__img img { width: 100%; height: 100%; object-fit: cover; transition: transform 1s var(--ease); }
+.vcard__meta { position: absolute; left: 12px; right: 12px; bottom: 12px; display: grid; gap: 1px; padding: 10px 14px; border-radius: 14px; background: rgba(255, 255, 255, .82); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); opacity: 0; transform: translateY(8px); transition: opacity .4s, transform .5s var(--ease); }
+.vcard__meta b { font-size: 13px; font-weight: 500; line-height: 1.3; }
+.vcard__meta em { font-style: normal; font-size: 10px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); }
+.vcard:hover, .vcard:focus-visible { transform: translateY(-6px); }
+.vcard:hover .vcard__img, .vcard:focus-visible .vcard__img { box-shadow: 0 24px 50px rgba(60, 40, 20, .14); }
+.vcard:hover .vcard__img img { transform: scale(1.05); }
+.vcard:hover .vcard__meta, .vcard:focus-visible .vcard__meta { opacity: 1; transform: none; }
+.vcard:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+.vitrine__hint { margin: 26px 0 60px; font-size: 13px; color: var(--muted); }
+.vitrine__count { color: var(--ink); font-weight: 500; }
+.brands li { cursor: pointer; }
+.brands li.on span { color: var(--gold); }
+.brands li:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+.lightbox { position: fixed; inset: 0; z-index: 80; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; padding: 24px; background: rgba(18, 16, 14, .9); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.lightbox figure { margin: 0; display: grid; justify-items: center; gap: 14px; min-width: 0; }
+.lightbox img { max-height: 80vh; max-width: 100%; width: auto; border-radius: 16px; box-shadow: 0 40px 80px rgba(0, 0, 0, .5); }
+.lightbox figcaption { text-align: center; color: var(--on-dark); }
+.lightbox figcaption b { display: block; font-weight: 400; font-size: 18px; }
+.lightbox figcaption span { font-size: 11px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--gold-2); }
+.lightbox__nav, .lightbox__close { width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, .2); color: var(--on-dark); font-size: 26px; line-height: 1; display: grid; place-items: center; transition: background-color .3s; }
+.lightbox__nav:hover, .lightbox__close:hover { background: rgba(255, 255, 255, .12); }
+.lightbox__close { position: absolute; top: 18px; right: 18px; }
+.lb-open { overflow: hidden; }
+@media (max-width: 760px) {
+  .lightbox { grid-template-columns: 1fr; padding: 70px 12px 24px; }
+  .lightbox__nav { display: none; }
+  .vitrine__filters { flex-wrap: nowrap; overflow-x: auto; margin-inline: calc(var(--pad) * -1); padding: 2px var(--pad) 8px; scrollbar-width: none; }
+  .vitrine__filters::-webkit-scrollbar { display: none; }
+  .vitrine__filters button { flex: none; }
+  .vcard { width: 46vw; }
+  .vcard__meta { opacity: 1; transform: none; left: 8px; right: 8px; bottom: 8px; padding: 8px 10px; }
+  .vcard__meta b { font-size: 12px; }
+}
 .brands { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--line); }
 .brands li { display: grid; grid-template-columns: 1.1fr 1.6fr auto; align-items: baseline; gap: 20px; padding: 30px 6px; border-bottom: 1px solid var(--line); position: relative; transition: padding .5s var(--ease), color .4s; }
 .brands li::before { content: ""; position: absolute; inset: 0; background: var(--bg-2); transform: scaleY(0); transform-origin: bottom; transition: transform .5s var(--ease); z-index: -1; }
@@ -459,16 +500,6 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
 .brands span { font-size: clamp(26px, 3.4vw, 50px); font-weight: 300; letter-spacing: -.025em; }
 .brands em { font-style: normal; color: var(--muted); font-size: 14px; }
 .brands i { font-style: normal; font-size: 11px; font-weight: 600; letter-spacing: .2em; color: var(--gold); }
-.hoverimg { position: fixed; top: 0; left: 0; z-index: 40; width: 260px; aspect-ratio: 4 / 5; border-radius: 18px; overflow: hidden; pointer-events: none; opacity: 0; transform: translate(-50%, -50%) scale(.6); box-shadow: 0 30px 60px rgba(40, 25, 10, .25); }
-.hoverimg img { width: 100%; height: 100%; object-fit: cover; }
-.gallery { margin-top: 70px; overflow: hidden; cursor: grab; user-select: none; touch-action: pan-y; }
-.gallery:active { cursor: grabbing; }
-.gallery__track { display: flex; gap: 18px; width: max-content; padding-inline: var(--pad); perspective: 1200px; }
-.gcard { width: clamp(220px, 22vw, 320px); flex: 0 0 auto; padding: 10px; border-radius: 22px; }
-.gcard img { border-radius: 14px; aspect-ratio: 4 / 5; object-fit: cover; width: 100%; pointer-events: none; transform: translateZ(26px); }
-.gcard figcaption { padding: 14px 8px 6px; display: flex; justify-content: space-between; gap: 10px; font-size: 13px; transform: translateZ(18px); }
-.gcard figcaption b { font-weight: 500; }
-.gcard figcaption span { color: var(--muted); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
 
 /* ---------- depoimentos ---------- */
 .quotes { z-index: 2; background: linear-gradient(var(--bg), var(--bg-2)); }

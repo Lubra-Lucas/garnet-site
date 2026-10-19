@@ -644,102 +644,131 @@
     render();
   })();
 
-  /* ---------- cases: imagem que segue o cursor + galeria arrastável ---------- */
-  (function cases() {
-    const data = [
-      ["karen-blush", "Paleta de Blush", "Karen Bachini"], ["johnjohn-gold", "Sombra Gold", "John John"],
-      ["bocarosa-omg", "#OMG", "Boca Rosa"], ["fran-your-browns", "Your Browns", "Fran"],
-      ["karen-sombras", "Paleta de Sombras", "Karen Bachini"], ["johnjohn-purple", "Sombra Purple", "John John"],
-      ["bocarosa-bembasiquinha", "#BemBasiquinha", "Boca Rosa"], ["fran-beach-face", "Beach Face", "Fran"],
-      ["karen-12-cores", "Paleta 12 Cores", "Karen Bachini"], ["johnjohn-red", "Sombra Red", "John John"],
-      ["bocarosa-copacabana", "#Copacabana 2", "Boca Rosa"], ["fran-gritani", "Gritani", "Fran"],
-    ];
-    const src = (k) => `assets/img/cases/${k}.webp`;
-    const track = $(".gallery__track");
-    track.innerHTML = data.map(([k, t, b]) => `<figure class="gcard glass" data-tilt data-tilt-max="7"><img src="${src(k)}" alt="${t} — ${b}" loading="lazy" draggable="false" /><figcaption><b>${t}</b><span>${b}</span></figcaption></figure>`).join("");
+  /* ---------- cases: vitrine infinita + índice de marcas + foto completa ---------- */
+  (function vitrine() {
+    const data = window.GARNET_VITRINE;
+    if (!data) return;
+    const brandOf = Object.fromEntries(data.brands.map((b) => [b.id, b]));
+    const tile = (s) => `assets/img/vitrine/${s}.webp`;
+    const full = (s) => `assets/img/vitrine/full/${s}.webp`;
+    let current = "all";
+    let list = [];
 
-    // tilt nos cards recém-criados
-    if (finePointer && !reduced) {
-      $$(".gcard").forEach((el) => {
-        el.addEventListener("pointermove", (e) => {
-          const r = el.getBoundingClientRect();
-          const nx = (e.clientX - r.left) / r.width, ny = (e.clientY - r.top) / r.height;
-          el.style.setProperty("--mx", nx * 100 + "%"); el.style.setProperty("--my", ny * 100 + "%");
-          el.classList.add("is-tilting");
-          el.style.transform = `perspective(900px) rotateY(${(nx - 0.5) * 14}deg) rotateX(${(0.5 - ny) * 14}deg)`;
+    // "Todas": intercala as marcas para nenhuma dominar uma fileira
+    const mixed = () => {
+      const byBrand = data.brands.map((b) => data.items.filter((it) => it.brand === b.id));
+      const out = [];
+      for (let i = 0; out.length < data.items.length; i++) byBrand.forEach((arr) => arr[i] && out.push(arr[i]));
+      return out;
+    };
+    const itemsFor = (f) => (f === "all" ? mixed() : data.items.filter((it) => it.brand === f));
+
+    // filtros e índice de marcas
+    const filters = $("[data-vfilter]");
+    const count = (id) => data.items.filter((it) => it.brand === id).length;
+    filters.innerHTML = `<button type="button" data-v="all" class="on">Todas <small>${data.items.length}</small></button>` +
+      data.brands.map((b) => `<button type="button" data-v="${b.id}">${b.short} <small>${count(b.id)}</small></button>`).join("");
+    $("[data-brands]").innerHTML = data.brands.filter((b) => b.id !== "garnet").map((b) => {
+      const names = [...new Set(data.items.filter((it) => it.brand === b.id).map((it) => it.name))].slice(0, 4).join(" · ");
+      return `<li data-brand="${b.id}" tabindex="0" role="button"><span>${b.label}</span><em>${names}</em><i>${String(count(b.id)).padStart(2, "0")}</i></li>`;
+    }).join("");
+
+    // fileiras: cada uma recebe metade dos produtos, repetidos até cobrir duas larguras de tela
+    const rows = $$(".vrow").map((el, r) => ({ el, track: $(".vrow__track", el), dir: r % 2 ? 1 : -1, x: 0, speed: 1, target: 1, half: 0 }));
+    const card = (it, i) => `<button type="button" class="vcard" data-i="${i}"><span class="vcard__img"><img src="${tile(it.slug)}" alt="${it.name} — ${brandOf[it.brand].label}" loading="lazy" width="720" height="900" /></span><span class="vcard__meta"><b>${it.name}</b><em>${brandOf[it.brand].label}</em></span></button>`;
+    function build() {
+      list = itemsFor(current);
+      const groups = rows.map((_, r) => list.map((it, i) => [it, i]).filter((_, k) => list.length < 6 || k % rows.length === r));
+      rows.forEach((row, r) => {
+        let g = groups[r].length ? groups[r] : groups[0];
+        let html = g.map(([it, i]) => card(it, i)).join("");
+        let reps = 1;
+        const cardW = Math.min(280, Math.max(200, window.innerWidth * 0.19)) + 18;
+        while (g.length * reps * cardW < window.innerWidth * 1.6) reps++;
+        const unit = html.repeat(reps);
+        row.track.innerHTML = unit + unit; // duas cópias idênticas: o laço volta sem emenda
+        row.x = row.dir > 0 ? -row.track.scrollWidth / 2 : 0;
+      });
+      requestAnimationFrame(() => rows.forEach((row) => { row.half = row.track.scrollWidth / 2; if (row.dir > 0) row.x = -row.half; }));
+      $(".vitrine__count").textContent = `${list.length} ${list.length === 1 ? "produto" : "produtos"}${current === "all" ? "" : " · " + brandOf[current].label}`;
+    }
+    const setFilter = (f) => {
+      current = f;
+      $$("button", filters).forEach((b) => b.classList.toggle("on", b.dataset.v === f));
+      $$("[data-brands] li").forEach((li) => li.classList.toggle("on", li.dataset.brand === f));
+      if (reduced) return build();
+      gsap.to(".vitrine", { opacity: 0, duration: 0.25, onComplete: () => { build(); gsap.to(".vitrine", { opacity: 1, duration: 0.4 }); } });
+    };
+    filters.addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) setFilter(b.dataset.v); });
+    $("[data-brands]").addEventListener("click", (e) => {
+      const li = e.target.closest("li"); if (!li) return;
+      setFilter(current === li.dataset.brand ? "all" : li.dataset.brand);
+      scrollTo($(".cases .vitrine__filters"));
+    });
+    $("[data-brands]").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.target.click(); } });
+    build();
+    let rw = window.innerWidth;
+    window.addEventListener("resize", () => { if (Math.abs(window.innerWidth - rw) > 40) { rw = window.innerWidth; build(); } });
+
+    // movimento contínuo; desacelera com o mouse em cima e acelera com o scroll
+    if (!reduced) {
+      rows.forEach((row) => {
+        row.el.addEventListener("pointerenter", () => { row.target = 0.12; });
+        row.el.addEventListener("pointerleave", () => { row.target = 1; });
+      });
+      let visible = false;
+      ScrollTrigger.create({ trigger: ".vitrine", start: "top bottom", end: "bottom top", onToggle: (s) => (visible = s.isActive) });
+      gsap.ticker.add(() => {
+        if (!visible) return;
+        const boost = lenis ? Math.min(6, Math.abs(lenis.velocity) * 0.15) : 0;
+        rows.forEach((row) => {
+          if (!row.half) return;
+          row.speed += (row.target - row.speed) * 0.08;
+          row.x += row.dir * (0.55 * row.speed + boost);
+          if (row.x <= -row.half) row.x += row.half;
+          if (row.x > 0) row.x -= row.half;
+          row.track.style.transform = `translate3d(${row.x}px,0,0)`;
         });
-        el.addEventListener("pointerleave", () => { el.classList.remove("is-tilting"); el.style.transform = ""; });
       });
     }
 
-    // arrastar com inércia + deriva lenta
-    const gallery = $(".gallery");
-    let x = 0, v = 0, dragging = false, startX = 0, startPos = 0, lastX = 0, moved = 0;
-    const bounds = () => -(track.scrollWidth - gallery.clientWidth);
-    gallery.addEventListener("pointerdown", (e) => {
-      if (e.button !== 0) return; // só o botão principal arrasta
-      dragging = true; moved = 0; startX = lastX = e.clientX; startPos = x;
-      gallery.setPointerCapture(e.pointerId);
-    });
-    const end = () => { dragging = false; };
-    gallery.addEventListener("pointermove", (e) => {
-      if (!dragging) return;
-      // o navegador às vezes perde o "soltar" do mouse; sem botão pressionado, o arraste termina
-      if (e.pointerType === "mouse" && e.buttons === 0) return end();
-      v = e.clientX - lastX; lastX = e.clientX; moved += Math.abs(v);
-      x = startPos + (e.clientX - startX);
-    });
-    ["pointerup", "pointercancel", "lostpointercapture"].forEach((t) => gallery.addEventListener(t, end));
-    window.addEventListener("blur", end);
-    gallery.addEventListener("dragstart", (e) => e.preventDefault());
-    let dir = -1; // deriva lenta que inverte nas pontas
-    gsap.ticker.add(() => {
-      if (!dragging) {
-        const min = bounds();
-        x += v; v *= 0.94;
-        if (Math.abs(v) < 0.1 && !reduced) x += dir * 0.35;
-        if (x > 0) { x += (0 - x) * 0.15; v = 0; dir = -1; }
-        if (x < min) { x += (min - x) * 0.15; v = 0; dir = 1; }
-      }
-      track.style.transform = `translate3d(${x}px,0,0)`;
-    });
-    // evita abrir/selecionar ao soltar depois de arrastar
-    gallery.addEventListener("click", (e) => { if (moved > 6) e.preventDefault(); }, true);
-
-    // imagem flutuante nos nomes das marcas
-    if (!finePointer || reduced) return;
-    const box = $(".hoverimg"), img = $("img", box);
-    const xTo = gsap.quickTo(box, "x", { duration: 0.6, ease: "power3" });
-    const yTo = gsap.quickTo(box, "y", { duration: 0.6, ease: "power3" });
-    // a imagem aparece só enquanto o ponteiro está de fato sobre um nome de marca.
-    // A checagem usa elementFromPoint também no scroll: rolando com a roda o mouse
-    // "sai" do nome sem disparar mouseleave, e a imagem ficava grudada no cursor.
-    let timer = null, active = null, px = -1, py = -1;
-    const show = (li) => {
-      const imgs = li.dataset.imgs.split(",");
-      let k = 0;
-      img.src = src(imgs[0]);
-      gsap.to(box, { opacity: 1, scale: 1, rotate: gsap.utils.random(-6, 6), duration: 0.5, ease: "expo.out", overwrite: "auto" });
-      clearInterval(timer);
-      timer = setInterval(() => { k = (k + 1) % imgs.length; img.src = src(imgs[k]); }, 750);
+    // foto completa (lightbox) com navegação entre os produtos do filtro atual
+    const lb = $(".lightbox"), lbImg = $("img", lb);
+    let at = 0;
+    const show = (i) => {
+      at = (i + list.length) % list.length;
+      const it = list[at];
+      lbImg.src = full(it.slug);
+      lbImg.alt = `${it.name} — ${brandOf[it.brand].label}`;
+      $("figcaption b", lb).textContent = it.name;
+      $("figcaption span", lb).textContent = brandOf[it.brand].label;
     };
-    const hide = () => {
-      clearInterval(timer);
-      gsap.to(box, { opacity: 0, scale: 0.6, duration: 0.35, ease: "power3.in", overwrite: "auto" });
+    const open = (i) => {
+      show(i); lb.hidden = false; document.body.classList.add("lb-open");
+      if (lenis) lenis.stop();
+      if (!reduced) gsap.fromTo(lb, { opacity: 0 }, { opacity: 1, duration: 0.3 });
+      $(".lightbox__close", lb).focus();
     };
-    const check = () => {
-      const el = px < 0 ? null : document.elementFromPoint(px, py);
-      const li = el ? el.closest(".brands li[data-imgs]") : null; // marcas sem foto ainda não abrem imagem
-      if (li === active) return;
-      active = li;
-      if (li) show(li); else hide();
-    };
-    $$(".brands li[data-imgs]").forEach((li) => { li.dataset.cursor = "ver"; });
-    window.addEventListener("pointermove", (e) => { px = e.clientX; py = e.clientY; xTo(px); yTo(py); check(); }, { passive: true });
-    window.addEventListener("scroll", check, { passive: true });
-    document.addEventListener("pointerleave", () => { px = -1; check(); });
-    window.addEventListener("blur", () => { px = -1; check(); });
-    gallery.dataset.cursor = "arraste";
+    const close = () => { lb.hidden = true; document.body.classList.remove("lb-open"); if (lenis) lenis.start(); };
+    $(".vitrine").addEventListener("click", (e) => { const c = e.target.closest(".vcard"); if (c) open(Number(c.dataset.i)); });
+    $(".lightbox__close", lb).addEventListener("click", close);
+    $(".lightbox__prev", lb).addEventListener("click", () => show(at - 1));
+    $(".lightbox__next", lb).addEventListener("click", () => show(at + 1));
+    lb.addEventListener("click", (e) => { if (e.target === lb) close(); });
+    document.addEventListener("keydown", (e) => {
+      if (lb.hidden) return;
+      if (e.key === "Escape") close();
+      if (e.key === "ArrowLeft") show(at - 1);
+      if (e.key === "ArrowRight") show(at + 1);
+    });
+    let tx = null;
+    lb.addEventListener("touchstart", (e) => { tx = e.touches[0].clientX; }, { passive: true });
+    lb.addEventListener("touchend", (e) => {
+      if (tx === null) return;
+      const dx = e.changedTouches[0].clientX - tx; tx = null;
+      if (Math.abs(dx) > 50) show(at + (dx < 0 ? 1 : -1));
+    });
+    $(".vitrine").dataset.cursor = "ver";
   })();
 
   /* ---------- FAQ com abertura suave ---------- */

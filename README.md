@@ -26,7 +26,8 @@ assets/css/style.css    estilos (tokens no topo, depois uma seção por bloco do
 assets/js/main.js       todas as interações, separadas por blocos comentados
 assets/vendor/          GSAP 3.13, ScrollTrigger e Lenis 1.3 (cópias locais)
 assets/seq/             150 frames WebP do estojo (sequência do scroll)
-assets/img/cases/       fotos reais dos 12 cases
+assets/img/vitrine/     quadros padronizados da vitrine (720×900) e full/ com as fotos originais
+assets/js/vitrine-data.js  lista de produtos da vitrine (marca e nome)
 assets/img/site/        logo, favicon e fotos de produto
 tools/render-sequence/  gerador dos frames do estojo (Three.js + Chromium)
 docs/                   referências e lista de dados simulados
@@ -44,6 +45,7 @@ _headers                cache para o Cloudflare Pages
 | Cards de vidro que inclinam com o mouse e brilham onde o cursor passa | `perspective` + `rotateX/Y` + variáveis CSS `--mx/--my` (tabela de highscore do Tibidle) | "tilt 3D" |
 | Faixa de mídia que acelera com o scroll | Marquee ligado à velocidade do Lenis | "marquee" |
 | Texto que acende palavra por palavra | ScrollTrigger com `scrub` | "manifesto" |
+| Vitrine infinita de produtos | Duas fileiras em laço contínuo, filtro por marca, foto original em tela cheia | "cases: vitrine infinita" |
 | Configurador do compacto | SVG gerado em JS, mensagem pronta para o WhatsApp | "configurador" |
 | Briefing em 4 passos | Formulário guiado, envio pelo WhatsApp | "briefing guiado" |
 | Cursor personalizado e botões magnéticos | GSAP `quickTo` | "cursor personalizado" |
@@ -65,3 +67,13 @@ Para regerar o estojo do protótipo: `cd tools/render-sequence && npm install &&
 O site é estático: no Cloudflare Pages, conecte este repositório com **build command vazio** e
 **output directory `/`**. Cada push na branch de produção publica automaticamente. Cada branch
 ganha um endereço de prévia. O domínio só deve ser apontado depois da aprovação do site.
+
+## Incluir produtos na vitrine
+
+As fotos originais ficam na branch `fotos` do repositório, em pastas por marca. Para cada produto novo:
+
+1. Recorte o produto (rembg com o modelo `birefnet-general`) e monte o quadro padronizado
+   720×900 (fundo de estúdio off-white, sombra e halo na cor do produto). Salve como
+   `assets/img/vitrine/<nome>.webp`.
+2. Salve a foto original reduzida (até 1200 px) em `assets/img/vitrine/full/<nome>.webp`.
+3. Acrescente uma linha em `assets/js/vitrine-data.js` com `slug`, `brand` e `name`.
