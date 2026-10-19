@@ -249,7 +249,8 @@
   /* ---------- poeira dourada (inspirado nas "brasas" do Tibidle) ---------- */
   (function dust() {
     const c = $(".dust");
-    if (reduced) { c.remove(); return; }
+    // poeira só em telas com mouse: no celular economiza processamento contínuo
+    if (reduced || !finePointer) { c.remove(); return; }
     const g = c.getContext("2d");
     let w = 0, h = 0, parts = [], running = true;
     const make = (anywhere) => ({
@@ -338,6 +339,12 @@
   const fmt = new Intl.NumberFormat("pt-BR");
   // números da indústria: cada card conta em sequência, com uma linha dourada que enche junto;
   // a animação recomeça sempre que a seção volta a aparecer na tela
+  // cards dos números: no celular viram com um toque; no teclado, com Enter ou Espaço
+  $$(".stats .stat").forEach((card) => {
+    card.addEventListener("click", () => { if (!finePointer) card.classList.toggle("is-flipped"); });
+    card.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); card.classList.toggle("is-flipped"); } });
+  });
+
   (function counters() {
     const cards = $$(".stats .stat");
     const items = cards.map((card) => {
@@ -345,7 +352,7 @@
       const bar = document.createElement("i");
       bar.className = "stat__bar";
       bar.setAttribute("aria-hidden", "true");
-      card.appendChild(bar);
+      $(".stat__front", card).appendChild(bar);
       if (!el.hasAttribute("data-count")) return { card, el, bar, seal: true };
       const end = Number(el.dataset.count), pre = el.dataset.prefix || "", suf = el.dataset.suffix || "";
       const plain = el.hasAttribute("data-plain");
@@ -680,7 +687,7 @@
 
     // fileiras: cada uma recebe metade dos produtos, repetidos até cobrir duas larguras de tela
     const rows = $$(".vrow").map((el, r) => ({ el, track: $(".vrow__track", el), dir: r % 2 ? 1 : -1, x: 0, speed: 1, target: 1, half: 0 }));
-    const card = (it, i) => `<button type="button" class="vcard" data-i="${i}"><span class="vcard__img"><img src="${tile(it.slug)}" alt="${it.name} — ${brandOf[it.brand].label}" loading="lazy" width="720" height="900" /></span><span class="vcard__meta"><b>${it.name}</b><em>${brandOf[it.brand].label}</em></span></button>`;
+    const card = (it, i) => `<button type="button" class="vcard" data-i="${i}"><span class="vcard__img"><img src="${tile(it.slug)}" alt="${it.name} — ${brandOf[it.brand].label}" loading="lazy" decoding="async" width="720" height="900" /></span><span class="vcard__meta"><b>${it.name}</b><em>${brandOf[it.brand].label}</em></span></button>`;
     function build() {
       list = itemsFor(current);
       const groups = rows.map((_, r) => list.map((it, i) => [it, i]).filter((_, k) => list.length < 6 || k % rows.length === r));
@@ -694,7 +701,11 @@
         row.track.innerHTML = unit + unit; // duas cópias idênticas: o laço volta sem emenda
         row.x = row.dir > 0 ? -row.track.scrollWidth / 2 : 0;
       });
-      requestAnimationFrame(() => rows.forEach((row) => { row.half = row.track.scrollWidth / 2; if (row.dir > 0) row.x = -row.half; }));
+      requestAnimationFrame(() => rows.forEach((row) => {
+        row.half = row.track.scrollWidth / 2;
+        if (row.dir > 0) row.x = -row.half;
+        row.track.style.setProperty("--dur", (row.half / 38).toFixed(1) + "s"); // ~38 px/s no modo CSS
+      }));
       $(".vitrine__count").textContent = `${list.length} ${list.length === 1 ? "produto" : "produtos"}${current === "all" ? "" : " · " + brandOf[current].label}`;
     }
     const setFilter = (f) => {
@@ -715,8 +726,10 @@
     let rw = window.innerWidth;
     window.addEventListener("resize", () => { if (Math.abs(window.innerWidth - rw) > 40) { rw = window.innerWidth; build(); } });
 
-    // movimento contínuo; desacelera com o mouse em cima e acelera com o scroll
-    if (!reduced) {
+    // movimento contínuo. Com mouse: JavaScript (desacelera no hover, acelera com o scroll).
+    // Em telas de toque: animação CSS, que roda fora do JavaScript e não engasga no celular.
+    if (!reduced && !finePointer) $(".vitrine").classList.add("is-css");
+    if (!reduced && finePointer) {
       rows.forEach((row) => {
         row.el.addEventListener("pointerenter", () => { row.target = 0.12; });
         row.el.addEventListener("pointerleave", () => { row.target = 1; });

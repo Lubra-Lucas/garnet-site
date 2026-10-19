@@ -334,13 +334,26 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* ---------- números ---------- */
 .numbers { z-index: 2; background: linear-gradient(var(--bg), var(--bg-2)); }
-.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; perspective: 1200px; }
-.stat { padding: 34px 28px 30px; min-height: 190px; display: flex; flex-direction: column; justify-content: flex-end; }
-.stat b { display: inline-block; white-space: nowrap; font-weight: 300; font-size: clamp(34px, 3.6vw, 56px); letter-spacing: -.03em; line-height: 1; font-variant-numeric: tabular-nums; transform: translateZ(30px); transform-origin: left center; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+/* cards que viram: frente com o número, verso com um texto curto (CSS 3D, leve) */
+.stat { position: relative; min-height: 190px; perspective: 1000px; border-radius: var(--r); outline: none; cursor: pointer; }
+.stat__in { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .8s var(--ease); }
+.stat.is-flipped .stat__in { transform: rotateY(180deg); }
+@media (hover: hover) and (pointer: fine) { .stat:hover .stat__in { transform: rotateY(180deg); } }
+.stat:focus-visible .stat__in { transform: rotateY(180deg); }
+.stat:focus-visible { box-shadow: 0 0 0 2px var(--gold); }
+.stat__face { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; padding: 30px 26px 26px; border-radius: var(--r); -webkit-backface-visibility: hidden; backface-visibility: hidden; border: 1px solid rgba(255, 255, 255, .9); box-shadow: 0 18px 50px rgba(60, 40, 20, .08), inset 0 1px 0 #fff; }
+.stat__front { background: linear-gradient(150deg, #fff, rgba(255, 255, 255, .55) 60%), var(--bg); }
+.stat__back { transform: rotateY(180deg); justify-content: center; gap: 10px; background: linear-gradient(150deg, var(--dark-2), var(--dark)); border-color: rgba(255, 255, 255, .08); color: var(--on-dark); }
+.stat__back em { font-style: normal; font-size: 10px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--gold-2); }
+.stat__back p { margin: 0; font-size: 14px; line-height: 1.5; color: var(--on-dark-muted); }
+.stat__turn { position: absolute; top: 16px; right: 18px; font-style: normal; font-size: 15px; color: var(--gold); opacity: .55; transition: opacity .3s, transform .6s var(--ease); }
+.stat:hover .stat__turn { opacity: 1; transform: rotate(180deg); }
+.stat b { display: inline-block; white-space: nowrap; font-weight: 300; font-size: clamp(34px, 3.6vw, 56px); letter-spacing: -.03em; line-height: 1; font-variant-numeric: tabular-nums; transform-origin: left center; }
 .stat__bar { display: block; height: 2px; margin-top: 16px; border-radius: 2px; background: linear-gradient(90deg, var(--gold), var(--gold-2)); transform-origin: left; order: 2; }
 .stat b { order: 1; } .stat span { order: 3; }
 .stat b small { font-size: .42em; font-weight: 400; letter-spacing: .02em; margin-left: .18em; color: var(--muted); }
-.stat span { margin-top: 12px; font-size: 11px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); transform: translateZ(18px); }
+.stat span { margin-top: 12px; font-size: 11px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
 
 /* ---------- manifesto ---------- */
 .manifesto { padding-block: clamp(120px, 18vw, 240px); position: relative; z-index: 2; }
@@ -460,6 +473,10 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
 .vitrine { display: grid; gap: 18px; overflow: hidden; padding-block: 6px 10px; }
 .vrow { overflow: hidden; }
 .vrow__track { display: flex; gap: 18px; width: max-content; will-change: transform; }
+/* celular: movimento por animação CSS (roda fora do JavaScript, sem engasgos) */
+.vitrine.is-css .vrow__track { animation: vscroll var(--dur, 60s) linear infinite; }
+.vitrine.is-css .vrow--rev .vrow__track { animation-direction: reverse; }
+@keyframes vscroll { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-50%, 0, 0); } }
 .vcard { flex: 0 0 auto; width: clamp(200px, 19vw, 280px); padding: 0; text-align: left; border-radius: 20px; position: relative; transition: transform .5s var(--ease); }
 .vcard__img { display: block; aspect-ratio: 4 / 5; border-radius: 20px; overflow: hidden; background: var(--bg-2); box-shadow: 0 10px 30px rgba(60, 40, 20, .06); transition: box-shadow .5s var(--ease); }
 .vcard__img img { width: 100%; height: 100%; object-fit: cover; transition: transform 1s var(--ease); }
@@ -493,7 +510,8 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
   .vitrine__filters::-webkit-scrollbar { display: none; }
   .vitrine__filters button { flex: none; }
   .vcard { width: 46vw; }
-  .vcard__meta { opacity: 1; transform: none; left: 8px; right: 8px; bottom: 8px; padding: 8px 10px; }
+  .vcard__meta { opacity: 1; transform: none; left: 8px; right: 8px; bottom: 8px; padding: 8px 10px; background: rgba(255, 255, 255, .93); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .vcard__img { box-shadow: none; }
   .vcard__meta b { font-size: 12px; }
 }
 .brands { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--line); }
@@ -578,6 +596,8 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
   .process__counter { display: none; }
 }
 @media (max-width: 760px) {
+  /* celular: sem camadas animadas de tela inteira (economia de bateria e rolagem mais fluida) */
+  .grain, .dust { display: none; }
   body { font-size: 15px; }
   .header { padding-left: 20px; }
   .story { height: 460vh; }
@@ -602,7 +622,10 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
   .layers li { padding: 8px 0 8px 16px; }
   .story__progress { display: none; }
   .stats { gap: 12px; }
-  .stat { padding: 24px 18px; min-height: 150px; }
+  .stat { min-height: 200px; }
+  .stat__face { padding: 20px 16px 18px; }
+  .stat__back p { font-size: 12.5px; line-height: 1.45; }
+  .stat__turn { top: 12px; right: 13px; }
   .models__grid { grid-template-columns: 1fr; }
   .model:nth-child(n) { grid-column: auto; min-height: 0; }
   .model h3 { padding-top: 30px; }
