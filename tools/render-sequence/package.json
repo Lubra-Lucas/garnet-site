@@ -1,0 +1,13 @@
+{
+  "name": "garnet-render-sequence",
+  "private": true,
+  "type": "module",
+  "description": "Renderiza a sequência de frames do estojo compacto (protótipo) usada no scroll da home.",
+  "scripts": {
+    "render": "node render.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "1.56.1",
+    "three": "0.180.0"
+  }
+}

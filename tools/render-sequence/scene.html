@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>Garnet · cena do estojo compacto</title>
+<style>html,body{margin:0;background:transparent}canvas{display:block}</style>
+<script type="importmap">
+{ "imports": {
+  "three": "./node_modules/three/build/three.module.js",
+  "three/addons/": "./node_modules/three/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<script type="module">
+// Cena 3D de um estojo de pó compacto Garnet. A linha do tempo vai de t=0 a t=1
+// e é "fatiada" em frames pelo render.mjs. Abra com ?t=0.5 para ver um instante.
+import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+
+const SIZE = Number(new URLSearchParams(location.search).get("size") || 1000);
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1);
+renderer.setSize(SIZE, SIZE);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+
+const key = new THREE.DirectionalLight(0xfff2e0, 2.2);
+key.position.set(3, 6, 4);
+key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048);
+key.shadow.camera.left = -3; key.shadow.camera.right = 3;
+key.shadow.camera.top = 3; key.shadow.camera.bottom = -3;
+key.shadow.radius = 8;
+scene.add(key);
+scene.add(new THREE.AmbientLight(0xffffff, 0.25));
+
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(12, 12), new THREE.ShadowMaterial({ opacity: 0.18 }));
+ground.rotation.x = -Math.PI / 2;
+ground.position.y = -0.62;
+ground.receiveShadow = true;
+scene.add(ground);
+
+// ---------- texturas desenhadas em canvas ----------
+function canvasTex(draw, size = 1024) {
+  const c = document.createElement("canvas");
+  c.width = c.height = size;
+  draw(c.getContext("2d"), size);
+  const t = new THREE.CanvasTexture(c);
+  t.anisotropy = 8;
+  return t;
+}
+
+// relevo do pó: medalhão com "G" prensado e raios finos
+const powderBump = canvasTex((g, s) => {
+  g.fillStyle = "#808080"; g.fillRect(0, 0, s, s);
+  g.translate(s / 2, s / 2);
+  for (let i = 0; i < 96; i++) {
+    g.rotate((Math.PI * 2) / 96);
+    g.fillStyle = i % 2 ? "#8c8c8c" : "#747474";
+    g.fillRect(150, -2, 330, 4);
+  }
+  g.beginPath(); g.arc(0, 0, 150, 0, Math.PI * 2); g.fillStyle = "#6a6a6a"; g.fill();
+  g.beginPath(); g.arc(0, 0, 138, 0, Math.PI * 2); g.fillStyle = "#9a9a9a"; g.fill();
+  g.fillStyle = "#5a5a5a";
+  g.font = "300 190px Georgia, serif";
+  g.textAlign = "center"; g.textBaseline = "middle";
+  g.fillText("G", 0, 12);
+});
+
+// tampa: "GARNET" gravado em volta
+const lidBump = canvasTex((g, s) => {
+  g.fillStyle = "#808080"; g.fillRect(0, 0, s, s);
+  g.translate(s / 2, s / 2);
+  g.strokeStyle = "#5c5c5c"; g.lineWidth = 6;
+  g.beginPath(); g.arc(0, 0, 440, 0, Math.PI * 2); g.stroke();
+  g.lineWidth = 2;
+  g.beginPath(); g.arc(0, 0, 420, 0, Math.PI * 2); g.stroke();
+  g.fillStyle = "#5c5c5c";
+  g.font = "300 120px Helvetica, Arial, sans-serif";
+  g.textAlign = "center"; g.textBaseline = "middle";
+  const word = "G A R N E T";
+  g.fillText(word, 0, 0);
+});
+
+// ---------- materiais ----------
+const gold = new THREE.MeshPhysicalMaterial({ color: 0xd4b07a, metalness: 1, roughness: 0.28, clearcoat: 0.6, clearcoatRoughness: 0.2 });
+const goldLid = gold.clone();
+goldLid.bumpMap = lidBump; goldLid.bumpScale = 1.4;
+const mirror = new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 1, roughness: 0.04 });
+const powder = new THREE.MeshStandardMaterial({ color: 0xc4876a, roughness: 0.95, metalness: 0, bumpMap: powderBump, bumpScale: 2.2 });
+const pan = new THREE.MeshPhysicalMaterial({ color: 0xbfc3c7, metalness: 1, roughness: 0.35 });
+
+const shadowed = (m) => { m.castShadow = true; m.receiveShadow = true; return m; };
+
+// ---------- geometria ----------
+const compact = new THREE.Group();
+scene.add(compact);
+
+const R = 1;
+const base = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(R, R * 0.97, 0.26, 128), gold));
+base.position.y = -0.13;
+const rim = shadowed(new THREE.Mesh(new THREE.TorusGeometry(R * 0.985, 0.022, 24, 128), gold));
+rim.rotation.x = Math.PI / 2;
+const baseGroup = new THREE.Group();
+baseGroup.add(base, rim);
+compact.add(baseGroup);
+
+const panGroup = new THREE.Group();
+const panMesh = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.84, 0.84, 0.07, 128), pan));
+const cake = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 0.072, 128), [powder, powder, powder]));
+cake.position.y = 0.006;
+// a face superior do cilindro recebe o relevo; ajusta o UV para centralizar
+panGroup.add(panMesh, cake);
+panGroup.position.y = -0.02;
+compact.add(panGroup);
+
+// tampa articulada na borda de trás
+const hinge = new THREE.Group();
+hinge.position.set(0, 0.0, -R);
+compact.add(hinge);
+const lid = new THREE.Group();
+lid.position.set(0, 0, R);
+hinge.add(lid);
+const lidShell = shadowed(new THREE.Mesh(new THREE.CylinderGeometry(R, R, 0.14, 128), [gold, goldLid, gold]));
+lidShell.position.y = 0.07;
+const lidMirror = new THREE.Mesh(new THREE.CircleGeometry(R * 0.86, 96), mirror);
+lidMirror.rotation.x = Math.PI / 2;
+lidMirror.position.y = -0.001;
+lid.add(lidShell, lidMirror);
+
+const hingeBar = shadowed(new THREE.Mesh(new RoundedBoxGeometry(0.42, 0.08, 0.08, 4, 0.03), gold));
+hingeBar.position.set(0, 0.0, -R - 0.02);
+compact.add(hingeBar);
+
+// ---------- linha do tempo ----------
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const lerp = (a, b, x) => a + (b - a) * x;
+
+// cores das "paradas" de categoria (nude, rosa, bronze, iluminador dourado, vinho)
+const palette = [0xc4876a, 0xd75c78, 0x8a4526, 0xd2a65e, 0x651c2e].map((c) => new THREE.Color(c));
+
+function setTime(t) {
+  // 0.00–0.18 fechado, girando · 0.18–0.36 abre · 0.36–0.66 troca de cores
+  // 0.66–0.86 vista explodida · 0.86–1.00 remonta e fecha de frente
+  // a dobradiça termina sempre atrás (rotação múltipla de 2π) para a tampa não cobrir o pó
+  const spin = ease(seg(t, 0, 0.36)) * (Math.PI * 2 + 0.6) + ease(seg(t, 0.86, 1)) * Math.PI * 2;
+  compact.rotation.y = -0.6 + spin + 0.25 * Math.sin(seg(t, 0.36, 0.86) * Math.PI);
+  compact.rotation.x = lerp(0.0, 0.18, ease(seg(t, 0.18, 0.36))) - 0.18 * ease(seg(t, 0.86, 1));
+
+  const open = ease(seg(t, 0.18, 0.36)) * (1 - ease(seg(t, 0.86, 0.97)));
+  hinge.rotation.x = -open * THREE.MathUtils.degToRad(108);
+
+  const k = seg(t, 0.36, 0.66) * (palette.length - 1);
+  const i = Math.min(palette.length - 2, Math.floor(k));
+  powder.color.copy(palette[i]).lerp(palette[i + 1], ease(k - i));
+  if (t < 0.36) powder.color.copy(palette[0]);
+  if (t > 0.66) powder.color.copy(palette[palette.length - 1]).lerp(palette[0], ease(seg(t, 0.86, 1)));
+
+  const ex = ease(seg(t, 0.66, 0.78)) * (1 - ease(seg(t, 0.84, 0.94)));
+  panGroup.position.y = -0.02 + ex * 0.55;
+  cake.position.y = 0.006 + ex * 0.35;
+  hinge.position.y = ex * 0.9;
+  baseGroup.position.y = -ex * 0.25;
+  hingeBar.position.y = ex * 0.45;
+
+  // câmera: começa de 3/4 alto, desce para frontal no final
+  const camT = ease(seg(t, 0.86, 1));
+  const camY = lerp(lerp(2.6, 3.9, ease(seg(t, 0.18, 0.4))), 2.2, camT);
+  const camZ = lerp(lerp(5.6, 6.3, ease(seg(t, 0.18, 0.4))), 5.4, camT);
+  camera.position.set(0, camY + ex * 0.5, camZ + ex * 1.4);
+  camera.lookAt(0, 0.45 * open + ex * 0.35, -0.25 * open);
+
+  renderer.render(scene, camera);
+}
+
+window.setTime = setTime;
+window.snapshot = (t) => { setTime(t); return renderer.domElement.toDataURL("image/png"); };
+setTime(Number(new URLSearchParams(location.search).get("t") || 0));
+window.ready = true;
+</script>
+</body>
+</html>
