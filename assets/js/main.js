@@ -336,15 +336,45 @@
     gsap.from(".footer__word", { yPercent: 40, opacity: 0, duration: 1.6, ease: "expo.out", scrollTrigger: { trigger: ".footer", start: "top 70%", once: true } });
   }
   const fmt = new Intl.NumberFormat("pt-BR");
-  $$("[data-count]").forEach((el) => {
-    const end = Number(el.dataset.count), pre = el.dataset.prefix || "", suf = el.dataset.suffix || "";
-    const plain = el.hasAttribute("data-plain");
-    const render = (v) => { el.textContent = pre + (plain ? Math.round(v) : fmt.format(Math.round(v))) + suf; };
-    if (reduced) return render(end);
-    const o = { v: plain ? end - 60 : 0 };
-    render(o.v);
-    gsap.to(o, { v: end, duration: 2.2, ease: "power3.out", onUpdate: () => render(o.v), scrollTrigger: { trigger: el, start: "top 88%", once: true } });
-  });
+  // números da indústria: cada card conta em sequência, com uma linha dourada que enche junto;
+  // a animação recomeça sempre que a seção volta a aparecer na tela
+  (function counters() {
+    const cards = $$(".stats .stat");
+    const items = cards.map((card) => {
+      const el = $("b", card);
+      const bar = document.createElement("i");
+      bar.className = "stat__bar";
+      bar.setAttribute("aria-hidden", "true");
+      card.appendChild(bar);
+      if (!el.hasAttribute("data-count")) return { card, el, bar, seal: true };
+      const end = Number(el.dataset.count), pre = el.dataset.prefix || "", suf = el.dataset.suffix || "";
+      const plain = el.hasAttribute("data-plain");
+      const from = plain ? 1950 : 0; // o ano "viaja" de 1950 até 1992
+      const unit = suf ? `<small>${suf.trim()}</small>` : ""; // unidade menor, ao lado do número
+      const render = (v) => { el.innerHTML = pre + (plain ? Math.round(v) : fmt.format(Math.round(v))) + unit; };
+      return { card, el, bar, end, from, render, o: { v: from } };
+    });
+    const finish = () => items.forEach((it) => { if (it.render) it.render(it.end); gsap.set(it.bar, { scaleX: 1 }); });
+    if (reduced || !items.length) return finish();
+
+    let tl = null;
+    const play = () => {
+      if (tl) tl.kill();
+      tl = gsap.timeline();
+      items.forEach((it, i) => {
+        const at = i * 0.16;
+        tl.fromTo(it.bar, { scaleX: 0 }, { scaleX: 1, duration: 2.4, ease: "power2.out" }, at);
+        if (it.seal) {
+          tl.fromTo(it.el, { scale: 1.6, opacity: 0, rotate: -8 }, { scale: 1, opacity: 1, rotate: 0, duration: 0.9, ease: "back.out(2.2)" }, at + 1.2);
+        } else {
+          it.o.v = it.from; it.render(it.from);
+          tl.to(it.o, { v: it.end, duration: 2.4, ease: "power2.out", onUpdate: () => it.render(it.o.v) }, at);
+        }
+      });
+    };
+    items.forEach((it) => { if (it.render) it.render(it.from); gsap.set(it.bar, { scaleX: 0 }); });
+    ScrollTrigger.create({ trigger: ".stats", start: "top 68%", end: "bottom 20%", onEnter: play, onEnterBack: play });
+  })();
 
   /* ---------- manifesto palavra por palavra ---------- */
   (function manifesto() {
