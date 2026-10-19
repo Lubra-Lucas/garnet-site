@@ -261,36 +261,27 @@
         <div class="section__head reveal">
           <span class="eyebrow">Personalização</span>
           <h2 class="display">Monte o seu <em>compacto</em></h2>
-          <p class="lead">Uma prévia do que a sua marca pode lançar. Envie a configuração e nossa equipe transforma em amostra.</p>
+          <p class="lead">Escolha a embalagem, as cores e o desenho prensado na maquiagem. Envie a configuração e nossa equipe transforma em amostra.</p>
         </div>
         <div class="config__grid">
           <div class="config__stage" data-tilt data-tilt-max="6">
             <svg class="cfg" viewBox="0 0 400 400" role="img" aria-label="Prévia do produto configurado">
               <defs>
                 <radialGradient id="cfgShine" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></radialGradient>
+                <radialGradient id="cfgPanShade" cx="50%" cy="45%" r="62%"><stop offset=".62" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></radialGradient>
                 <linearGradient id="cfgCase" x1="0" y1="0" x2="1" y2="1"><stop offset="0" class="cfg-case-a"/><stop offset="1" class="cfg-case-b"/></linearGradient>
                 <pattern id="cfgSparkle" width="14" height="14" patternUnits="userSpaceOnUse"><circle cx="3" cy="4" r=".9" fill="#fff" opacity=".9"/><circle cx="10" cy="11" r=".6" fill="#fff" opacity=".7"/><circle cx="11" cy="3" r=".4" fill="#fff" opacity=".8"/></pattern>
-                <filter id="cfgEmboss"><feGaussianBlur in="SourceAlpha" stdDeviation="1.2" result="b"/><feSpecularLighting in="b" surfaceScale="3" specularConstant=".7" specularExponent="18" lighting-color="#fff" result="s"><feDistantLight azimuth="225" elevation="40"/></feSpecularLighting><feComposite in="s" in2="SourceAlpha" operator="in" result="sc"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="sc"/></feMerge></filter>
-                <clipPath id="cfgClip"><rect class="cfg-clip" x="70" y="70" width="260" height="260" rx="130"/></clipPath>
               </defs>
-              <rect class="cfg-shadow" x="56" y="70" width="300" height="300" rx="150" />
-              <rect class="cfg-case" x="50" y="50" width="300" height="300" rx="150" fill="url(#cfgCase)" />
-              <rect class="cfg-rim" x="62" y="62" width="276" height="276" rx="138" />
-              <g clip-path="url(#cfgClip)" class="cfg-pans"></g>
-              <rect class="cfg-gloss" x="50" y="50" width="300" height="300" rx="150" fill="url(#cfgShine)" />
+              <g class="cfg-body"></g>
             </svg>
             <div class="config__badge"><span class="cfg-sum"></span></div>
           </div>
 
           <form class="config__panel" onsubmit="return false">
-            <fieldset><legend>Formato</legend>
-              <div class="chips" data-opt="shape">
-                <button type="button" data-v="round" class="on">Redondo</button>
-                <button type="button" data-v="square">Quadrado</button>
-                <button type="button" data-v="quad">Paleta 4 cores</button>
-              </div>
+            <fieldset><legend>Embalagem</legend>
+              <div class="chips chips--icon" data-opt="format"></div>
             </fieldset>
-            <fieldset><legend>Cor do pigmento</legend>
+            <fieldset><legend>Cor base <small>(paletas geram os tons automaticamente)</small></legend>
               <div class="swatch-pick" data-opt="color">
                 <button type="button" data-v="#c4876a" style="--c:#c4876a" class="on" aria-label="Nude"></button>
                 <button type="button" data-v="#d75c78" style="--c:#d75c78" aria-label="Rosa"></button>
@@ -298,8 +289,22 @@
                 <button type="button" data-v="#8a4526" style="--c:#8a4526" aria-label="Bronze"></button>
                 <button type="button" data-v="#d2a65e" style="--c:#d2a65e" aria-label="Dourado"></button>
                 <button type="button" data-v="#651c2e" style="--c:#651c2e" aria-label="Vinho"></button>
+                <button type="button" data-v="#7b5ea7" style="--c:#7b5ea7" aria-label="Lavanda"></button>
                 <label class="swatch-custom" aria-label="Cor personalizada"><input type="color" value="#b06f8a" /></label>
               </div>
+            </fieldset>
+            <fieldset><legend>Desenho prensado</legend>
+              <div class="chips chips--icon chips--art" data-opt="art"></div>
+            </fieldset>
+            <fieldset class="cfg-relief-set"><legend>Relevo</legend>
+              <div class="chips" data-opt="relief">
+                <button type="button" data-v="high" class="on">Alto relevo</button>
+                <button type="button" data-v="low">Baixo relevo</button>
+              </div>
+              <p class="cfg-note" hidden>Pó solto não recebe relevo: o desenho fica para a tampa.</p>
+            </fieldset>
+            <fieldset class="cfg-text-set"><legend>Texto ou inicial do relevo</legend>
+              <input class="field" type="text" maxlength="14" value="SUA MARCA" data-opt="text" aria-label="Texto do relevo" />
             </fieldset>
             <fieldset><legend>Acabamento</legend>
               <div class="chips" data-opt="finish">
@@ -309,16 +314,15 @@
                 <button type="button" data-v="metal">Metálico</button>
               </div>
             </fieldset>
-            <fieldset><legend>Embalagem</legend>
+            <fieldset><legend>Cor da embalagem</legend>
               <div class="chips" data-opt="case">
                 <button type="button" data-v="gold" class="on">Dourada</button>
                 <button type="button" data-v="black">Preta</button>
                 <button type="button" data-v="rose">Rosé</button>
+                <button type="button" data-v="lilac">Lilás</button>
+                <button type="button" data-v="white">Branca</button>
                 <button type="button" data-v="clear">Acrílico</button>
               </div>
-            </fieldset>
-            <fieldset><legend>Relevo prensado</legend>
-              <input class="field" type="text" maxlength="14" value="SUA MARCA" data-opt="text" aria-label="Texto do relevo" />
             </fieldset>
             <a class="btn btn--dark magnetic cfg-send" target="_blank" rel="noopener">Quero esse produto</a>
           </form>

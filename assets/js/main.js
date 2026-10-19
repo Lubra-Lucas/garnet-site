@@ -437,91 +437,198 @@
   /* ---------- configurador ---------- */
   (function configurator() {
     const svg = $(".cfg");
-    const pansG = $(".cfg-pans", svg);
-    const state = { shape: "round", color: "#c4876a", finish: "matte", case: "gold", text: "SUA MARCA" };
-    const names = { "#c4876a": "Nude", "#d75c78": "Rosa", "#e9a07f": "Pêssego", "#8a4526": "Bronze", "#d2a65e": "Dourado", "#651c2e": "Vinho" };
-    const labels = {
-      shape: { round: "Redondo", square: "Quadrado", quad: "Paleta 4 cores" },
-      finish: { matte: "Matte", satin: "Acetinado", shimmer: "Cintilante", metal: "Metálico" },
-      case: { gold: "Embalagem dourada", black: "Embalagem preta", rose: "Embalagem rosé", clear: "Embalagem acrílica" },
-    };
-    const cases = { gold: ["#ecd4a0", "#a87e46"], black: ["#4a4541", "#0e0d0c"], rose: ["#f1cfc2", "#b98270"], clear: ["rgba(255,255,255,.75)", "rgba(205,210,222,.5)"] };
+    const body = $(".cfg-body", svg);
     const NS = "http://www.w3.org/2000/svg";
-    const el = (tag, attrs) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); return n; };
+    const state = { format: "round", color: "#c4876a", art: "floral", relief: "high", finish: "matte", case: "gold", text: "SUA MARCA" };
+
+    // embalagens inspiradas nas usadas nos cases (medidas no espaço 400×400, centro em 200,200)
+    const grid = (cols, rows, w, h, gx, gy, r) => {
+      const out = [];
+      for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++)
+        out.push({ t: "r", x: (i - (cols - 1) / 2) * gx, y: (j - (rows - 1) / 2) * gy, w, h, r });
+      return out;
+    };
+    const FORMATS = {
+      round: { label: "Compacto redondo", w: 300, h: 300, r: 150, pans: [{ t: "c", x: 0, y: 0, r: 120 }] },
+      single: { label: "Unitária quadrada", w: 262, h: 262, r: 30, pans: [{ t: "c", x: 0, y: 0, r: 94 }] },
+      trio: { label: "Trio redondo", w: 344, h: 156, r: 30, pans: [-102, 0, 102].map((x) => ({ t: "c", x, y: 0, r: 44 })) },
+      quad: { label: "Quarteto", w: 268, h: 268, r: 30, pans: grid(2, 2, 104, 104, 118, 118, 14) },
+      six: { label: "Sexteto em linha", w: 350, h: 156, r: 24, pans: grid(6, 1, 44, 108, 52, 0, 8) },
+      twelve: { label: "Paleta 12 cores", w: 330, h: 262, r: 24, pans: grid(4, 3, 66, 66, 76, 76, 10) },
+      jar: { label: "Pote pó solto", w: 300, h: 300, r: 150, jar: true, pans: [{ t: "c", x: 0, y: 0, r: 116 }] },
+    };
+
+    // desenhos no espaço -50..50; "currentColor" recebe a cor de cada camada do relevo
+    const initial = () => (state.text.trim()[0] || "G").toUpperCase();
+    const esc = (t) => t.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+    const ARTS = {
+      none: { label: "Liso", draw: () => "" },
+      logo: {
+        label: "Texto",
+        draw: () => {
+          const t = esc(state.text.trim().toUpperCase() || "SUA MARCA");
+          const fs = Math.min(15, 86 / (t.length * 0.72));
+          return `<text x="0" y="1" fill="currentColor" font-family="Montserrat, sans-serif" font-weight="600" font-size="${fs.toFixed(1)}" letter-spacing="${(fs * 0.18).toFixed(1)}" text-anchor="middle" dominant-baseline="middle">${t}</text><path d="M-30 ${fs + 3}h60M-30 ${-fs - 3}h60" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>`;
+        },
+      },
+      mono: {
+        label: "Monograma",
+        draw: () => `<circle r="38" fill="none" stroke="currentColor" stroke-width="3"/><circle r="31" fill="none" stroke="currentColor" stroke-width="1.2"/><text y="3" fill="currentColor" font-family="Cormorant Garamond, Georgia, serif" font-style="italic" font-size="50" text-anchor="middle" dominant-baseline="middle">${esc(initial())}</text>`,
+      },
+      floral: {
+        label: "Floral",
+        draw: () => Array.from({ length: 8 }, (_, i) => `<ellipse cx="0" cy="-22" rx="9" ry="19" fill="currentColor" transform="rotate(${i * 45})"/>`).join("") + `<circle r="9" fill="currentColor"/>`,
+      },
+      arabesque: {
+        label: "Arabesco",
+        draw: () => {
+          const half = `<path d="M0 -40 C 16 -34 20 -18 8 -12 C -2 -7 4 6 16 4 C 28 2 32 -12 22 -18 M8 -12 C 22 -4 30 14 18 26 C 10 34 2 30 0 40" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round"/>`;
+          return half + `<g transform="scale(-1 1)">${half}</g><path d="M0 -10 L7 0 L0 10 L-7 0Z" fill="currentColor"/>`;
+        },
+      },
+      geo: {
+        label: "Geométrico",
+        draw: () => {
+          let d = "";
+          for (let k = -84; k <= 84; k += 14) d += `M${k - 60} -60 L${k + 60} 60 M${k + 60} -60 L${k - 60} 60 `;
+          return `<path d="${d}" stroke="currentColor" stroke-width="2.6" fill="none"/>`;
+        },
+      },
+      rays: {
+        label: "Raios",
+        draw: () => Array.from({ length: 28 }, (_, i) => `<path d="M0 -14 L0 -48" stroke="currentColor" stroke-width="${i % 2 ? 1.8 : 3.4}" stroke-linecap="round" transform="rotate(${(i * 360) / 28})"/>`).join("") + `<circle r="9" fill="currentColor"/>`,
+      },
+      heart: { label: "Coração", draw: () => `<path d="M0 34 C -46 6 -40 -34 -14 -34 C -4 -34 0 -24 0 -20 C 0 -24 4 -34 14 -34 C 40 -34 46 6 0 34Z" fill="currentColor"/>` },
+      waves: {
+        label: "Ondas",
+        draw: () => [-36, -18, 0, 18, 36].map((y) => `<path d="M-60 ${y} q 10 -9 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/>`).join(""),
+      },
+      leaf: {
+        label: "Folhas",
+        draw: () => {
+          const leaf = (rot) => `<g transform="rotate(${rot})"><path d="M0 4 C 14 -8 14 -30 0 -44 C -14 -30 -14 -8 0 4Z" fill="currentColor"/></g>`;
+          return leaf(-38) + leaf(0) + leaf(38) + `<path d="M0 6 L0 30" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>`;
+        },
+      },
+    };
+
+    const CASES = {
+      gold: ["#ecd4a0", "#a87e46", "Dourada"], black: ["#4a4541", "#0e0d0c", "Preta"], rose: ["#f1cfc2", "#b98270", "Rosé"],
+      lilac: ["#e3d8f0", "#a28fc4", "Lilás"], white: ["#ffffff", "#d8d2c8", "Branca"], clear: ["rgba(255,255,255,.75)", "rgba(205,210,222,.5)", "Acrílico"],
+    };
+    const FINISH = { matte: "Matte", satin: "Acetinado", shimmer: "Cintilante", metal: "Metálico" };
+    const names = { "#c4876a": "Nude", "#d75c78": "Rosa", "#e9a07f": "Pêssego", "#8a4526": "Bronze", "#d2a65e": "Dourado", "#651c2e": "Vinho", "#7b5ea7": "Lavanda" };
 
     const shade = (hex, amt) => {
       const n = parseInt(hex.slice(1), 16);
       const f = (v) => Math.max(0, Math.min(255, Math.round(v + amt * (amt > 0 ? 255 - v : v))));
       return "#" + [f(n >> 16), f((n >> 8) & 255), f(n & 255)].map((v) => v.toString(16).padStart(2, "0")).join("");
     };
+    // tons da paleta: do mais claro ao mais escuro a partir da cor base
+    const tones = (n) => n === 1 ? [state.color] : Array.from({ length: n }, (_, i) => shade(state.color, 0.5 - (0.9 * i) / (n - 1)));
 
-    function finishLayer(x, y, w, h, rx) {
-      const g = el("g", {});
-      if (state.finish === "satin") g.appendChild(el("rect", { x, y, width: w, height: h, rx, fill: "url(#cfgShine)", opacity: 0.6 }));
-      if (state.finish === "shimmer") {
-        g.appendChild(el("rect", { x, y, width: w, height: h, rx, fill: "url(#cfgSparkle)", opacity: 0.85 }));
-        g.appendChild(el("rect", { x, y, width: w, height: h, rx, fill: "url(#cfgShine)", opacity: 0.5 }));
-      }
-      if (state.finish === "metal") {
-        const id = "met" + Math.random().toString(36).slice(2, 7);
-        const lg = el("linearGradient", { id, x1: 0, y1: 0, x2: 1, y2: 1 });
-        [[0, "#fff", 0.0], [0.35, "#fff", 0.55], [0.5, "#fff", 0.05], [0.7, "#fff", 0.4], [1, "#fff", 0]].forEach(([o, c, a]) => lg.appendChild(el("stop", { offset: o, "stop-color": c, "stop-opacity": a })));
-        g.appendChild(lg);
-        g.appendChild(el("rect", { x, y, width: w, height: h, rx, fill: `url(#${id})` }));
-      }
-      return g;
+    const shapeSvg = (p, extra = "") => p.t === "c"
+      ? `<circle cx="${200 + p.x}" cy="${200 + p.y}" r="${p.r}" ${extra}/>`
+      : `<rect x="${200 + p.x - p.w / 2}" y="${200 + p.y - p.h / 2}" width="${p.w}" height="${p.h}" rx="${p.r}" ${extra}/>`;
+    const box = (p) => p.t === "c" ? [200 + p.x - p.r, 200 + p.y - p.r, p.r * 2, p.r * 2] : [200 + p.x - p.w / 2, 200 + p.y - p.h / 2, p.w, p.h];
+
+    function finishLayer(b) {
+      const [x, y, w, h] = b;
+      if (state.finish === "satin") return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#cfgShine)" opacity=".6"/>`;
+      if (state.finish === "shimmer") return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#cfgSparkle)" opacity=".85"/><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#cfgShine)" opacity=".5"/>`;
+      if (state.finish === "metal") return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#cfgMetal)"/>`;
+      return "";
+    }
+
+    // relevo: o desenho é desenhado 3 vezes (sombra, luz e cor), deslocado pela luz vinda do alto à esquerda
+    function reliefLayer(p, c) {
+      const art = ARTS[state.art];
+      const fmt = FORMATS[state.format];
+      if (!art || state.art === "none" || fmt.jar) return "";
+      const size = p.t === "c" ? p.r * 2 : Math.min(p.w, p.h);
+      const s = (size / 100) * (p.t === "c" ? 0.78 : 0.84);
+      const cx = 200 + p.x, cy = 200 + p.y;
+      const d = Math.max(0.7, size / 90); // altura do relevo
+      const up = state.relief === "high" ? 1 : -1;
+      const inner = art.draw();
+      const layer = (dx, dy, col, op) => `<g transform="translate(${cx + dx} ${cy + dy}) scale(${s.toFixed(3)})" color="${col}" opacity="${op}">${inner}</g>`;
+      return layer(d * up, d * up, shade(c, -0.42), 0.75) + layer(-d * up, -d * up, shade(c, 0.45), 0.8) + layer(0, 0, c, 1);
     }
 
     function render() {
-      const round = state.shape !== "square";
-      const caseRx = state.shape === "round" ? 150 : state.shape === "quad" ? 60 : 36;
-      const clipRx = state.shape === "round" ? 130 : state.shape === "quad" ? 44 : 22;
-      $(".cfg-case", svg).setAttribute("rx", caseRx);
-      $(".cfg-gloss", svg).setAttribute("rx", caseRx);
-      $(".cfg-shadow", svg).setAttribute("rx", caseRx);
-      $(".cfg-rim", svg).setAttribute("rx", caseRx - 12);
-      $(".cfg-clip", svg).setAttribute("rx", clipRx);
-      const [a, b] = cases[state.case];
+      const fmt = FORMATS[state.format];
+      const [a, b] = CASES[state.case];
       $(".cfg-case-a", svg).setAttribute("stop-color", a);
       $(".cfg-case-b", svg).setAttribute("stop-color", b);
-      $(".cfg-case", svg).setAttribute("stroke", state.case === "clear" ? "rgba(150,155,170,.55)" : "none");
+      const cx = 200 - fmt.w / 2, cy = 200 - fmt.h / 2;
+      const caseRect = (extra) => `<rect x="${cx}" y="${cy}" width="${fmt.w}" height="${fmt.h}" rx="${fmt.r}" ${extra}/>`;
+      const cols = tones(fmt.pans.length);
+      let html = `<linearGradient id="cfgMetal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".35" stop-color="#fff" stop-opacity=".55"/><stop offset=".5" stop-color="#fff" stop-opacity=".05"/><stop offset=".7" stop-color="#fff" stop-opacity=".4"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>`;
+      html += `<rect x="${cx + 6}" y="${cy + 22}" width="${fmt.w}" height="${fmt.h}" rx="${fmt.r}" fill="rgba(60,40,20,.22)" style="filter:blur(16px)"/>`;
+      html += caseRect(`fill="url(#cfgCase)" ${state.case === "clear" || state.case === "white" ? 'stroke="rgba(150,140,130,.45)"' : ""}`);
+      html += `<rect x="${cx + 10}" y="${cy + 10}" width="${fmt.w - 20}" height="${fmt.h - 20}" rx="${Math.max(0, fmt.r - 10)}" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2"/>`;
 
-      pansG.replaceChildren();
-      pansG.appendChild(el("rect", { x: 70, y: 70, width: 260, height: 260, fill: shade(state.color, -0.25) }));
-      const pans = state.shape === "quad"
-        ? [[78, 78, -0.05], [204, 78, 0.18], [78, 204, -0.3], [204, 204, 0.35]].map(([x, y, s]) => ({ x, y, w: 118, h: 118, rx: 18, c: shade(state.color, s) }))
-        : [{ x: 74, y: 74, w: 252, h: 252, rx: round ? 126 : 18, c: state.color }];
-      pans.forEach((p) => {
-        pansG.appendChild(el("rect", { class: "pan", x: p.x, y: p.y, width: p.w, height: p.h, rx: p.rx, fill: p.c }));
-        pansG.appendChild(finishLayer(p.x, p.y, p.w, p.h, p.rx));
+      fmt.pans.forEach((p, i) => {
+        const c = cols[i], id = `cfgPan${i}`, bb = box(p);
+        html += `<clipPath id="${id}">${shapeSvg(p)}</clipPath>`;
+        html += shapeSvg(p, `fill="${shade(c, -0.25)}" stroke="rgba(0,0,0,.18)" stroke-width="3"`); // godê
+        html += `<g clip-path="url(#${id})">${shapeSvg(p, `fill="${c}"`)}${reliefLayer(p, c)}${finishLayer(bb)}<rect x="${bb[0]}" y="${bb[1]}" width="${bb[2]}" height="${bb[3]}" fill="url(#cfgPanShade)"/></g>`;
+        if (fmt.jar) {
+          // peneira do pote: disco translúcido com furos
+          let holes = "";
+          [[0, 1], [22, 8], [44, 14], [66, 20]].forEach(([r, n]) => {
+            for (let k = 0; k < n; k++) { const t = (k / n) * Math.PI * 2; holes += `<circle cx="${200 + Math.cos(t) * r}" cy="${200 + Math.sin(t) * r}" r="3.2" fill="${shade(c, -0.35)}"/>`; }
+          });
+          html += `<circle cx="200" cy="200" r="${p.r}" fill="rgba(255,255,255,.32)" stroke="rgba(255,255,255,.7)" stroke-width="2"/>${holes}`;
+        }
       });
-      if (state.text.trim()) {
-        const t = el("text", { class: "pan-text", x: 200, y: 200, fill: shade(state.color, state.shape === "quad" ? 0.55 : -0.18), filter: "url(#cfgEmboss)", opacity: 0.9 });
-        t.textContent = state.text.trim().toUpperCase();
-        if (state.shape === "quad") t.setAttribute("style", "font-size:11px;letter-spacing:.25em");
-        pansG.appendChild(t);
-      }
+      html += caseRect(`fill="url(#cfgShine)" opacity=".7" pointer-events="none"`);
+      body.innerHTML = html;
+
+      const jar = !!fmt.jar;
+      $(".cfg-note").hidden = !jar;
+      $$('[data-opt="relief"] button, [data-opt="art"] button').forEach((b) => (b.disabled = jar));
+      $(".cfg-text-set").hidden = !(state.art === "logo" || state.art === "mono") || jar;
 
       const colorName = names[state.color] || state.color.toUpperCase();
-      $(".cfg-sum").textContent = `${labels.shape[state.shape]} · ${colorName} · ${labels.finish[state.finish]}`;
+      const artName = jar ? "sem relevo (pó solto)" : `${ARTS[state.art].label}${state.art === "none" ? "" : " · " + (state.relief === "high" ? "alto relevo" : "baixo relevo")}`;
+      $(".cfg-sum").textContent = `${fmt.label} · ${colorName} · ${jar ? "pó solto" : ARTS[state.art].label}`;
       const msg = [
         "Olá! Montei um produto no site da Garnet e quero desenvolver 🙂",
-        `Formato: ${labels.shape[state.shape]}`,
-        `Cor: ${colorName}`,
-        `Acabamento: ${labels.finish[state.finish]}`,
-        `${labels.case[state.case]}`,
-        `Relevo prensado: ${state.text.trim() || "sem relevo"}`,
-      ].join("\n");
+        `Embalagem: ${fmt.label} (${CASES[state.case][2]})`,
+        `Cor base: ${colorName}${fmt.pans.length > 1 ? ` (paleta com ${fmt.pans.length} tons)` : ""}`,
+        `Acabamento: ${FINISH[state.finish]}`,
+        `Desenho prensado: ${artName}`,
+        !jar && (state.art === "logo" || state.art === "mono") ? `Texto do relevo: ${state.text.trim() || "—"}` : "",
+      ].filter(Boolean).join("\n");
       $(".cfg-send").href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
-      if (!reduced) gsap.fromTo(svg, { scale: 0.97 }, { scale: 1, duration: 0.6, ease: "elastic.out(1, .5)" });
+      if (!reduced) gsap.fromTo(svg, { scale: 0.97 }, { scale: 1, duration: 0.6, ease: "elastic.out(1, .5)", overwrite: true });
     }
+
+    // chips com miniaturas desenhadas a partir das mesmas definições
+    const formatIcon = (f) => {
+      const k = 30 / 360;
+      const pans = f.pans.map((p) => p.t === "c"
+        ? `<circle cx="${20 + p.x * k}" cy="${20 + p.y * k}" r="${Math.max(1.4, p.r * k)}"/>`
+        : `<rect x="${20 + (p.x - p.w / 2) * k}" y="${20 + (p.y - p.h / 2) * k}" width="${p.w * k}" height="${p.h * k}" rx="${p.r * k}"/>`).join("");
+      return `<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="${20 - (f.w * k) / 2}" y="${20 - (f.h * k) / 2}" width="${f.w * k}" height="${f.h * k}" rx="${f.r * k}" fill="none" stroke="currentColor" stroke-width="1.4"/><g fill="currentColor" opacity=".55">${pans}</g></svg>`;
+    };
+    const artIcon = (key) => `<svg viewBox="-55 -55 110 110" aria-hidden="true"><circle r="52" fill="none" stroke="currentColor" stroke-width="4" opacity=".35"/><g color="currentColor">${ARTS[key].draw()}</g></svg>`;
+    $('[data-opt="format"]').innerHTML = Object.entries(FORMATS).map(([k, f]) => `<button type="button" data-v="${k}"${k === state.format ? ' class="on"' : ""}>${formatIcon(f)}<span>${f.label}</span></button>`).join("");
+    const drawArtChips = () => {
+      $('[data-opt="art"]').innerHTML = Object.keys(ARTS).map((k) => `<button type="button" data-v="${k}"${k === state.art ? ' class="on"' : ""}>${k === "none" ? '<svg viewBox="-55 -55 110 110" aria-hidden="true"><circle r="52" fill="none" stroke="currentColor" stroke-width="4" opacity=".35"/></svg>' : artIcon(k)}<span>${ARTS[k].label}</span></button>`).join("");
+    };
+    drawArtChips();
 
     $$(".config__panel [data-opt]").forEach((group) => {
       const key = group.dataset.opt;
-      if (key === "text") { group.addEventListener("input", () => { state.text = group.value; render(); }); return; }
+      if (key === "text") {
+        group.addEventListener("input", () => { state.text = group.value; render(); drawArtChips(); });
+        return;
+      }
       group.addEventListener("click", (e) => {
         const btn = e.target.closest("button");
-        if (!btn) return;
+        if (!btn || btn.disabled) return;
         $$("button, .swatch-custom", group).forEach((b) => b.classList.toggle("on", b === btn));
         state[key] = btn.dataset.v;
         render();
