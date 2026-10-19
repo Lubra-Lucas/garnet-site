@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Teste de recorte · Garnet</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/svg+xml" href="../../assets/img/site/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@1,400;1,500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <style>
+    /* Página de teste: reaproveita os tokens e componentes do site (style.css) */
+    body { overflow-x: hidden; }
+    .lab-top { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 18px; padding: 14px var(--pad); background: rgba(247, 244, 239, .82); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+    .lab-top img { height: 18px; width: auto; }
+    .lab-top .controls { margin: 0 0 0 auto; }
+    .lab-top span { font-size: 11px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+    .lab-top .seg button { padding: 8px 14px; font-size: 10.5px; }
+    .lab-top a.back { margin-left: 8px; font-size: 12px; font-weight: 500; border-bottom: 1px solid currentColor; }
+    .intro { padding-block: clamp(70px, 10vw, 130px) 40px; }
+    .intro .display { font-size: clamp(36px, 5vw, 72px); }
+    .controls { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+    .seg { display: inline-flex; padding: 4px; border-radius: 99px; border: 1px solid var(--line); background: #fff; }
+    .seg button { padding: 10px 20px; border-radius: 99px; font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; transition: background-color .3s, color .3s; }
+    .seg button.on { background: var(--ink); color: var(--on-dark); }
+
+    .block { padding-block: clamp(60px, 9vw, 120px); }
+    .block__head { max-width: 760px; margin-bottom: 50px; }
+    .block__head .display { font-size: clamp(30px, 3.6vw, 52px); }
+
+    /* ---------- palco com produto recortado ---------- */
+    .stage {
+      --halo: var(--gold-2);
+      position: relative; aspect-ratio: 4 / 5; border-radius: 24px; overflow: visible;
+      background: radial-gradient(120% 90% at 50% 38%, #fff 0%, var(--bg) 70%);
+      display: grid; place-items: center; isolation: isolate;
+    }
+    .stage::before { /* halo na cor do produto */
+      content: ""; position: absolute; left: 50%; top: 46%; width: 78%; aspect-ratio: 1; transform: translate(-50%, -50%);
+      background: radial-gradient(closest-side, color-mix(in srgb, var(--halo) 55%, transparent), transparent 72%);
+      filter: blur(8px); z-index: -1; transition: opacity .5s;
+    }
+    .prod { position: relative; width: 74%; transform-style: preserve-3d; will-change: transform; }
+    .prod__float { animation: float 6s ease-in-out infinite; }
+    .prod img { width: 100%; height: auto; filter: drop-shadow(0 18px 22px rgba(60, 35, 15, .18)) drop-shadow(0 4px 6px rgba(60, 35, 15, .12)); transform: translateZ(40px); }
+    .prod__shadow { /* sombra de contato recriada */
+      position: absolute; left: 50%; bottom: 9%; width: 58%; height: 7%; transform: translateX(calc(-50% + var(--sx, 0px))) scaleX(var(--ss, 1));
+      background: radial-gradient(closest-side, rgba(60, 35, 15, .32), transparent); filter: blur(6px); z-index: -1;
+      animation: shadow 6s ease-in-out infinite;
+    }
+    @keyframes float { 0%, 100% { transform: translateY(0) rotate(-.6deg); } 50% { transform: translateY(-14px) rotate(.6deg); } }
+    @keyframes shadow { 0%, 100% { opacity: 1; scale: 1; } 50% { opacity: .65; scale: .88; } }
+    .show-edges .prod img { background: repeating-conic-gradient(#d9d9d9 0 25%, #fff 0 50%) 0 0 / 18px 18px; border-radius: 6px; }
+    .tag { position: absolute; top: 16px; left: 16px; z-index: 2; font-size: 10px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; padding: 7px 11px; border-radius: 99px; background: rgba(255,255,255,.85); border: 1px solid var(--line); }
+    .tag--after { background: var(--ink); color: var(--on-dark); border-color: var(--ink); }
+
+    /* ---------- lado a lado ---------- */
+    .pairs { display: grid; gap: 70px; }
+    .pair { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(16px, 3vw, 36px); align-items: start; }
+    .pair__info { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 20px; border-top: 1px solid var(--line); padding-top: 18px; }
+    .pair__info h3 { margin: 0; font-size: clamp(22px, 2.2vw, 30px); font-weight: 400; letter-spacing: -.01em; }
+    .pair__info p { margin: 0; color: var(--muted); font-size: 14px; max-width: 560px; }
+    .before { position: relative; aspect-ratio: 4 / 5; border-radius: 24px; overflow: hidden; }
+    .before img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* ---------- no contexto do site: cards de categoria ---------- */
+    .cats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; padding-top: 110px; }
+    .ccard { position: relative; border-radius: var(--r); background: var(--c); padding: 18px 18px 26px; transition: background-color .5s; }
+    .ccard__media { position: relative; aspect-ratio: 4 / 3.3; border-radius: 16px; display: grid; place-items: end center; overflow: visible; }
+    .ccard__media .prod { width: 96%; margin-bottom: 2%; }
+    .ccard .ccard__media .photo { inset: auto 0 0 0; aspect-ratio: 4 / 5; height: auto; }
+    .ccard__media .photo { position: absolute; inset: 0; border-radius: 16px; overflow: hidden; opacity: 0; transition: opacity .5s; }
+    .ccard__media .photo img { width: 100%; height: 100%; object-fit: cover; }
+    .ccard h3 { margin: 22px 0 4px 6px; font-size: 26px; font-weight: 400; }
+    .ccard p { margin: 0 0 0 6px; color: var(--muted); font-size: 14px; }
+    .mode-before .ccard__media .photo { opacity: 1; }
+    .mode-before .ccard__media .prod, .mode-before .ccard__media .prod__shadow { opacity: 0; }
+    .ccard__media .prod, .ccard__media .prod__shadow { transition: opacity .5s; }
+
+    /* ---------- destaque de case (marca grande atrás) ---------- */
+    .feature { position: relative; border-radius: 32px; overflow: hidden; background: var(--dark); color: var(--on-dark); min-height: min(86vh, 760px); display: grid; place-items: center; cursor: zoom-in; }
+    .feature__word { position: absolute; inset: 0; display: grid; place-items: center; font-weight: 200; font-size: clamp(90px, 19vw, 300px); letter-spacing: .04em; line-height: .8; white-space: nowrap; color: transparent; -webkit-text-stroke: 1px rgba(217, 188, 136, .35); user-select: none; }
+    .feature .stage { width: min(520px, 70%); background: none; }
+    .feature .stage::before { width: 110%; }
+    .feature__cap { position: absolute; left: clamp(20px, 4vw, 48px); bottom: clamp(20px, 4vw, 44px); z-index: 3; }
+    .feature__cap b { display: block; font-size: clamp(24px, 2.6vw, 36px); font-weight: 300; }
+    .feature__cap span { font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--gold-2); }
+    .feature__hint { position: absolute; right: clamp(20px, 4vw, 48px); bottom: clamp(20px, 4vw, 44px); z-index: 3; font-size: 12px; color: var(--on-dark-muted); }
+
+    /* ---------- pó com partículas ---------- */
+    .powder { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(30px, 6vw, 90px); align-items: center; }
+    .powder .stage { --halo: #d9a46a; }
+    .powder canvas { position: absolute; inset: -6% -10%; width: 120%; height: 112%; pointer-events: none; z-index: 3; }
+    .powder .prod { z-index: 2; }
+
+    /* ---------- lightbox ---------- */
+    .lb { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 24px; background: rgba(18, 16, 14, .86); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); opacity: 0; visibility: hidden; transition: opacity .4s, visibility .4s; cursor: zoom-out; }
+    .lb.on { opacity: 1; visibility: visible; }
+    .lb img { max-height: 86vh; width: auto; border-radius: 18px; box-shadow: 0 40px 80px rgba(0,0,0,.5); transform: scale(.94); transition: transform .5s var(--ease); }
+    .lb.on img { transform: none; }
+    .lb p { position: absolute; bottom: 18px; left: 0; right: 0; text-align: center; color: var(--on-dark-muted); font-size: 12px; margin: 0; }
+
+    .verdict { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .verdict article { padding: 28px; }
+    .verdict h3 { margin: 0 0 8px; font-size: 18px; font-weight: 500; }
+    .verdict p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    @media (max-width: 760px) {
+      .lab-top { flex-wrap: wrap; gap: 10px; }
+      .lab-top .controls { order: 3; width: 100%; margin: 0; gap: 8px; }
+      .lab-top .seg button { padding: 7px 10px; font-size: 9.5px; letter-spacing: .06em; }
+    }
+    @media (max-width: 860px) {
+      .cats { grid-template-columns: 1fr; gap: 110px; }
+      .powder, .verdict { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .pair { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .tag { top: 8px; left: 8px; font-size: 8.5px; padding: 5px 8px; }
+      .lab-top span { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) { .prod__float, .prod__shadow { animation: none; } }
+  </style>
+</head>
+<body>
+  <div class="lab-top">
+    <img src="../../assets/img/site/garnet-logo.png" alt="Garnet" />
+    <span>Laboratório · teste de recorte</span>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Comparar">
+        <button type="button" data-mode="after" class="on">Depois (recorte)</button>
+        <button type="button" data-mode="before">Antes (foto)</button>
+      </div>
+      <div class="seg" role="group" aria-label="Bordas">
+        <button type="button" data-edges="off" class="on">Visual final</button>
+        <button type="button" data-edges="on">Ver bordas do recorte</button>
+      </div>
+    </div>
+    <a class="back" href="../../">Voltar ao site</a>
+  </div>
+
+  <main>
+    <section class="wrap intro">
+      <span class="eyebrow">Teste · 3 produtos</span>
+      <h1 class="display">Produto recortado, <em>integrado ao site</em></h1>
+      <p class="lead">Fundo removido automaticamente (IA de recorte, rodando no nosso próprio ambiente). A sombra e o brilho foram recriados para o produto “pousar” no fundo do site. Passe o mouse sobre os produtos. Os botões na barra do topo trocam entre o recorte e a foto original em qualquer ponto da página.</p>
+    </section>
+
+    <!-- 1. lado a lado -->
+    <section class="wrap block">
+      <div class="block__head">
+        <span class="eyebrow">1 · Lado a lado</span>
+        <h2 class="display">A mesma foto, <em>antes e depois</em></h2>
+      </div>
+      <div class="pairs">
+        <div class="pair">
+          <div class="before"><span class="tag">Antes</span><img src="../../assets/img/site/po-facial-chocolate.webp" alt="Foto original do Pó Facial Chocolate com fundo de mármore" /></div>
+          <div class="stage" data-tilt-prod style="--halo:#d9a46a"><span class="tag tag--after">Depois</span><div class="prod__shadow"></div><div class="prod"><div class="prod__float"><img src="img/po-facial-chocolate.webp" alt="Pó Facial Chocolate recortado" /></div></div></div>
+          <div class="pair__info"><h3>Pó Facial Chocolate</h3><p>O caso mais difícil: pote de acrílico transparente com pó solto. O recorte manteve a transparência do pote. O pó espalhado na mesa sai e pode ser recriado em animação (veja a seção 4).</p></div>
+        </div>
+        <div class="pair">
+          <div class="before"><span class="tag">Antes</span><img src="../../assets/img/cases/karen-12-cores.webp" alt="Foto original da Paleta 12 cores Karen Bachini com fundo rosa" /></div>
+          <div class="stage" data-tilt-prod style="--halo:#e9b3c3"><span class="tag tag--after">Depois</span><div class="prod__shadow"></div><div class="prod"><div class="prod__float" style="animation-delay:-2s"><img src="img/karen-12-cores.webp" alt="Paleta 12 cores Karen Bachini recortada" /></div></div></div>
+          <div class="pair__info"><h3>Paleta 12 Cores · Karen Bachini</h3><p>Saem o fundo rosa, a esponja, a pedra e o texto gravado “Case de sucesso / Garnet”. O pincel ficou; dá para tirar se preferirem só a paleta.</p></div>
+        </div>
+        <div class="pair">
+          <div class="before"><span class="tag">Antes</span><img src="../../assets/img/cases/johnjohn-gold.webp" alt="Foto original da Sombra Gold John John com fundo bege" /></div>
+          <div class="stage" data-tilt-prod style="--halo:#d8b47e"><span class="tag tag--after">Depois</span><div class="prod__shadow"></div><div class="prod"><div class="prod__float" style="animation-delay:-4s"><img src="img/johnjohn-gold.webp" alt="Sombra Gold John John recortada" /></div></div></div>
+          <div class="pair__info"><h3>Sombra Gold · John John</h3><p>Embalagem preta sobre fundo claro: o produto ganha destaque e o off-white do site fica limpo em volta.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. no contexto: categorias -->
+    <section class="block" style="background:var(--bg-2)">
+      <div class="wrap">
+        <div class="block__head">
+          <span class="eyebrow">2 · No contexto do site</span>
+          <h2 class="display">Cards de categoria com o produto <em>saindo do card</em></h2>
+          <p class="lead">Use o botão “Antes / Depois” no topo para comparar com as fotos atuais. Role a página: o produto sobe um pouco mais rápido que o card (parallax).</p>
+        </div>
+        <div class="cats">
+          <article class="ccard" style="--c:#efe3d6">
+            <div class="ccard__media" data-tilt-prod style="--halo:#d9a46a">
+              <div class="photo"><img src="../../assets/img/site/po-facial-chocolate.webp" alt="" /></div>
+              <div class="prod__shadow"></div>
+              <div class="prod" data-par="-14"><div class="prod__float"><img src="img/po-facial-chocolate.webp" alt="Pó Facial Chocolate" /></div></div>
+            </div>
+            <h3>Maquiagem</h3><p>Pós, blushes e sombras</p>
+          </article>
+          <article class="ccard" style="--c:#f0dde3">
+            <div class="ccard__media" data-tilt-prod style="--halo:#e9b3c3">
+              <div class="photo"><img src="../../assets/img/cases/karen-12-cores.webp" alt="" /></div>
+              <div class="prod__shadow"></div>
+              <div class="prod" data-par="-20"><div class="prod__float" style="animation-delay:-2s"><img src="img/karen-12-cores.webp" alt="Paleta 12 cores" /></div></div>
+            </div>
+            <h3>Paletas</h3><p>Sombras, blushes e iluminadores</p>
+          </article>
+          <article class="ccard" style="--c:#ece4d6">
+            <div class="ccard__media" data-tilt-prod style="--halo:#d8b47e">
+              <div class="photo"><img src="../../assets/img/cases/johnjohn-gold.webp" alt="" /></div>
+              <div class="prod__shadow"></div>
+              <div class="prod" data-par="-11"><div class="prod__float" style="animation-delay:-4s"><img src="img/johnjohn-gold.webp" alt="Sombra Gold" /></div></div>
+            </div>
+            <h3>Compactados</h3><p>Sombras e pós prensados com relevo</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. destaque de case -->
+    <section class="wrap block">
+      <div class="block__head">
+        <span class="eyebrow">3 · Destaque de case</span>
+        <h2 class="display">Produto na frente, <em>marca ao fundo</em></h2>
+        <p class="lead">Estilo das páginas de produto da MBOOM. Clique no bloco para abrir a foto original da campanha — o cenário não se perde, só sai do caminho.</p>
+      </div>
+      <div class="feature" data-lb="../../assets/img/cases/karen-12-cores.webp" data-lb-cap="Foto original da campanha · Karen Bachini Beauty">
+        <div class="feature__word" data-par-x="-120">KAREN</div>
+        <div class="stage" data-tilt-prod style="--halo:#e9b3c3"><div class="prod__shadow"></div><div class="prod" data-rot="8"><div class="prod__float"><img src="img/karen-12-cores.webp" alt="Paleta 12 cores Karen Bachini" /></div></div></div>
+        <div class="feature__cap"><span>Karen Bachini Beauty</span><b>Paleta 12 Cores</b></div>
+        <div class="feature__hint">Clique para ver a campanha ↗</div>
+      </div>
+    </section>
+
+    <!-- 4. pó com partículas -->
+    <section class="block" style="background:var(--bg-2)">
+      <div class="wrap powder">
+        <div>
+          <span class="eyebrow">4 · Pó em movimento</span>
+          <h2 class="display">O pó que estava na mesa <em>volta animado</em></h2>
+          <p class="lead">Partículas na cor do produto se soltam do pote e assentam devagar. Passe o mouse no pote para uma “nuvem” de pó. Mesma técnica da poeira dourada do topo do site.</p>
+        </div>
+        <div class="stage" data-tilt-prod data-powder>
+          <canvas aria-hidden="true"></canvas>
+          <div class="prod__shadow"></div>
+          <div class="prod"><div class="prod__float"><img src="img/po-facial-chocolate.webp" alt="Pó Facial Chocolate com partículas de pó animadas" /></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. avaliação -->
+    <section class="wrap block">
+      <div class="block__head">
+        <span class="eyebrow">5 · Avaliação técnica</span>
+        <h2 class="display">O que o teste <em>mostrou</em></h2>
+      </div>
+      <div class="verdict">
+        <article class="glass" data-tilt><h3>Qualidade do recorte</h3><p>Bordas limpas nos três, inclusive no acrílico transparente do pote e na tampa da paleta. Sem retoque manual.</p></article>
+        <article class="glass" data-tilt><h3>Peso</h3><p>Cada recorte ficou entre 55 e 110 KB (WebP com transparência) — mais leve que as fotos atuais.</p></article>
+        <article class="glass" data-tilt><h3>Para aplicar nos 12 cases</h3><p>O processo é automático (alguns segundos por foto). Glitter e reflexos fortes podem pedir revisão pontual.</p></article>
+      </div>
+    </section>
+  </main>
+
+  <div class="lb" role="dialog" aria-modal="true" aria-label="Foto original"><img alt="" /><p></p></div>
+
+  <script src="../../assets/vendor/gsap.min.js"></script>
+  <script src="../../assets/vendor/ScrollTrigger.min.js"></script>
+  <script>
+  (() => {
+    "use strict";
+    const $ = (s, el = document) => el.querySelector(s);
+    const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
+    gsap.registerPlugin(ScrollTrigger);
+
+    /* botões Antes/Depois e bordas */
+    $$("[data-mode]").forEach((b) => b.addEventListener("click", () => {
+      $$("[data-mode]").forEach((x) => x.classList.toggle("on", x === b));
+      document.body.classList.toggle("mode-before", b.dataset.mode === "before");
+    }));
+    $$("[data-edges]").forEach((b) => b.addEventListener("click", () => {
+      $$("[data-edges]").forEach((x) => x.classList.toggle("on", x === b));
+      document.body.classList.toggle("show-edges", b.dataset.edges === "on");
+    }));
+
+    /* tilt do produto: inclina em 3D e a sombra se desloca para o lado oposto */
+    if (fine && !reduced) {
+      $$("[data-tilt-prod]").forEach((st) => {
+        const prod = $(".prod", st), sh = $(".prod__shadow", st);
+        const rx = gsap.quickTo(prod, "rotationX", { duration: .6, ease: "power3" });
+        const ry = gsap.quickTo(prod, "rotationY", { duration: .6, ease: "power3" });
+        gsap.set(prod, { transformPerspective: 900 });
+        st.addEventListener("pointermove", (e) => {
+          const r = st.getBoundingClientRect();
+          const nx = (e.clientX - r.left) / r.width - .5, ny = (e.clientY - r.top) / r.height - .5;
+          ry(nx * 22); rx(-ny * 16);
+          sh.style.setProperty("--sx", (-nx * 40).toFixed(1) + "px");
+          sh.style.setProperty("--ss", (1 - Math.abs(nx) * .25).toFixed(2));
+        });
+        st.addEventListener("pointerleave", () => { rx(0); ry(0); sh.style.setProperty("--sx", "0px"); sh.style.setProperty("--ss", 1); });
+      });
+      $$("[data-tilt]").forEach((el) => {
+        el.addEventListener("pointermove", (e) => {
+          const r = el.getBoundingClientRect(), nx = (e.clientX - r.left) / r.width, ny = (e.clientY - r.top) / r.height;
+          el.style.setProperty("--mx", nx * 100 + "%"); el.style.setProperty("--my", ny * 100 + "%");
+          el.style.transform = `perspective(900px) rotateY(${(nx - .5) * 8}deg) rotateX(${(.5 - ny) * 8}deg)`;
+        });
+        el.addEventListener("pointerleave", () => { el.style.transform = ""; });
+      });
+    }
+
+    if (!reduced) {
+      /* entrada: o produto "cai" no lugar */
+      $$(".stage .prod, .ccard .prod").forEach((p) => {
+        gsap.from(p, { y: -80, opacity: 0, scale: .92, duration: 1.3, ease: "expo.out", scrollTrigger: { trigger: p, start: "top 88%", once: true } });
+      });
+      /* parallax: produto sobe mais rápido que o card (yPercent, para não brigar com o y da entrada) */
+      $$("[data-par]").forEach((p) => {
+        gsap.fromTo(p, { yPercent: 0 }, { yPercent: Number(p.dataset.par), ease: "none", scrollTrigger: { trigger: p.closest(".ccard"), start: "top bottom", end: "bottom top", scrub: true } });
+      });
+      /* destaque: palavra desliza e o produto gira um pouco */
+      $$("[data-par-x]").forEach((w) => gsap.fromTo(w, { x: -Number(w.dataset.parX) }, { x: Number(w.dataset.parX), ease: "none", scrollTrigger: { trigger: w.parentElement, start: "top bottom", end: "bottom top", scrub: true } }));
+      $$("[data-rot]").forEach((p) => gsap.fromTo(p, { rotation: -Number(p.dataset.rot) }, { rotation: Number(p.dataset.rot), ease: "none", scrollTrigger: { trigger: p.closest(".feature"), start: "top bottom", end: "bottom top", scrub: true } }));
+    }
+
+    /* lightbox com a foto original */
+    const lb = $(".lb");
+    $$("[data-lb]").forEach((el) => el.addEventListener("click", () => {
+      $("img", lb).src = el.dataset.lb; $("p", lb).textContent = el.dataset.lbCap || ""; lb.classList.add("on");
+    }));
+    lb.addEventListener("click", () => lb.classList.remove("on"));
+    addEventListener("keydown", (e) => { if (e.key === "Escape") lb.classList.remove("on"); });
+
+    /* partículas de pó saindo do pote */
+    $$("[data-powder]").forEach((st) => {
+      const c = $("canvas", st);
+      if (reduced) { c.remove(); return; }
+      const g = c.getContext("2d");
+      let w = 0, h = 0, parts = [], burst = 0, visible = false;
+      const cols = ["#b98457", "#a8714a", "#c99a6c", "#8f5c3a", "#d8b08a"];
+      const resize = () => { const d = Math.min(devicePixelRatio || 1, 2); w = c.offsetWidth; h = c.offsetHeight; c.width = w * d; c.height = h * d; g.setTransform(d, 0, 0, d, 0, 0); };
+      resize(); addEventListener("resize", resize);
+      const spawn = (n, power) => {
+        for (let i = 0; i < n; i++) {
+          const a = -Math.PI / 2 + (Math.random() - .5) * 2.2;
+          const sp = (0.4 + Math.random() * 1.6) * power;
+          parts.push({ x: w * (.22 + Math.random() * .56), y: h * (.74 + Math.random() * .06), vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, r: .7 + Math.random() * 2.6, life: 0, max: 140 + Math.random() * 160, c: cols[(Math.random() * cols.length) | 0] });
+        }
+      };
+      st.addEventListener("pointerenter", () => { burst = 1; spawn(140, 2.2); });
+      ScrollTrigger.create({ trigger: st, start: "top bottom", end: "bottom top", onToggle: (s) => (visible = s.isActive) });
+      gsap.ticker.add(() => {
+        if (!visible) return;
+        spawn(Math.random() < .6 ? 2 : 1, .8);
+        g.clearRect(0, 0, w, h);
+        parts = parts.filter((p) => p.life < p.max);
+        for (const p of parts) {
+          p.life++; p.vx *= .985; p.vy = p.vy * .985 + .012; // arrasto + leve gravidade: o pó assenta
+          p.x += p.vx; p.y += p.vy;
+          const k = 1 - p.life / p.max;
+          g.globalAlpha = Math.max(0, k) * .85;
+          g.fillStyle = p.c;
+          g.beginPath(); g.arc(p.x, p.y, p.r, 0, 6.283); g.fill();
+        }
+        g.globalAlpha = 1;
+      });
+    });
+  })();
+  </script>
+</body>
+</html>

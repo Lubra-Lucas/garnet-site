@@ -28,7 +28,7 @@ jobs:
       - name: Montar a pasta do site
         run: |
           mkdir _site
-          cp -r index.html assets _site/
+          cp -r index.html assets lab _site/
           # protótipo: não deixar o Google indexar no lugar do domínio oficial
           sed -i 's|<meta name="theme-color"|<meta name="robots" content="noindex, nofollow" />\n  <meta name="theme-color"|' _site/index.html
           touch _site/.nojekyll
