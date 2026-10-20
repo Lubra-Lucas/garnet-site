@@ -467,7 +467,6 @@
       quad: { label: "Quarteto", w: 268, h: 268, r: 30, pans: grid(2, 2, 104, 104, 118, 118, 14) },
       six: { label: "Sexteto em linha", w: 350, h: 156, r: 24, pans: grid(6, 1, 44, 108, 52, 0, 8) },
       twelve: { label: "Paleta 12 cores", w: 330, h: 262, r: 24, pans: grid(4, 3, 66, 66, 76, 76, 10) },
-      jar: { label: "Pote pó solto", w: 300, h: 300, r: 150, jar: true, pans: [{ t: "c", x: 0, y: 0, r: 116 }] },
     };
 
     // desenhos no espaço -50..50; "currentColor" recebe a cor de cada camada do relevo
@@ -556,7 +555,7 @@
     function reliefLayer(p, c) {
       const art = ARTS[state.art];
       const fmt = FORMATS[state.format];
-      if (!art || state.art === "none" || fmt.jar) return "";
+      if (!art || state.art === "none") return "";
       const size = p.t === "c" ? p.r * 2 : Math.min(p.w, p.h);
       const s = (size / 100) * (p.t === "c" ? 0.78 : 0.84);
       const cx = 200 + p.x, cy = 200 + p.y;
@@ -585,33 +584,22 @@
         html += `<clipPath id="${id}">${shapeSvg(p)}</clipPath>`;
         html += shapeSvg(p, `fill="${shade(c, -0.25)}" stroke="rgba(0,0,0,.18)" stroke-width="3"`); // godê
         html += `<g clip-path="url(#${id})">${shapeSvg(p, `fill="${c}"`)}${reliefLayer(p, c)}${finishLayer(bb)}<rect x="${bb[0]}" y="${bb[1]}" width="${bb[2]}" height="${bb[3]}" fill="url(#cfgPanShade)"/></g>`;
-        if (fmt.jar) {
-          // peneira do pote: disco translúcido com furos
-          let holes = "";
-          [[0, 1], [22, 8], [44, 14], [66, 20]].forEach(([r, n]) => {
-            for (let k = 0; k < n; k++) { const t = (k / n) * Math.PI * 2; holes += `<circle cx="${200 + Math.cos(t) * r}" cy="${200 + Math.sin(t) * r}" r="3.2" fill="${shade(c, -0.35)}"/>`; }
-          });
-          html += `<circle cx="200" cy="200" r="${p.r}" fill="rgba(255,255,255,.32)" stroke="rgba(255,255,255,.7)" stroke-width="2"/>${holes}`;
-        }
       });
       html += caseRect(`fill="url(#cfgShine)" opacity=".7" pointer-events="none"`);
       body.innerHTML = html;
 
-      const jar = !!fmt.jar;
-      $(".cfg-note").hidden = !jar;
-      $$('[data-opt="relief"] button, [data-opt="art"] button').forEach((b) => (b.disabled = jar));
-      $(".cfg-text-set").hidden = !(state.art === "logo" || state.art === "mono") || jar;
+      $(".cfg-text-set").hidden = !(state.art === "logo" || state.art === "mono");
 
       const colorName = names[state.color] || state.color.toUpperCase();
-      const artName = jar ? "sem relevo (pó solto)" : `${ARTS[state.art].label}${state.art === "none" ? "" : " · " + (state.relief === "high" ? "alto relevo" : "baixo relevo")}`;
-      $(".cfg-sum").textContent = `${fmt.label} · ${colorName} · ${jar ? "pó solto" : ARTS[state.art].label}`;
+      const artName = `${ARTS[state.art].label}${state.art === "none" ? "" : " · " + (state.relief === "high" ? "alto relevo" : "baixo relevo")}`;
+      $(".cfg-sum").textContent = `${fmt.label} · ${colorName} · ${ARTS[state.art].label}`;
       const msg = [
-        "Olá! Montei um produto no site da Garnet e quero desenvolver 🙂",
+        "Olá! Fiz uma simulação no site da Garnet e quero desenvolver a minha make 🙂",
         `Embalagem: ${fmt.label} (${CASES[state.case][2]})`,
         `Cor base: ${colorName}${fmt.pans.length > 1 ? ` (paleta com ${fmt.pans.length} tons)` : ""}`,
         `Acabamento: ${FINISH[state.finish]}`,
         `Desenho prensado: ${artName}`,
-        !jar && (state.art === "logo" || state.art === "mono") ? `Texto do relevo: ${state.text.trim() || "—"}` : "",
+        state.art === "logo" || state.art === "mono" ? `Texto do relevo: ${state.text.trim() || "—"}` : "",
       ].filter(Boolean).join("\n");
       $(".cfg-send").href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
       if (!reduced) gsap.fromTo(svg, { scale: 0.97 }, { scale: 1, duration: 0.6, ease: "elastic.out(1, .5)", overwrite: true });
