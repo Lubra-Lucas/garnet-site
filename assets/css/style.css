@@ -323,7 +323,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .m-ria { font-family: var(--sans); font-weight: 600; letter-spacing: -.02em; }
 
 /* ---------- números ---------- */
-.numbers { z-index: 2; background: linear-gradient(var(--bg), var(--bg-2)); }
+/* clip: o selo "BPF" entra ampliado e, no celular, alargava a página e tirava os botões fixos da tela */
+.numbers { z-index: 2; background: linear-gradient(var(--bg), var(--bg-2)); overflow-x: clip; }
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
 /* cards que viram: frente com o número, verso com um texto curto (CSS 3D, leve) */
 .stat { position: relative; min-height: 190px; perspective: 1000px; border-radius: var(--r); outline: none; cursor: pointer; }
