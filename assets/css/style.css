@@ -650,15 +650,19 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
   /* índice de marcas: no celular ficam só os filtros */
   .brands { display: none; }
   /* processo e modelos viram carrosséis de deslizar para o lado */
-  .steps { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-inline: calc(var(--pad) * -1); padding: 4px var(--pad) 10px; }
+  .steps { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-inline: calc(var(--pad) * -1); padding: 4px var(--pad) 10px; scroll-padding-inline: var(--pad); }
   .steps::-webkit-scrollbar, .models__grid::-webkit-scrollbar { display: none; }
   .steps::before, .steps__line { display: none; }
   .steps li, .steps li.on { flex: 0 0 78%; scroll-snap-align: start; padding: 22px 20px; opacity: 1; border: 1px solid var(--line); border-radius: var(--r); background: var(--bg-2); }
   .steps li::before { display: none; }
   .steps h3 { font-size: 22px; }
   .steps p { font-size: 14px; }
-  .models__grid { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-inline: calc(var(--pad) * -1); padding: 4px var(--pad) 10px; }
+  .models__grid { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-inline: calc(var(--pad) * -1); padding: 4px var(--pad) 10px; scroll-padding-inline: var(--pad); }
   .model:nth-child(n) { flex: 0 0 80%; scroll-snap-align: start; }
+  /* sem 3D nem desfoque no celular: os cards ficam parados e o deslize fica leve (não há tilt no toque) */
+  .models__grid { perspective: none; }
+  .model.glass { transform-style: flat; will-change: auto; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .model span, .model h3, .model p { transform: none; }
   .swipe-hint { display: block; margin-top: 14px; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
   .dark .swipe-hint { color: var(--on-dark-muted); }
   .brief__send, .brief__mail { flex: 1 1 100%; letter-spacing: .08em; }

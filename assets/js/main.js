@@ -315,7 +315,9 @@
       onEnter: (els) => gsap.to(els, { opacity: 1, y: 0, duration: 1.2, ease: "expo.out", stagger: 0.1 }),
     });
     gsap.from(".stat", { y: 60, opacity: 0, duration: 1.1, ease: "expo.out", stagger: 0.07, scrollTrigger: { trigger: ".stats", start: "top 80%", once: true } });
-    gsap.from(".model", { y: 70, opacity: 0, duration: 1.1, ease: "expo.out", stagger: 0.08, scrollTrigger: { trigger: ".models__grid", start: "top 80%", once: true } });
+    // no celular os modelos são um carrossel: entram juntos, sem cada card subir em separado
+    const modelsSwipe = window.matchMedia("(max-width: 760px)").matches;
+    gsap.from(".model", { y: modelsSwipe ? 0 : 70, opacity: 0, duration: 1.1, ease: "expo.out", stagger: modelsSwipe ? 0 : 0.08, scrollTrigger: { trigger: ".models__grid", start: "top 80%", once: true } });
     if ($(".quotes__grid")) gsap.from(".quote", { y: 60, opacity: 0, duration: 1.1, ease: "expo.out", stagger: 0.1, scrollTrigger: { trigger: ".quotes__grid", start: "top 80%", once: true } });
     gsap.from(".footer__word", { yPercent: 40, opacity: 0, duration: 1.6, ease: "expo.out", scrollTrigger: { trigger: ".footer", start: "top 70%", once: true } });
   }
