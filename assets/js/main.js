@@ -52,7 +52,7 @@
     ctx.drawImage(img, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
   }
 
-  function loadFrames(onProgress) {
+  function loadFrames(onProgress, onFirst) {
     let done = 0;
     // primeiro o frame 0 e alguns "âncoras" espalhados; depois o resto, 6 por vez
     const order = [0];
@@ -70,7 +70,7 @@
         img.onload = img.onerror = () => {
           done++;
           onProgress(done / SEQ.frames);
-          if (i === 0) drawFrame(0);
+          if (i === 0) onFirst();
           if (done === SEQ.frames) resolve();
           else pump();
         };
@@ -81,40 +81,23 @@
     });
   }
 
-  /* ---------- preloader ---------- */
-  const pre = $(".preloader");
-  const preYear = $(".preloader__year");
-  const prePct = $(".preloader__pct");
-  function setPre(p) {
-    pre.style.setProperty("--p", p);
-    $(".preloader__bar i").style.setProperty("--p", p);
-    prePct.textContent = Math.round(p * 100) + "%";
-    preYear.textContent = Math.round(1992 + (new Date().getFullYear() - 1992) * p);
-  }
-  $(".preloader__bar i").style.transform = "scaleX(var(--p))";
-
-  const framesReady = loadFrames(setPre);
-  const timeout = new Promise((r) => setTimeout(r, 7000));
-  const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
-
-  sizeCanvas();
-  Promise.all([Promise.race([framesReady, timeout]), fontsReady]).then(start);
-
+  /* ---------- entrada (sem tela de espera) ---------- */
+  // o texto da abertura aparece na hora; o estojo entra assim que o frame 0 chega
+  // e os outros frames continuam carregando em segundo plano
+  let started = false;
   function start() {
-    setPre(1);
+    if (started) return;
+    started = true;
     sizeCanvas();
     drawFrame(0);
-    const tl = gsap.timeline({ delay: 0.25 });
-    tl.to(".preloader__mark span", { yPercent: -110, opacity: 0, stagger: 0.04, duration: 0.6, ease: "power3.in" })
-      .to(".preloader__meta", { opacity: 0, duration: 0.3 }, "<")
-      .to(pre, { clipPath: "inset(0 0 100% 0)", duration: 1, ease: "expo.inOut" }, "-=0.2")
-      .add(() => { pre.remove(); body.classList.remove("is-loading"); ScrollTrigger.refresh(); }, "-=0.35")
-      // anima a escala pelo objeto pos (e não pelo transform do canvas, que é controlado pelo scroll)
-      .fromTo(pos, { s: 0.7 }, { s: 1, duration: 1.4, ease: "expo.out" }, "-=0.55")
-      .from(canvas, { opacity: 0, duration: 1, ease: "power2.out" }, "<")
-      .from(".chapter--hero > *", { y: 40, opacity: 0, stagger: 0.09, duration: 1.1, ease: "expo.out" }, "<0.1")
-      .from(".trustbar", { y: 30, opacity: 0, duration: 1, ease: "expo.out" }, "-=0.7");
+    if (reduced) return;
+    // anima a escala pelo objeto pos (e não pelo transform do canvas, que é controlado pelo scroll)
+    gsap.fromTo(pos, { s: 0.86 }, { s: 1, duration: 1.3, ease: "expo.out" });
+    gsap.fromTo(canvas, { opacity: 0 }, { opacity: 1, duration: 0.8, ease: "power2.out" });
   }
+  const framesReady = loadFrames(() => {}, start);
+  sizeCanvas();
+  if (document.fonts) document.fonts.ready.then(() => ScrollTrigger.refresh());
 
   /* ---------- scroll suave (Lenis) ---------- */
   let lenis = null;
@@ -200,20 +183,19 @@
 
       // posição do estojo acompanha o lado livre de cada capítulo
       // o estojo atravessa a tela só quando nenhum texto está visível
-      tl.fromTo(pos, { x: side(0.2), s: 1, y: 0 }, { x: side(-0.2), duration: 0.07, ease: "power2.inOut" }, 0.12)
-        .to(pos, { x: side(0.2), duration: 0.05, ease: "power2.inOut" }, 0.36)
-        .to(pos, { x: side(-0.2), duration: 0.05, ease: "power2.inOut" }, 0.635)
-        .to(pos, { x: 0, y: () => (desktop ? -H() * 0.13 : -H() * 0.04), s: desktop ? 0.72 : 0.9, duration: 0.05, ease: "power2.inOut" }, 0.85);
+      // abertura encurtada: 3 capítulos depois da capa (antes eram 4, em quase o dobro de rolagem)
+      tl.fromTo(pos, { x: side(0.2), s: 1, y: 0 }, { x: side(-0.2), duration: 0.08, ease: "power2.inOut" }, 0.08)
+        .to(pos, { x: side(0.2), duration: 0.06, ease: "power2.inOut" }, 0.31)
+        .to(pos, { x: 0, y: () => (desktop ? -H() * 0.13 : -H() * 0.04), s: desktop ? 0.72 : 0.9, duration: 0.07, ease: "power2.inOut" }, 0.68);
 
       const show = (el, at, dur = 0.05) => tl.fromTo(el, { autoAlpha: 0, y: 50 }, { autoAlpha: 1, y: 0, duration: dur, ease: "power2.out" }, at);
       const hide = (el, at, dur = 0.05) => tl.fromTo(el, { autoAlpha: 1, y: 0 }, { autoAlpha: 0, y: -50, duration: dur, ease: "power2.in", immediateRender: false }, at);
-      // a abertura fica parada por um trecho do scroll antes de sair (antes sumia quase de imediato)
-      hide(chapters[0], 0.07, 0.06);
-      hide($(".trustbar"), 0.07, 0.06); // faixa de marcas sai junto com a abertura
-      show(chapters[1], 0.19); hide(chapters[1], 0.32, 0.04);
-      show(chapters[2], 0.41); hide(chapters[2], 0.6, 0.035);
-      show(chapters[3], 0.69); hide(chapters[3], 0.81, 0.04);
-      show(chapters[4], 0.9);
+      hide(chapters[0], 0.05, 0.06);
+      hide($(".trustbar"), 0.05, 0.06); // faixa de marcas sai junto com a abertura
+      show(chapters[1], 0.15); hide(chapters[1], 0.27, 0.04);
+      // capítulo da cor coincide com a troca de cor do pó (36%–66% dos frames)
+      show(chapters[2], 0.37); hide(chapters[2], 0.63, 0.04);
+      show(chapters[3], 0.76);
 
       return () => { pos.x = 0; pos.y = 0; pos.s = 1; };
     });
@@ -435,7 +417,8 @@
   (function process() {
     const steps = $$(".steps li");
     const counter = $(".process__counter b");
-    if (reduced) { steps.forEach((s) => s.classList.add("on")); return; }
+    // no celular as etapas viram carrossel e já aparecem todas acesas
+    if (reduced || window.matchMedia("(max-width: 760px)").matches) { steps.forEach((s) => s.classList.add("on")); return; }
     gsap.to(".steps__line line", { strokeDashoffset: 0, ease: "none", scrollTrigger: { trigger: ".steps", start: "top 60%", end: "bottom 60%", scrub: true } });
     steps.forEach((li, i) => {
       ScrollTrigger.create({
@@ -444,6 +427,18 @@
         onLeaveBack: () => { li.classList.remove("on"); counter.textContent = String(Math.max(1, i)).padStart(2, "0"); },
       });
     });
+  })();
+
+  /* ---------- botão fixo "Inicie seu projeto" (celular) ---------- */
+  // aparece depois da abertura e some quando o briefing já está na tela
+  (function mobileCta() {
+    const toggle = () => {
+      const past = window.scrollY > window.innerHeight * 0.9;
+      const contact = $("#contato").getBoundingClientRect().top < window.innerHeight * 0.85;
+      body.classList.toggle("show-mcta", past && !contact);
+    };
+    window.addEventListener("scroll", toggle, { passive: true });
+    toggle();
   })();
 
   /* ---------- configurador ---------- */
