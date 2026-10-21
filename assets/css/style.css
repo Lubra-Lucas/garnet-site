@@ -626,6 +626,16 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
   .hide-sm { display: none; }
   .cat { width: min(68vw, 40vh); }
   .hscroll__intro .lead { display: none; }
+  /* "o que fabricamos" vira carrossel de deslizar: a página não fica fixada */
+  .hscroll__pin { height: auto; display: block; padding: 90px 0 70px; }
+  .hscroll__intro { margin-bottom: 30px; }
+  .hscroll__track { width: auto; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; gap: 12px; padding-block: 4px 10px; scroll-padding-inline: var(--pad); will-change: auto; }
+  .hscroll__track::-webkit-scrollbar { display: none; }
+  .cat { flex: 0 0 72%; width: auto; scroll-snap-align: start; }
+  .cat--end { padding-right: var(--pad); }
+  .cat--end .display { font-size: 30px; }
+  .hscroll__bar { position: relative; left: auto; right: auto; bottom: auto; margin: 22px var(--pad) 0; }
+  .hscroll__hint { padding-inline: var(--pad); }
   .brands li { grid-template-columns: 1fr auto; }
   .brands em { grid-column: 1 / -1; grid-row: 2; }
   .fields { grid-template-columns: 1fr; }

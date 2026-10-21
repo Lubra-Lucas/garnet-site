@@ -380,39 +380,58 @@
     gsap.to($$(".w", p), { opacity: 1, stagger: 0.1, ease: "none", scrollTrigger: { trigger: p, start: "top 78%", end: "bottom 45%", scrub: true } });
   })();
 
-  /* ---------- "o que fabricamos": scroll horizontal fixado ---------- */
+  /* ---------- "o que fabricamos": scroll horizontal fixado (desktop) ou carrossel de deslizar (celular) ---------- */
   if (!reduced) {
-    const pin = $(".hscroll__pin"), track = $(".hscroll__track"), section = $(".hscroll");
+    const pin = $(".hscroll__pin"), track = $(".hscroll__track"), section = $(".hscroll"), bar = $(".hscroll__bar i");
     const cats = $$(".cat", track);
-    const dist = () => Math.max(0, track.scrollWidth - window.innerWidth);
-    gsap.to(track, {
-      x: () => -dist(),
-      ease: "none",
-      scrollTrigger: {
-        trigger: pin,
-        start: "top top",
-        end: () => "+=" + dist(),
-        pin: true,
-        scrub: 0.6,
-        invalidateOnRefresh: true,
-        onUpdate(self) {
-          $(".hscroll__bar i").style.setProperty("--p", self.progress);
-          const mid = window.innerWidth / 2;
-          let best = null, bd = Infinity;
-          cats.forEach((c) => {
-            const r = c.getBoundingClientRect();
-            const d = Math.abs(r.left + r.width / 2 - mid);
-            if (d < bd) { bd = d; best = c; }
-          });
-          const bg = best && best.style.getPropertyValue("--bg");
-          if (bg) section.style.background = bg;
+    // fundo da seção acompanha a categoria mais perto do centro da tela
+    const tintByCenter = () => {
+      const mid = window.innerWidth / 2;
+      let best = null, bd = Infinity;
+      cats.forEach((c) => {
+        const r = c.getBoundingClientRect();
+        const d = Math.abs(r.left + r.width / 2 - mid);
+        if (d < bd) { bd = d; best = c; }
+      });
+      const bg = best && best.style.getPropertyValue("--bg");
+      if (bg) section.style.background = bg;
+    };
+    gsap.matchMedia().add({ desktop: "(min-width: 761px)", mobile: "(max-width: 760px)" }, (c) => {
+      if (c.conditions.mobile) {
+        // celular: o próprio dedo move as categorias, sem fixar a página (menos rolagem)
+        const onSwipe = () => {
+          const max = track.scrollWidth - track.clientWidth;
+          bar.style.setProperty("--p", max > 0 ? track.scrollLeft / max : 0);
+          tintByCenter();
+        };
+        track.addEventListener("scroll", onSwipe, { passive: true });
+        onSwipe();
+        return () => { track.removeEventListener("scroll", onSwipe); section.style.background = ""; };
+      }
+      const dist = () => Math.max(0, track.scrollWidth - window.innerWidth);
+      gsap.to(track, {
+        x: () => -dist(),
+        ease: "none",
+        scrollTrigger: {
+          trigger: pin,
+          start: "top top",
+          end: () => "+=" + dist(),
+          pin: true,
+          scrub: 0.6,
+          invalidateOnRefresh: true,
+          onUpdate(self) {
+            bar.style.setProperty("--p", self.progress);
+            tintByCenter();
+          },
+          onLeaveBack: () => { section.style.background = ""; },
         },
-        onLeaveBack: () => { section.style.background = ""; },
-      },
+      });
+      return () => { section.style.background = ""; };
     });
     gsap.set(section, { transition: "background-color .8s" });
     gsap.from(".hscroll__intro > *", { y: 40, opacity: 0, stagger: 0.08, duration: 1, ease: "expo.out", scrollTrigger: { trigger: section, start: "top 70%", once: true } });
   }
+
 
   /* ---------- processo: linha dourada e etapas ---------- */
   (function process() {
