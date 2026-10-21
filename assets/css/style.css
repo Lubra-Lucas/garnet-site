@@ -233,8 +233,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .header.is-hidden { transform: translate(-50%, -140%); }
 .header__logo img { height: 22px; width: auto; }
-.header__nav { display: flex; gap: 26px; margin-left: auto; }
-.header__nav a { position: relative; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); }
+.header__cta { white-space: nowrap; flex: none; }
+.header__nav { display: flex; gap: clamp(14px, 1.6vw, 26px); margin-left: auto; }
+.header__nav a { position: relative; white-space: nowrap; font-size: 12px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); }
 .header__nav a::after { content: ""; position: absolute; left: 0; right: 0; bottom: -6px; height: 1px; background: var(--gold); transform: scaleX(0); transform-origin: right; transition: transform .45s var(--ease); }
 .header__nav a:hover::after, .header__nav a.is-current::after { transform: scaleX(1); transform-origin: left; }
 .header__burger { display: none; width: 42px; height: 42px; border-radius: 50%; background: var(--ink); position: relative; margin-left: auto; }
@@ -656,6 +657,10 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
   .proto span { display: none; }
   .proto { padding: 10px; }
   .footer__grid { grid-template-columns: 1fr; }
+  /* links de contato com área de toque de ~44px, sem mexer no desenho */
+  .footer__info { gap: 14px; }
+  .footer__info a, .link-gold { position: relative; }
+  .footer__info a::before, .link-gold::before { content: ""; position: absolute; inset: -10px -6px; }
 }
 
 /* ---------- movimento reduzido ---------- */

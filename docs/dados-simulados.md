@@ -20,5 +20,6 @@ na página; esta lista registra o que ainda é ilustrativo e deve ser trocado qu
   marcas de clientes** já estiveram nesses veículos e lojas (não a marca Garnet). O texto da faixa diz isso.
 - Prazo de referência: cerca de 30 dias para a entrega, variando com quantidade e complexidade.
   Pedido mínimo varia por produto.
+- Tempo de resposta aos contatos: até 1 dia útil.
 - Telefone: o mesmo número do WhatsApp, (11) 98153-1188.
 - WhatsApp, Instagram, e-mail, endereço e CNPJ.

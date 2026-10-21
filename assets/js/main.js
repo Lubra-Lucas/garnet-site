@@ -888,6 +888,8 @@
       updateCursor();
     }, { passive: true });
     window.addEventListener("scroll", updateCursor, { passive: true });
+    // depois de um clique (ex.: abrir a foto da vitrine) o rótulo "ver" não fica preso sobre o que abriu
+    window.addEventListener("click", () => requestAnimationFrame(updateCursor));
     document.addEventListener("pointerleave", () => gsap.to(cur, { opacity: 0, duration: 0.2 }));
     document.addEventListener("pointerenter", () => gsap.to(cur, { opacity: 1, duration: 0.2 }));
 
