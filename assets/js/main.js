@@ -282,10 +282,11 @@
     let x = 0, boost = 0;
     gsap.ticker.add(() => {
       const v = lenis ? lenis.velocity : 0;
-      boost += (Math.abs(v) * 0.35 - boost) * 0.1;
+      // limita o empurrão: um salto grande (link do menu) jogava a faixa para fora da tela
+      boost += (Math.min(Math.abs(v) * 0.35, 40) - boost) * 0.1;
       x -= (reduced ? 0 : 0.6) + boost;
       const wRow = row.offsetWidth;
-      if (wRow && -x >= wRow) x += wRow;
+      if (wRow) x %= wRow;
       track.style.transform = `translate3d(${x}px,0,0) skewX(${Math.max(-8, Math.min(8, -v * 0.25))}deg)`;
     });
   })();
@@ -807,6 +808,7 @@
       back.disabled = n === 0;
       next.textContent = n === steps.length - 1 ? "Revisar e enviar" : "Continuar";
       send.hidden = true;
+      mail.hidden = true;
       next.hidden = false;
       err.textContent = "";
     };
@@ -840,7 +842,10 @@
       ].filter(Boolean).join("\n");
       // link real (e não window.open) para funcionar em qualquer navegador e app
       send.href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`;
+      // alternativa para quem prefere e-mail
+      mail.href = `mailto:contato@garnetcosmeticos.com.br?subject=${encodeURIComponent(`Novo projeto — ${f("empresa")}`)}&body=${encodeURIComponent(text)}`;
       send.hidden = false;
+      mail.hidden = false;
       next.hidden = true;
       err.textContent = "";
     });
@@ -851,7 +856,12 @@
     send.textContent = "Abrir conversa no WhatsApp";
     send.hidden = true;
     next.after(send);
-    form.addEventListener("input", () => { if (!send.hidden) { send.hidden = true; next.hidden = false; } });
+    const mail = document.createElement("a");
+    mail.className = "btn btn--ghost-light brief__mail";
+    mail.textContent = "Prefiro enviar por e-mail";
+    mail.hidden = true;
+    send.after(mail);
+    form.addEventListener("input", () => { if (!send.hidden) { send.hidden = mail.hidden = true; next.hidden = false; } });
     back.addEventListener("click", () => i > 0 && go(i - 1));
   })();
 

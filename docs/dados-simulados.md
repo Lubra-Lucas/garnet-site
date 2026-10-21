@@ -16,5 +16,9 @@ na página; esta lista registra o que ainda é ilustrativo e deve ser trocado qu
 - 6 categorias, 5 modelos de produção, 8 etapas do processo, FAQ.
 - Vitrine com 111 fotos de produtos (branch `fotos`): Boca Rosa, Karen Bachini Beauty, Fran,
   John John, Alê de Souza × Payot, Estrela Beauty, Alice Salazar, Max Weber Beauty e linha Garnet.
-- Veículos: Vogue, Elle, Forbes, Marie Claire, Sephora e Riachuelo.
+- Faixa Vogue, Elle, Forbes, Marie Claire, Sephora e Riachuelo: produtos **fabricados pela Garnet para
+  marcas de clientes** já estiveram nesses veículos e lojas (não a marca Garnet). O texto da faixa diz isso.
+- Prazo de referência: cerca de 30 dias para a entrega, variando com quantidade e complexidade.
+  Pedido mínimo varia por produto.
+- Telefone: o mesmo número do WhatsApp, (11) 98153-1188.
 - WhatsApp, Instagram, e-mail, endereço e CNPJ.

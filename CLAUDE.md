@@ -13,6 +13,7 @@
   `data-tilt` (opcional: `data-tilt-max`).
 - O site é público. Nunca publique número, certificação ou depoimento que a Garnet não tenha
   confirmado. Conteúdo ilustrativo deve ser apresentado como exemplo e registrado em `docs/dados-simulados.md`.
-- Contato: todos os formulários terminam no WhatsApp `5511981531188`. Não há backend.
+- Contato: os formulários terminam no WhatsApp `5511981531188` (com opção de e-mail para
+  `contato@garnetcosmeticos.com.br` no briefing). Não há backend.
 - Imagens: WebP, no máximo ~1400px no lado maior, em `assets/img/`.
 - Não mexa no domínio nem no ambiente de produção sem autorização do dono do projeto.
