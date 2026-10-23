@@ -21,5 +21,7 @@ na página; esta lista registra o que ainda é ilustrativo e deve ser trocado qu
 - Prazo de referência: cerca de 30 dias para a entrega, variando com quantidade e complexidade.
   Pedido mínimo varia por produto.
 - Tempo de resposta aos contatos: até 1 dia útil.
+- Seção "Nossa fábrica": 5 fotos reais da fábrica (`assets/img/fabrica/`), com autorização de uso de
+  imagem das pessoas que aparecem. A pedido da Garnet, ficam sem legenda e não podem ser ampliadas.
 - Telefone: o mesmo número do WhatsApp, (11) 98153-1188.
 - WhatsApp, Instagram, e-mail, endereço e CNPJ.
