@@ -21,6 +21,7 @@ window.GARNET_VITRINE = {
     { slug: "bocarosa-carinha-rosa", brand: "bocarosa", name: "#Carinha de Metida" },
     { slug: "fran-gritani", brand: "fran", name: "Gritani" },
     { slug: "johnjohn-red", brand: "johnjohn", name: "Sombra Live It Up" },
+    { slug: "fran-franciny-2", brand: "fran", name: "Paleta Franciny Ehlke" },
     { slug: "garnet-bronzer-palmeiras", brand: "garnet", name: "Bronzer folhas de palmeira" },
     { slug: "bocarosa-omg", brand: "bocarosa", name: "#OMG!" },
     { slug: "garnet-bronzer", brand: "garnet", name: "Bronzer com relevo" },
