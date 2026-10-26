@@ -16,7 +16,7 @@ na página; esta lista registra o que ainda é ilustrativo e deve ser trocado qu
 - **1.000 m²** de área fabril, **50 mil unidades por mês**, **+150 marcas atendidas**, **BPF**.
 - 5 categorias (maquiagem, lábios, perfumaria, skincare e corpo), 5 modelos de produção, 8 etapas do processo, FAQ.
   A Garnet não fabrica shampoo nem condicionador: Cabelos saiu do site; o perfume capilar entra em Perfumaria.
-- Vitrine com 111 fotos de produtos (branch `fotos`): Boca Rosa, Karen Bachini Beauty, Fran,
+- Vitrine com 93 fotos de produtos (branch `fotos`; em out/2026 saíram 18 fotos duplicadas ou com defeito, sem perder nenhum produto): Boca Rosa, Karen Bachini Beauty, Fran,
   John John, Alê de Souza × Payot, Estrela Beauty, Alice Salazar, Max Weber Beauty e linha Garnet.
 - Faixa Vogue, Elle, Forbes, Marie Claire, Sephora e Riachuelo: produtos **fabricados pela Garnet para
   marcas de clientes** já estiveram nesses veículos e lojas (não a marca Garnet). O texto da faixa diz isso.
