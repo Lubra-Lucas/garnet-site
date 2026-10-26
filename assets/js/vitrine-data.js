@@ -71,7 +71,6 @@ window.GARNET_VITRINE = {
     { slug: "karen-07", brand: "karen", name: "Quarteto de Sombras" },
     { slug: "alice-quarteto", brand: "alice", name: "Quarteto" },
     { slug: "maxweber-iluminador", brand: "maxweber", name: "Iluminador" },
-    { slug: "fran-franciny", brand: "fran", name: "Paleta Franciny Ehlke" },
     { slug: "bocarosa-27", brand: "bocarosa", name: "#OMG! Prata" },
     { slug: "garnet-estrelas", brand: "garnet", name: "Sombra estrelas" },
     { slug: "bocarosa-12", brand: "bocarosa", name: "Pride" },
