@@ -75,6 +75,7 @@ window.GARNET_VITRINE = {
     { slug: "garnet-estrelas", brand: "garnet", name: "Sombra estrelas" },
     { slug: "bocarosa-12", brand: "bocarosa", name: "Pride" },
     { slug: "karen-04", brand: "karen", name: "Paleta de Sombras" },
+    { slug: "fran-nine-essentials-v2", brand: "fran", name: "Nine Essentials" },
     { slug: "bocarosa-20", brand: "bocarosa", name: "#BemBasiquinha" },
     { slug: "garnet-dream-away", brand: "garnet", name: "Dream Away" },
     { slug: "ale-02", brand: "ale", name: "It's Brown!" },
