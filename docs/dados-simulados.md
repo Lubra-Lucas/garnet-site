@@ -6,7 +6,6 @@ na página; esta lista registra o que ainda é ilustrativo e deve ser trocado qu
 | Onde | Situação atual | Para trocar |
 |---|---|---|
 | O que fabricamos | Todas as imagens (Maquiagem: blush com flores; Lábios: batom; Perfumaria: perfume e perfume capilar; Skincare: sérum; Corpo: loção) são imagens de conceito da linha Garnet geradas por IA, de produtos que a Garnet confirmou que consegue fabricar | Fotos dos produtos depois de fabricados |
-| Inspirações | Os 7 compactos da seção "Ideias para o seu compacto" são imagens de conceito da linha Garnet geradas por IA (não estão na vitrine de produtos fabricados) | Fotos dos compactos depois de fabricados, se forem produzidos |
 | Depoimentos | **Fora do ar.** O bloco está comentado em `index.html` (os textos antigos não eram de clientes reais) | Depoimentos reais com autorização; depois é só descomentar e trocar os textos |
 | Estojo 3D | Animação gerada por código (`tools/render-sequence`) | Render profissional, se desejarem |
 
@@ -16,6 +15,9 @@ na página; esta lista registra o que ainda é ilustrativo e deve ser trocado qu
 - **1.000 m²** de área fabril, **50 mil unidades por mês**, **+150 marcas atendidas**, **BPF**.
 - 5 categorias (maquiagem, lábios, perfumaria, skincare e corpo), 5 modelos de produção, 8 etapas do processo, FAQ.
   A Garnet não fabrica shampoo nem condicionador: Cabelos saiu do site; o perfume capilar entra em Perfumaria.
+- Vitrine: 7 compactos da Linha Garnet gerados por IA (slugs `garnet-bronzer-palmeiras`, `garnet-iluminador-aneis`,
+  `garnet-por-do-sol`, `garnet-blush-espiral-coral`, `garnet-lua-estrelas`, `garnet-blush-rosa`, `garnet-blush-g-lilas`);
+  a Garnet informou que são da linha Garnet. Trocar por fotos reais quando houver.
 - Vitrine com 93 fotos de produtos (branch `fotos`; em out/2026 saíram 18 fotos duplicadas ou com defeito, sem perder nenhum produto): Boca Rosa, Karen Bachini Beauty, Fran,
   John John, Alê de Souza × Payot, Estrela Beauty, Alice Salazar, Max Weber Beauty e linha Garnet.
 - Faixa Vogue, Elle, Forbes, Marie Claire, Sephora e Riachuelo: produtos **fabricados pela Garnet para

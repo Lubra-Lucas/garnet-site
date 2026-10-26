@@ -347,19 +347,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .stat b small { font-size: .42em; font-weight: 400; letter-spacing: .02em; margin-left: .18em; color: var(--muted); }
 .stat span { margin-top: 12px; font-size: 11px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
 
-/* ---------- inspirações de compactos (imagens de conceito) ---------- */
-.ideas { z-index: 2; background: var(--bg); }
-.ideas__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px 18px; }
-.idea { display: flex; flex-direction: column; }
-.idea__img { position: relative; aspect-ratio: 4 / 5; border-radius: var(--r); overflow: hidden; background: var(--bg-2); }
-.idea__img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
-.idea__tec { margin-top: 16px; font-size: 10px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); }
-.idea h3 { margin: 6px 0 0; font-size: 19px; font-weight: 400; letter-spacing: -.01em; }
-.idea__cta { margin-top: 10px; align-self: flex-start; font-size: 13px; font-weight: 500; color: var(--ink-2); border-bottom: 1px solid var(--gold); padding-bottom: 2px; transition: color .3s; }
-.idea__cta:hover { color: var(--gold); }
-.idea--end { justify-content: center; align-items: flex-start; gap: 24px; padding: 24px; border: 1px solid var(--line); border-radius: var(--r); background: var(--bg-2); }
-.idea--end .display { font-size: clamp(26px, 2.4vw, 36px); }
-
 /* ---------- nossa fábrica (fotos reais) ---------- */
 .factory { z-index: 2; background: var(--bg-2); }
 .factory__grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-areas: "a a b c" "d d e e"; grid-auto-rows: clamp(240px, 29vw, 440px); gap: 18px; }
@@ -595,7 +582,6 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
 
 /* ---------- responsivo ---------- */
 @media (max-width: 1080px) {
-  .ideas__grid { grid-template-columns: repeat(3, 1fr); }
   .header__nav, .header__cta { display: none; }
   .header__burger { display: block; }
   .stats { grid-template-columns: repeat(2, 1fr); }
@@ -653,12 +639,6 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
   .cat--end .display { font-size: 30px; }
   .hscroll__bar { position: relative; left: auto; right: auto; bottom: auto; margin: 22px var(--pad) 0; }
   .hscroll__hint { padding-inline: var(--pad); }
-  /* inspirações: carrossel de deslizar */
-  .ideas__grid { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-inline: calc(var(--pad) * -1); padding: 4px var(--pad) 10px; scroll-padding-inline: var(--pad); }
-  .ideas__grid::-webkit-scrollbar { display: none; }
-  .idea { flex: 0 0 64%; scroll-snap-align: start; }
-  .idea--end { aspect-ratio: 4 / 5; }
-  .idea__cta { padding-block: 8px 2px; }
   /* nossa fábrica: carrossel de deslizar, fotos na mesma altura */
   .factory__grid { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-inline: calc(var(--pad) * -1); padding: 4px var(--pad) 10px; scroll-padding-inline: var(--pad); }
   .factory__grid::-webkit-scrollbar { display: none; }
