@@ -5,7 +5,7 @@ na página; esta lista registra o que ainda é ilustrativo e deve ser trocado qu
 
 | Onde | Situação atual | Para trocar |
 |---|---|---|
-| O que fabricamos | Imagens de **Perfumaria** (perfume) e **Skincare** (sérum) são imagens de conceito da linha Garnet geradas por IA, de produtos que a Garnet confirmou que consegue fabricar | Fotos dos produtos depois de fabricados |
+| O que fabricamos | Imagens de **Lábios** (batom), **Perfumaria** (perfume e perfume capilar), **Skincare** (sérum) e **Corpo** (loção) são imagens de conceito da linha Garnet geradas por IA, de produtos que a Garnet confirmou que consegue fabricar. Só **Maquiagem** é foto de produto fabricado | Fotos dos produtos depois de fabricados |
 | Depoimentos | **Fora do ar.** O bloco está comentado em `index.html` (os textos antigos não eram de clientes reais) | Depoimentos reais com autorização; depois é só descomentar e trocar os textos |
 | Estojo 3D | Animação gerada por código (`tools/render-sequence`) | Render profissional, se desejarem |
 

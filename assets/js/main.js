@@ -431,6 +431,10 @@
       return () => { section.style.background = ""; };
     });
     gsap.set(section, { transition: "background-color .8s" });
+    // Perfumaria mostra o perfume e o perfume capilar, trocando devagar (só opacidade)
+    $$(".cat__img--duo .cat__alt").forEach((alt) => {
+      gsap.timeline({ repeat: -1, repeatDelay: 2.6, delay: 2.6, yoyo: true }).to(alt, { opacity: 1, duration: 1.2, ease: "power2.inOut" });
+    });
     gsap.from(".hscroll__intro > *", { y: 40, opacity: 0, stagger: 0.08, duration: 1, ease: "expo.out", scrollTrigger: { trigger: section, start: "top 70%", once: true } });
   }
 

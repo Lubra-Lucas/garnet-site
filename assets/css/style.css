@@ -381,6 +381,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .cat__n { position: absolute; top: 26px; left: 30px; z-index: 2; font-size: 11px; font-weight: 600; letter-spacing: .2em; color: var(--ink-2); }
 .cat__img { position: relative; aspect-ratio: 4 / 5; border-radius: 16px; overflow: hidden; background: var(--bg); }
 .cat__img img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.12); transition: transform 1.2s var(--ease); }
+/* Perfumaria: perfume e perfume capilar se alternam (só opacidade; o JS liga a troca) */
+.cat__img--duo .cat__alt { position: absolute; inset: 0; opacity: 0; }
 .cat:hover .cat__img img { transform: scale(1.02); }
 .cat h3 { margin: 22px 0 4px 6px; font-size: 26px; font-weight: 400; letter-spacing: -.01em; }
 .cat p { margin: 0 0 0 6px; color: var(--muted); font-size: 14px; }
