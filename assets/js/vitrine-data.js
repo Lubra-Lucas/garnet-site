@@ -58,7 +58,6 @@ window.GARNET_VITRINE = {
     { slug: "karen-01", brand: "karen", name: "Quarteto Nude" },
     { slug: "bocarosa-09", brand: "bocarosa", name: "#BemBasiquinha" },
     { slug: "garnet-coracoes", brand: "garnet", name: "Pó corações" },
-    { slug: "fran-nine-essentials", brand: "fran", name: "Nine Essentials" },
     { slug: "ale-01", brand: "ale", name: "Roses for us!" },
     { slug: "estrela-sombra", brand: "estrela", name: "Sombra" },
     { slug: "bocarosa-14", brand: "bocarosa", name: "Happy Birthday #Queridinhos" },
