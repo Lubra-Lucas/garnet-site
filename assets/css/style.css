@@ -349,7 +349,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* ---------- inspirações de compactos (imagens de conceito) ---------- */
 .ideas { z-index: 2; background: var(--bg); }
-.ideas__grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; }
+.ideas__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px 18px; }
 .idea { display: flex; flex-direction: column; }
 .idea__img { position: relative; aspect-ratio: 4 / 5; border-radius: var(--r); overflow: hidden; background: var(--bg-2); }
 .idea__img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
@@ -357,6 +357,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .idea h3 { margin: 6px 0 0; font-size: 19px; font-weight: 400; letter-spacing: -.01em; }
 .idea__cta { margin-top: 10px; align-self: flex-start; font-size: 13px; font-weight: 500; color: var(--ink-2); border-bottom: 1px solid var(--gold); padding-bottom: 2px; transition: color .3s; }
 .idea__cta:hover { color: var(--gold); }
+.idea--end { justify-content: center; align-items: flex-start; gap: 24px; padding: 24px; border: 1px solid var(--line); border-radius: var(--r); background: var(--bg-2); }
+.idea--end .display { font-size: clamp(26px, 2.4vw, 36px); }
 
 /* ---------- nossa fábrica (fotos reais) ---------- */
 .factory { z-index: 2; background: var(--bg-2); }
@@ -655,6 +657,7 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
   .ideas__grid { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-inline: calc(var(--pad) * -1); padding: 4px var(--pad) 10px; scroll-padding-inline: var(--pad); }
   .ideas__grid::-webkit-scrollbar { display: none; }
   .idea { flex: 0 0 64%; scroll-snap-align: start; }
+  .idea--end { aspect-ratio: 4 / 5; }
   .idea__cta { padding-block: 8px 2px; }
   /* nossa fábrica: carrossel de deslizar, fotos na mesma altura */
   .factory__grid { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-inline: calc(var(--pad) * -1); padding: 4px var(--pad) 10px; scroll-padding-inline: var(--pad); }

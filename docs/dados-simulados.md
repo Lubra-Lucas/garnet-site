@@ -5,8 +5,8 @@ na página; esta lista registra o que ainda é ilustrativo e deve ser trocado qu
 
 | Onde | Situação atual | Para trocar |
 |---|---|---|
-| O que fabricamos | Imagens de **Lábios** (batom), **Perfumaria** (perfume e perfume capilar), **Skincare** (sérum) e **Corpo** (loção) são imagens de conceito da linha Garnet geradas por IA, de produtos que a Garnet confirmou que consegue fabricar. Só **Maquiagem** é foto de produto fabricado | Fotos dos produtos depois de fabricados |
-| Inspirações | Os 5 compactos da seção "Ideias para o seu compacto" são imagens de conceito da linha Garnet geradas por IA (não estão na vitrine de produtos fabricados) | Fotos dos compactos depois de fabricados, se forem produzidos |
+| O que fabricamos | Todas as imagens (Maquiagem: blush com flores; Lábios: batom; Perfumaria: perfume e perfume capilar; Skincare: sérum; Corpo: loção) são imagens de conceito da linha Garnet geradas por IA, de produtos que a Garnet confirmou que consegue fabricar | Fotos dos produtos depois de fabricados |
+| Inspirações | Os 7 compactos da seção "Ideias para o seu compacto" são imagens de conceito da linha Garnet geradas por IA (não estão na vitrine de produtos fabricados) | Fotos dos compactos depois de fabricados, se forem produzidos |
 | Depoimentos | **Fora do ar.** O bloco está comentado em `index.html` (os textos antigos não eram de clientes reais) | Depoimentos reais com autorização; depois é só descomentar e trocar os textos |
 | Estojo 3D | Animação gerada por código (`tools/render-sequence`) | Render profissional, se desejarem |
 
