@@ -18,8 +18,10 @@ na página; esta lista registra o que ainda é ilustrativo e deve ser trocado qu
 - Vitrine: 7 compactos da Linha Garnet gerados por IA (slugs `garnet-bronzer-palmeiras`, `garnet-iluminador-aneis`,
   `garnet-por-do-sol`, `garnet-blush-espiral-coral`, `garnet-lua-estrelas`, `garnet-blush-rosa`, `garnet-blush-g-lilas`);
   a Garnet informou que são da linha Garnet. Trocar por fotos reais quando houver.
-- Vitrine com 100 fotos de produtos (branch `fotos`; em out/2026 saíram 18 fotos duplicadas ou com defeito, sem perder nenhum produto): Boca Rosa, Karen Bachini Beauty, Fran,
-  John John, Alê de Souza × Payot, Estrela Beauty, Alice Salazar, Max Weber Beauty e linha Garnet.
+- Vitrine com 98 fotos de produtos (branch `fotos`; em out/2026 saíram 18 fotos duplicadas ou com defeito, sem perder nenhum produto): Boca Rosa, Karen Bachini Beauty, Fran,
+  John John, Alê de Souza × Payot, Estrela Beauty e linha Garnet. Alice Salazar e Max Weber Beauty continuam
+  citadas no texto (faixa do topo e números), mas ficam fora da vitrine por enquanto, a pedido da Garnet
+  (linhas comentadas em `assets/js/vitrine-data.js`; fotos mantidas).
 - Faixa Vogue, Elle, Forbes, Marie Claire, Sephora e Riachuelo: produtos **fabricados pela Garnet para
   marcas de clientes** já estiveram nesses veículos e lojas (não a marca Garnet). O texto da faixa diz isso.
 - Prazo de referência: cerca de 30 dias para a entrega, variando com quantidade e complexidade.
