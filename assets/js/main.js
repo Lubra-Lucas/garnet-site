@@ -111,13 +111,17 @@
     if (lenis) lenis.scrollTo(target, { offset: 0, duration: 1.6 });
     else target.scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
   };
-  $$('a[href^="#"]').forEach((a) => {
+  $$('a[href^="#"]:not(.skip)').forEach((a) => {
     a.addEventListener("click", (e) => {
       const id = a.getAttribute("href");
       const el = id === "#topo" ? document.body : $(id);
       if (!el) return;
       e.preventDefault();
-      closeMenu();
+      // fecha o menu sem roubar o foco: o clique já levou o usuário à seção
+      closeMenu(false);
+      // o header que se escondia ao rolar volta a aparecer depois de navegar pelo menu
+      header.classList.remove("is-hidden");
+      keepHeader = true;
       scrollTo(id === "#topo" ? 0 : el);
     });
   });
@@ -125,27 +129,57 @@
   /* ---------- header ---------- */
   const header = $(".header");
   let lastY = 0;
+  // depois de clicar numa âncora, o header fica visível até o usuário rolar para baixo por conta própria
+  let keepHeader = false, keepTimer = 0;
   const onScrollHeader = () => {
     const y = window.scrollY;
     header.classList.toggle("is-scrolled", y > 40);
-    header.classList.toggle("is-hidden", y > 400 && y > lastY && !body.classList.contains("menu-open"));
+    if (keepHeader) {
+      header.classList.remove("is-hidden");
+      clearTimeout(keepTimer);
+      keepTimer = setTimeout(() => { keepHeader = false; }, 250);
+    } else {
+      header.classList.toggle("is-hidden", y > 400 && y > lastY && !body.classList.contains("menu-open"));
+    }
     lastY = y;
   };
   window.addEventListener("scroll", onScrollHeader, { passive: true });
   const burger = $(".header__burger");
-  function closeMenu() {
+  const mnav = $(".mnav");
+  // menu fechado fica inert (fora da ordem de Tab e do leitor de tela)
+  function closeMenu(restoreFocus = true) {
+    const wasOpen = body.classList.contains("menu-open");
     body.classList.remove("menu-open");
     burger.setAttribute("aria-expanded", "false");
-    $(".mnav").setAttribute("aria-hidden", "true");
+    burger.setAttribute("aria-label", "Abrir menu");
+    mnav.setAttribute("aria-hidden", "true");
+    mnav.inert = true;
     if (lenis) lenis.start();
+    if (wasOpen && restoreFocus) burger.focus();
   }
-  burger.addEventListener("click", () => {
-    const open = !body.classList.contains("menu-open");
-    if (!open) return closeMenu();
+  function openMenu() {
     body.classList.add("menu-open");
     burger.setAttribute("aria-expanded", "true");
-    $(".mnav").setAttribute("aria-hidden", "false");
+    burger.setAttribute("aria-label", "Fechar menu");
+    mnav.setAttribute("aria-hidden", "false");
+    mnav.inert = false;
     if (lenis) lenis.stop();
+    const first = $("a", mnav);
+    if (first) first.focus({ preventScroll: true });
+  }
+  burger.addEventListener("click", () => {
+    if (body.classList.contains("menu-open")) closeMenu(); else openMenu();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (!body.classList.contains("menu-open")) return;
+    if (e.key === "Escape") return closeMenu();
+    if (e.key !== "Tab") return;
+    // Tab preso entre o botão (fica no header) e os links do menu
+    const items = [...$$("a", mnav), burger];
+    const i = items.indexOf(document.activeElement);
+    const next = e.shiftKey ? (i <= 0 ? items.length - 1 : i - 1) : (i === items.length - 1 ? 0 : i + 1);
+    e.preventDefault();
+    items[next].focus();
   });
 
   /* ---------- linha do tempo da história ---------- */
@@ -461,7 +495,11 @@
     const toggle = () => {
       const past = window.scrollY > window.innerHeight * 0.9;
       const contact = $("#contato").getBoundingClientRect().top < window.innerHeight * 0.85;
-      body.classList.toggle("show-mcta", past && !contact);
+      // o atalho some também sobre o simulador; o WhatsApp só aparece depois da abertura e some no briefing
+      const cfg = $("#personalize").getBoundingClientRect();
+      const onCfg = cfg.top < window.innerHeight * 0.85 && cfg.bottom > window.innerHeight * 0.15;
+      body.classList.toggle("show-mcta", past && !contact && !onCfg);
+      body.classList.toggle("show-wa", past && !contact);
     };
     window.addEventListener("scroll", toggle, { passive: true });
     toggle();
@@ -757,7 +795,7 @@
 
     // foto completa (lightbox) com navegação entre os produtos do filtro atual
     const lb = $(".lightbox"), lbImg = $("img", lb);
-    let at = 0;
+    let at = 0, opener = null;
     const show = (i) => {
       at = (i + list.length) % list.length;
       const it = list[at];
@@ -767,12 +805,18 @@
       $("figcaption span", lb).textContent = brandOf[it.brand].label;
     };
     const open = (i) => {
+      opener = document.activeElement;
       show(i); lb.hidden = false; document.body.classList.add("lb-open");
       if (lenis) lenis.stop();
       if (!reduced) gsap.fromTo(lb, { opacity: 0 }, { opacity: 1, duration: 0.3 });
       $(".lightbox__close", lb).focus();
     };
-    const close = () => { lb.hidden = true; document.body.classList.remove("lb-open"); if (lenis) lenis.start(); };
+    const close = () => {
+      lb.hidden = true; document.body.classList.remove("lb-open"); if (lenis) lenis.start();
+      // devolve o foco ao cartão que abriu a foto
+      if (opener && opener.isConnected) opener.focus({ preventScroll: true });
+      opener = null;
+    };
     $(".vitrine").addEventListener("click", (e) => { const c = e.target.closest(".vcard"); if (c) open(Number(c.dataset.i)); });
     $(".lightbox__close", lb).addEventListener("click", close);
     $(".lightbox__prev", lb).addEventListener("click", () => show(at - 1));
@@ -780,6 +824,13 @@
     lb.addEventListener("click", (e) => { if (e.target === lb) close(); });
     document.addEventListener("keydown", (e) => {
       if (lb.hidden) return;
+      if (e.key === "Tab") {
+        // Tab preso entre fechar, anterior e próxima
+        const f = [$(".lightbox__close", lb), $(".lightbox__prev", lb), $(".lightbox__next", lb)];
+        const i = f.indexOf(document.activeElement);
+        const n = e.shiftKey ? (i <= 0 ? f.length - 1 : i - 1) : (i === f.length - 1 ? 0 : i + 1);
+        e.preventDefault(); f[n].focus();
+      }
       if (e.key === "Escape") close();
       if (e.key === "ArrowLeft") show(at - 1);
       if (e.key === "ArrowRight") show(at + 1);
