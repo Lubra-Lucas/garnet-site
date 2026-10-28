@@ -316,6 +316,7 @@
         </div>
         <div class="config__grid">
           <div class="config__preview">
+          <div class="config__view">
           <div class="config__stage" data-tilt data-tilt-max="6">
             <svg class="cfg" viewBox="0 0 400 400" role="img" aria-label="Prévia do produto configurado">
               <defs>
@@ -326,9 +327,9 @@
               </defs>
               <g class="cfg-body"></g>
             </svg>
-            <div class="config__badge"><span class="cfg-sum"></span></div>
           </div>
-          <p class="config__note">Simulação ilustrativa. Trabalhamos com diversos fornecedores de embalagem: formatos, cores e acabamentos vão muito além destes exemplos.</p>
+          <div class="config__badge"><span class="cfg-sum" aria-live="polite"></span></div>
+          </div>
           </div>
 
           <form class="config__panel" onsubmit="return false">
@@ -344,7 +345,7 @@
                 <button type="button" data-v="#d2a65e" style="--c:#d2a65e" aria-label="Dourado"></button>
                 <button type="button" data-v="#651c2e" style="--c:#651c2e" aria-label="Vinho"></button>
                 <button type="button" data-v="#7b5ea7" style="--c:#7b5ea7" aria-label="Lavanda"></button>
-                <label class="swatch-custom" aria-label="Cor personalizada"><input type="color" value="#b06f8a" /></label>
+                <label class="swatch-custom"><input type="color" value="#b06f8a" aria-label="Cor personalizada" /></label>
               </div>
             </fieldset>
             <fieldset><legend>Desenho prensado</legend>
@@ -356,8 +357,8 @@
                 <button type="button" data-v="low">Baixo relevo</button>
               </div>
             </fieldset>
-            <fieldset class="cfg-text-set"><legend>Texto ou inicial do relevo</legend>
-              <input class="field" type="text" maxlength="14" value="SUA MARCA" data-opt="text" aria-label="Texto do relevo" />
+            <fieldset class="cfg-text-set"><legend class="cfg-text-legend">Texto do relevo</legend>
+              <input class="field" type="text" maxlength="14" value="SUA MARCA" placeholder="SUA MARCA" data-opt="text" aria-label="Texto do relevo" />
             </fieldset>
             <fieldset><legend>Acabamento</legend>
               <div class="chips" data-opt="finish">
@@ -377,7 +378,12 @@
                 <button type="button" data-v="clear">Acrílico</button>
               </div>
             </fieldset>
-            <a class="btn btn--dark magnetic cfg-send" target="_blank" rel="noopener">Quero esse produto</a>
+            <p class="config__note">Simulação ilustrativa. Trabalhamos com diversos fornecedores de embalagem: formatos, cores e acabamentos vão muito além destes exemplos.</p>
+            <div class="cfg-actions">
+              <a class="btn btn--dark magnetic cfg-send" target="_blank" rel="noopener">Enviar minha ideia pelo WhatsApp</a>
+              <a class="cfg-alt cfg-mail">Prefiro enviar por e-mail</a>
+              <button type="button" class="cfg-alt cfg-reset">Recomeçar</button>
+            </div>
           </form>
         </div>
       </div>

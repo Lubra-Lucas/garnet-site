@@ -472,7 +472,8 @@
     const svg = $(".cfg");
     const body = $(".cfg-body", svg);
     const NS = "http://www.w3.org/2000/svg";
-    const state = { format: "round", color: "#c4876a", art: "floral", relief: "high", finish: "matte", case: "gold", text: "SUA MARCA" };
+    const INITIAL = { format: "round", color: "#c4876a", art: "floral", relief: "high", finish: "matte", case: "gold", text: "SUA MARCA" };
+    const state = { ...INITIAL };
 
     // embalagens inspiradas nas usadas nos cases (medidas no espaço 400×400, centro em 200,200)
     const grid = (cols, rows, w, h, gx, gy, r) => {
@@ -492,14 +493,17 @@
 
     // desenhos no espaço -50..50; "currentColor" recebe a cor de cada camada do relevo
     const initial = () => (state.text.trim()[0] || "G").toUpperCase();
+    // texto efetivo do relevo: o mesmo que a prévia mostra (vazio cai no padrão)
+    const reliefText = () => state.art === "mono" ? initial() : (state.text.trim().toUpperCase() || "SUA MARCA");
     const esc = (t) => t.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
     const ARTS = {
       none: { label: "Liso", draw: () => "" },
       logo: {
         label: "Texto",
         draw: () => {
-          const t = esc(state.text.trim().toUpperCase() || "SUA MARCA");
-          const fs = Math.min(15, 86 / (t.length * 0.72));
+          const raw = reliefText(); // tamanho da fonte pelo texto cru (esc() aumenta o comprimento)
+          const t = esc(raw);
+          const fs = Math.min(15, 86 / (raw.length * 0.72));
           return `<text x="0" y="1" fill="currentColor" font-family="Montserrat, sans-serif" font-weight="600" font-size="${fs.toFixed(1)}" letter-spacing="${(fs * 0.18).toFixed(1)}" text-anchor="middle" dominant-baseline="middle">${t}</text><path d="M-30 ${fs + 3}h60M-30 ${-fs - 3}h60" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>`;
         },
       },
@@ -587,7 +591,7 @@
       return layer(d * up, d * up, shade(c, -0.42), 0.75) + layer(-d * up, -d * up, shade(c, 0.45), 0.8) + layer(0, 0, c, 1);
     }
 
-    function render() {
+    function render(animate = true) {
       const fmt = FORMATS[state.format];
       const [a, b] = CASES[state.case];
       $(".cfg-case-a", svg).setAttribute("stop-color", a);
@@ -609,21 +613,53 @@
       html += caseRect(`fill="url(#cfgShine)" opacity=".7" pointer-events="none"`);
       body.innerHTML = html;
 
-      $(".cfg-text-set").hidden = !(state.art === "logo" || state.art === "mono");
+      const hasText = state.art === "logo" || state.art === "mono";
+      $(".cfg-text-set").hidden = !hasText;
+      $(".cfg-relief-set").hidden = state.art === "none"; // "Liso" não tem relevo
+      const textLabel = state.art === "mono" ? "Inicial do monograma (usamos a 1ª letra)" : "Texto do relevo";
+      $(".cfg-text-legend").textContent = textLabel;
+      $('[data-opt="text"]').setAttribute("aria-label", textLabel);
 
       const colorName = names[state.color] || state.color.toUpperCase();
       const artName = `${ARTS[state.art].label}${state.art === "none" ? "" : " · " + (state.relief === "high" ? "alto relevo" : "baixo relevo")}`;
-      $(".cfg-sum").textContent = `${fmt.label} · ${colorName} · ${ARTS[state.art].label}`;
+      // resumo curto (2 linhas) com as 5 escolhas principais; também vira o aria-label da prévia
+      const line1 = `${fmt.label} · embalagem ${CASES[state.case][2].toLowerCase()}`;
+      const line2 = `${colorName} · ${artName.toLowerCase()} · ${FINISH[state.finish].toLowerCase()}`;
+      const sum = $(".cfg-sum");
+      sum.innerHTML = `<span>${esc(line1)}</span><span>${esc(line2)}</span>`;
+      svg.setAttribute("aria-label", `Prévia do produto configurado: ${line1}; ${line2}`);
+      sync();
       const msg = [
         "Olá! Fiz uma simulação no site da Garnet e quero desenvolver a minha make 🙂",
         `Embalagem: ${fmt.label} (${CASES[state.case][2]})`,
         `Cor base: ${colorName}${fmt.pans.length > 1 ? ` (paleta com ${fmt.pans.length} tons)` : ""}`,
         `Acabamento: ${FINISH[state.finish]}`,
         `Desenho prensado: ${artName}`,
-        state.art === "logo" || state.art === "mono" ? `Texto do relevo: ${state.text.trim() || "—"}` : "",
+        hasText ? `${textLabel}: ${reliefText()}` : "",
       ].filter(Boolean).join("\n");
       $(".cfg-send").href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
-      if (!reduced) gsap.fromTo(svg, { scale: 0.97 }, { scale: 1, duration: 0.6, ease: "elastic.out(1, .5)", overwrite: true });
+      $(".cfg-mail").href = `mailto:contato@garnetcosmeticos.com.br?subject=${encodeURIComponent("Simulação Monte a sua make")}&body=${encodeURIComponent(msg)}`;
+      if (animate && !reduced) gsap.fromTo(svg, { scale: 0.97 }, { scale: 1, duration: 0.6, ease: "elastic.out(1, .5)", overwrite: true });
+    }
+
+    // sincroniza .on e aria-pressed de todos os botões de escolha (inclusive os criados dinamicamente)
+    function sync() {
+      $$(".config__panel [data-opt]").forEach((group) => {
+        const key = group.dataset.opt;
+        if (key === "text") return;
+        let hit = false;
+        $$("button", group).forEach((b) => {
+          const on = b.dataset.v === state[key];
+          hit = hit || on;
+          b.classList.toggle("on", on);
+          b.setAttribute("aria-pressed", on);
+        });
+        if (key === "color") {
+          const cu = $(".swatch-custom");
+          cu.classList.toggle("on", !hit);
+          $("input", cu).setAttribute("aria-label", hit ? "Cor personalizada" : "Cor personalizada (selecionada)");
+        }
+      });
     }
 
     // chips com miniaturas desenhadas a partir das mesmas definições
@@ -644,22 +680,28 @@
     $$(".config__panel [data-opt]").forEach((group) => {
       const key = group.dataset.opt;
       if (key === "text") {
-        group.addEventListener("input", () => { state.text = group.value; render(); drawArtChips(); });
+        // ao digitar: sem reanimar a prévia a cada tecla
+        group.addEventListener("input", () => { state.text = group.value; drawArtChips(); render(false); });
         return;
       }
       group.addEventListener("click", (e) => {
         const btn = e.target.closest("button");
         if (!btn || btn.disabled) return;
-        $$("button, .swatch-custom", group).forEach((b) => b.classList.toggle("on", b === btn));
         state[key] = btn.dataset.v;
         render();
       });
     });
     const custom = $(".swatch-custom input");
     custom.addEventListener("input", () => {
-      $$(".swatch-pick button").forEach((b) => b.classList.remove("on"));
-      custom.parentElement.classList.add("on");
       state.color = custom.value;
+      render();
+    });
+    // recomeçar: volta ao estado inicial
+    $(".cfg-reset").addEventListener("click", () => {
+      Object.assign(state, INITIAL);
+      $('[data-opt="text"]').value = INITIAL.text;
+      custom.value = "#b06f8a";
+      drawArtChips();
       render();
     });
     render();
