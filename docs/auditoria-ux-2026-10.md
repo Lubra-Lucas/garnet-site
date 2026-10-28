@@ -54,8 +54,49 @@ no navegador ou lido no código; "hipótese" = inferência.
 - Vitrine e marquees sem botão de pausa (WCAG 2.2.2); cursor personalizado parado no canto em tablets.
 - `lab/` publicado; `_headers` sem efeito no GitHub Pages (cache de 10 min nos frames) — depende do dono.
 
-## Implementado nesta rodada
-Ver a seção "Resultados" abaixo (preenchida após os testes).
+## Implementado nesta rodada (6 pacotes, mesclados e testados juntos)
+
+- **Acessibilidade e navegação:** link "Ir para o conteúdo"; anel de foco dourado em todo o site;
+  menu do celular com `inert`, Esc e foco preso; lightbox devolve o foco; menu na ordem da página
+  (Cases, Fábrica, O que fabricamos, Como funciona, Modelos, Simulador, Dúvidas) e botão
+  "Inicie seu projeto" no menu do celular; botões fixos somem no simulador/briefing e no topo.
+- **Tipografia e contraste:** token `--gold-text` (5,2:1) nos rótulos dourados; piso de 12 px;
+  `--muted` mais escuro (passa 4,5:1 também sobre `--bg-2`); títulos com `text-wrap: balance`;
+  "GARNET" do rodapé inteiro; alvos de toque de 44 px; ritmo vertical menor; eixo esquerdo único (`--axis`).
+- **Simulador:** prévia fixa no topo também no celular/tablet; `aria-pressed` e resumo com `aria-live`;
+  relevo some com desenho "Liso"; mensagem usa o texto efetivo do relevo; "Recomeçar"; resumo completo;
+  "Enviar minha ideia pelo WhatsApp" e opção por e-mail com o mesmo conteúdo.
+- **Briefing:** erros por campo (`aria-invalid`, foco no primeiro); telefone com DDD; marca opcional;
+  Enter avança; foco e anúncio "Passo X de 4"; altura acompanha o passo; linha de apoio em cada modelo
+  e "Ainda não sei" em destaque; revisão antes de enviar com "Copiar mensagem"; atalho "Fale direto pelo
+  WhatsApp"; linha "Origem: briefing do site"; categoria pré-marcada pelos links "Iniciar projeto";
+  aviso de privacidade sem afirmar conformidade com a LGPD.
+- **Conteúdo e SEO:** title/description com "fábrica" e "private label"; OG/Twitter completos; JSON-LD
+  Organization completo e FAQPage; lead curto no topo do celular; cases "Marcas que já fabricamos";
+  dica da vitrine para toque; "Iniciar projeto" em cada categoria; selo "Nossa especialidade desde 1992";
+  nota "Imagens ilustrativas de conceito"; linha "Para quem…" nos modelos; FAQ "Como peço um orçamento?";
+  contadores partem de ~85% do valor (sem "+0").
+- **Performance e vitrine:** frames do estojo em carga progressiva (metade no celular); vitrine montada
+  perto da tela, cópias do laço fora do teclado/leitor de tela, botão "Pausar animação"; poeira e marquee
+  param fora da tela; cursor só aparece com mouse.
+
+## Resultados medidos (antes → depois)
+
+| Medida | Antes | Depois |
+|---|---|---|
+| Fim do carregamento, celular 4G + CPU 4x | 16,0 s | 4,5 s |
+| Arquivos baixados até o carregamento | 161 | 31 |
+| Peso até o carregamento | 2,81 MB | 0,69 MB |
+| LCP (mesmo teste) | 2,80 s | 2,83–2,90 s (igual) |
+| Paradas de Tab na página | 340 | 132 |
+| Erros de console / 404 (360–1440, com e sem movimento reduzido) | 0 | 0 |
+| Rolagem horizontal (360, 390, 768, 1440) | 0 | 0 |
+| Altura da página no celular 390 | 14.009 px | 13.837 px |
+
+Testes funcionais (Playwright): categoria → briefing pré-marcado; briefing de ponta a ponta com
+validação e mensagem final; simulador com prévia visível no celular; skip link; menu do celular e Esc;
+filtro da vitrine, pausa e lightbox com retorno do foco. Limitações: não testado em leitor de tela real
+nem em aparelhos físicos; o comportamento do wa.me foi conferido só pelo link gerado.
 
 ## Propostas estruturais (aguardam aprovação)
 1. Reordenar a página: hero → o que fabricamos → modelos → como funciona → prova (cases + números + fábrica) → simulador → FAQ → briefing. Hoje as categorias começam a 7,5 telas do topo no celular.
