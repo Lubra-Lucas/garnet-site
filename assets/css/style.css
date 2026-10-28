@@ -282,6 +282,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .chapter--hero { left: var(--pad); width: min(640px, 46vw); }
 .chapter--hero .display { font-size: clamp(36px, min(5.4vw, 8.4vh), 86px); }
 .chapter--hero { top: 46%; }
+.lead-short { display: none; }
 /* a abertura nasce visível: não depende de nenhuma animação para aparecer */
 .chapter.chapter--hero { opacity: 1; visibility: visible; }
 @media (max-height: 780px) and (min-width: 761px) { .chapter--hero .lead { margin-top: 16px; font-size: 15px; } .chapter--hero .actions { margin-top: 24px; } .scrollhint { display: none; } }
@@ -291,6 +292,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .chapter--right { right: var(--pad); }
 .chapter--center { left: 50%; top: auto; bottom: 7vh; translate: -50% 0; text-align: center; width: min(760px, 90vw); }
 .chapter--center .btn { margin-top: 30px; }
+.chapter--center .actions { justify-content: center; margin-top: 30px; }
+.chapter--center .actions .btn { margin-top: 0; }
 .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 38px; }
 .scrollhint { display: flex; align-items: center; gap: 12px; margin-top: 56px; font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: var(--muted); }
 .scrollhint span { width: 1px; height: 46px; background: var(--line); position: relative; overflow: hidden; }
@@ -377,7 +380,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hscroll__intro .lead { margin-top: 14px; font-size: 14px; }
 .hscroll__track { display: flex; gap: 22px; width: max-content; padding-left: var(--pad); padding-right: var(--pad); will-change: transform; }
 .cat {
-  flex: 0 0 auto; width: clamp(220px, min(24vw, 36vh), 360px);
+  flex: 0 0 auto; width: clamp(210px, min(24vw, 31vh), 360px);
   position: relative;
   padding: 18px 18px 26px;
   border-radius: var(--r);
@@ -393,9 +396,21 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .cat:hover .cat__img img { transform: scale(1.02); }
 .cat h3 { margin: 22px 0 4px 6px; font-size: 26px; font-weight: 400; letter-spacing: -.01em; }
 .cat p { margin: 0 0 0 6px; color: var(--muted); font-size: 14px; }
+.cat__cta { display: inline-block; margin: 10px 0 0 6px; font-size: 12px; font-weight: 500; letter-spacing: .04em; color: var(--ink); border-bottom: 1px solid var(--gold); padding-bottom: 2px; }
+.cat__badge { position: absolute; left: 10px; bottom: 10px; z-index: 2; max-width: calc(100% - 20px); padding: 5px 10px; border-radius: 12px; line-height: 1.35; background: var(--ink); color: var(--gold-3); font-size: 9px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+.hscroll__note { margin: 4px 0 0; font-size: 11px; letter-spacing: .06em; color: var(--muted); }
 .cat--end { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 26px; background: transparent; }
 .cat--end .display { font-size: 36px; }
-.hscroll__bar { position: absolute; left: var(--pad); right: var(--pad); bottom: 40px; height: 1px; background: var(--line); }
+/* telas baixas (desktop): compacta os cartões para o CTA caber acima da barra de progresso */
+@media (min-width: 761px) and (max-height: 760px) {
+  .hscroll__pin { padding-top: 56px; gap: 12px; }
+  .hscroll__intro .lead { margin-top: 8px; }
+  .cat { width: clamp(200px, min(22vw, 26vh), 360px); padding-bottom: 14px; }
+  .cat h3 { margin-top: 14px; font-size: 22px; }
+  .cat p { font-size: 13px; }
+  .cat__cta { margin-top: 6px; }
+}
+.hscroll__bar { position: absolute; left: var(--pad); right: var(--pad); bottom: 22px; height: 1px; background: var(--line); }
 .hscroll__bar i { position: absolute; inset: 0; background: var(--gold); transform-origin: left; transform: scaleX(var(--p, 0)); }
 
 /* ---------- processo ---------- */
@@ -425,6 +440,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .model span { font-size: 11px; font-weight: 600; letter-spacing: .2em; color: var(--gold-2); transform: translateZ(20px); }
 .model h3 { margin: auto 0 10px; padding-top: 50px; font-size: 30px; font-weight: 300; letter-spacing: -.02em; transform: translateZ(40px); }
 .model p { margin: 0; color: var(--on-dark-muted); font-size: 15px; transform: translateZ(24px); }
+.model p.model__for { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(243, 238, 230, .14); color: var(--gold-2); font-size: 14px; }
+.models__help { margin: 40px 0 0; }
+.models__help .link-gold { margin-top: 0; }
 
 /* ---------- configurador ---------- */
 .config { z-index: 2; background: var(--bg); }
@@ -507,6 +525,9 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
 .vcard:hover .vcard__meta, .vcard:focus-visible .vcard__meta { opacity: 1; transform: none; }
 .vcard:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
 .vitrine__hint { margin: 26px 0 60px; font-size: 13px; color: var(--muted); }
+/* dica da vitrine: mouse (hover fino) vs. toque */
+.vitrine__hint .hint-mouse { display: none; }
+@media (hover: hover) and (pointer: fine) { .vitrine__hint .hint-mouse { display: inline; } .vitrine__hint .hint-touch { display: none; } }
 .vitrine__count { color: var(--ink); font-weight: 500; }
 .brands li { cursor: pointer; }
 .brands li.on span { color: var(--gold); }
@@ -657,10 +678,13 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
     left: 20px; right: 20px; width: auto; top: auto; bottom: 7vh; translate: none;
   }
   .chapter--hero { bottom: 5vh; }
+  .chapter--center { bottom: calc(7vh + 64px); } /* acima da barra fixa de CTA do celular */
   .chapter--hero .display { font-size: 38px; }
   .chapter .display { font-size: 34px; }
   .chapter .lead { font-size: 15px; margin-top: 14px; }
-  .chapter--hero .lead { display: none; }
+  .chapter--hero .lead { margin-top: 12px; font-size: 14px; line-height: 1.45; }
+  .chapter--hero .lead-full { display: none; }
+  .chapter--hero .lead-short { display: inline; }
   .actions { margin-top: 24px; }
   .actions .btn { flex: 1 1 auto; padding: 0 16px; --h: 46px; font-size: 10px; letter-spacing: .08em; white-space: nowrap; }
   .scrollhint { display: none; }
