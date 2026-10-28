@@ -25,6 +25,8 @@
 </head>
 <body>
 
+  <a class="skip" href="#conteudo">Ir para o conteúdo</a>
+
   <div class="grain" aria-hidden="true"></div>
   <div class="cursor" aria-hidden="true"><div class="cursor__dot"></div><div class="cursor__ring"><span class="cursor__label"></span></div></div>
   <canvas class="dust" aria-hidden="true"></canvas>
@@ -35,22 +37,25 @@
       <img src="assets/img/site/garnet-logo.png" alt="Garnet" width="340" height="77" />
     </a>
     <nav class="header__nav" aria-label="Principal">
-      <a href="#sobre">Quem somos</a>
+      <a href="#cases">Cases</a>
+      <a href="#fabrica">Fábrica</a>
       <a href="#fabricamos">O que fabricamos</a>
       <a href="#processo">Como funciona</a>
       <a href="#modelos">Modelos</a>
-      <a href="#personalize">Personalize</a>
-      <a href="#cases">Cases</a>
+      <a href="#personalize">Simulador</a>
+      <a href="#faq">Dúvidas</a>
     </nav>
     <a href="#contato" class="btn btn--dark btn--sm magnetic header__cta">Inicie seu projeto</a>
     <button class="header__burger" aria-label="Abrir menu" aria-expanded="false"><span></span><span></span></button>
   </header>
-  <div class="mnav" aria-hidden="true">
-    <a href="#sobre">Quem somos</a><a href="#fabricamos">O que fabricamos</a><a href="#processo">Como funciona</a>
-    <a href="#modelos">Modelos de produção</a><a href="#personalize">Personalize</a><a href="#cases">Cases</a><a href="#contato">Contato</a>
+  <div class="mnav" aria-hidden="true" inert>
+    <a href="#cases">Cases</a><a href="#fabrica">Fábrica</a><a href="#fabricamos">O que fabricamos</a><a href="#processo">Como funciona</a>
+    <a href="#modelos">Modelos</a><a href="#personalize">Simulador</a><a href="#faq">Dúvidas</a><a href="#contato">Contato</a>
+    <a href="#contato" class="mnav__cta">Inicie seu projeto</a>
   </div>
 
   <main id="topo">
+    <span id="conteudo" tabindex="-1"></span>
 
     <!-- ============ HISTÓRIA COM SEQUÊNCIA DE FRAMES (técnica MBOOM) ============ -->
     <section class="story" id="sobre" aria-label="Apresentação">
@@ -402,7 +407,7 @@
     ============ fim dos depoimentos ============ -->
 
     <!-- ============ FAQ ============ -->
-    <section class="section faq">
+    <section class="section faq" id="faq">
       <div class="wrap wrap--narrow">
         <div class="section__head reveal">
           <span class="eyebrow">Dúvidas frequentes</span>
@@ -496,7 +501,7 @@
   <div class="lightbox" role="dialog" aria-modal="true" aria-label="Foto do produto" hidden>
     <button class="lightbox__close" type="button" aria-label="Fechar">×</button>
     <button class="lightbox__nav lightbox__prev" type="button" aria-label="Anterior">‹</button>
-    <figure><img alt="" /><figcaption><b></b><span></span></figcaption></figure>
+    <figure><img alt="" /><figcaption aria-live="polite"><b></b><span></span></figcaption></figure>
     <button class="lightbox__nav lightbox__next" type="button" aria-label="Próxima">›</button>
   </div>
 
