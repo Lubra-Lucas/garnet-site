@@ -812,68 +812,43 @@
   /* ---------- briefing guiado ---------- */
   (function brief() {
     const form = $(".brief__form");
+    if (!form) return;
     const steps = $$(".bstep", form);
+    const stepsBox = $(".brief__steps", form);
     const next = $(".brief__next", form), back = $(".brief__back", form), err = $(".brief__err", form);
+    const live = $(".brief__live", form);
+    const progress = $(".brief__progress i", form);
     let i = 0;
+    let reviewing = false;
+    let text = "";
+    const val = (b) => b.dataset.v || b.textContent;
+    const setOn = (b, on) => { b.classList.toggle("on", on); b.setAttribute("aria-pressed", on ? "true" : "false"); };
     $$(".chips", form).forEach((g) => {
       const multi = g.classList.contains("chips--multi");
       g.addEventListener("click", (e) => {
         const b = e.target.closest("button");
         if (!b) return;
-        if (multi) b.classList.toggle("on");
-        else $$("button", g).forEach((x) => x.classList.toggle("on", x === b));
+        if (multi) setOn(b, !b.classList.contains("on"));
+        else $$("button", g).forEach((x) => setOn(x, x === b));
         err.textContent = "";
       });
     });
-    const picked = (name) => $$(`[data-name="${name}"] .on`, form).map((b) => b.textContent);
-    const go = (n) => {
-      steps.forEach((s, k) => { s.classList.toggle("is-on", k === n); s.classList.toggle("is-past", k < n); });
-      i = n;
-      $(".brief__progress i", form).style.width = (n + 1) * 25 + "%";
-      back.disabled = n === 0;
-      next.textContent = n === steps.length - 1 ? "Revisar e enviar" : "Continuar";
-      send.hidden = true;
-      mail.hidden = true;
-      next.hidden = false;
-      err.textContent = "";
+    const picked = (name) => $$(`[data-name="${name}"] .on`, form).map(val);
+
+    // resumo legível do que será enviado (aparece no lugar dos campos, acima dos botões)
+    const review = document.createElement("section");
+    review.className = "brief__review";
+    review.hidden = true;
+    review.setAttribute("aria-labelledby", "brief-review-title");
+    review.innerHTML = '<h3 id="brief-review-title" tabindex="-1">Revise antes de enviar</h3><dl></dl>';
+    $(".brief__nav", form).before(review);
+    const reviewTitle = $("h3", review), reviewList = $("dl", review);
+    const row = (k, v) => {
+      const dt = document.createElement("dt"), dd = document.createElement("dd");
+      dt.textContent = k; dd.textContent = v;
+      reviewList.append(dt, dd);
     };
-    const validators = [
-      () => picked("categoria").length || "Escolha pelo menos uma categoria.",
-      () => picked("modelo").length || "Escolha um modelo (ou “Ainda não sei”).",
-      () => picked("volume").length || "Escolha uma faixa de volume.",
-      () => {
-        const f = (n) => form.elements[n];
-        const checks = [
-          [f("nome"), (v) => v.trim().length >= 2],
-          [f("empresa"), (v) => v.trim().length >= 2],
-          [f("telefone"), (v) => /^[0-9+()\-\s]{8,25}$/.test(v.trim())],
-          [f("email"), (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())],
-        ];
-        let ok = true;
-        checks.forEach(([input, test]) => { const good = test(input.value); input.classList.toggle("err", !good); ok = ok && good; });
-        return ok || "Confira os campos destacados.";
-      },
-    ];
-    next.addEventListener("click", () => {
-      const r = validators[i]();
-      if (r !== true && typeof r === "string") { err.textContent = r; gsap.fromTo(form, { x: -8 }, { x: 0, duration: 0.5, ease: "elastic.out(1,.3)" }); return; }
-      if (i < steps.length - 1) return go(i + 1);
-      const f = (n) => form.elements[n].value.trim();
-      const text = [
-        "Olá! Vim pelo site e quero iniciar um projeto 🙂",
-        `Nome: ${f("nome")}`, `Empresa/Marca: ${f("empresa")}`, `Telefone: ${f("telefone")}`, `E-mail: ${f("email")}`,
-        `Categorias: ${picked("categoria").join(", ")}`, `Modelo: ${picked("modelo").join(", ")}`, `Volume: ${picked("volume").join(", ")}`,
-        f("mensagem") ? `Mensagem: ${f("mensagem")}` : "",
-      ].filter(Boolean).join("\n");
-      // link real (e não window.open) para funcionar em qualquer navegador e app
-      send.href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`;
-      // alternativa para quem prefere e-mail
-      mail.href = `mailto:contato@garnetcosmeticos.com.br?subject=${encodeURIComponent(`Novo projeto — ${f("empresa")}`)}&body=${encodeURIComponent(text)}`;
-      send.hidden = false;
-      mail.hidden = false;
-      next.hidden = true;
-      err.textContent = "";
-    });
+
     const send = document.createElement("a");
     send.className = "btn btn--gold magnetic brief__send";
     send.target = "_blank";
@@ -886,8 +861,168 @@
     mail.textContent = "Prefiro enviar por e-mail";
     mail.hidden = true;
     send.after(mail);
-    form.addEventListener("input", () => { if (!send.hidden) { send.hidden = mail.hidden = true; next.hidden = false; } });
-    back.addEventListener("click", () => i > 0 && go(i - 1));
+    // copiar a mensagem: para quem não tem WhatsApp no aparelho
+    const copy = document.createElement("button");
+    copy.type = "button";
+    copy.className = "btn btn--ghost-light brief__copy";
+    copy.textContent = "Copiar mensagem";
+    copy.hidden = true;
+    mail.after(copy);
+    const copyLabel = (t, announce) => {
+      copy.textContent = t;
+      if (announce) live.textContent = announce;
+      setTimeout(() => { copy.textContent = "Copiar mensagem"; }, 2200);
+    };
+    copy.addEventListener("click", () => {
+      const copied = () => copyLabel("Copiado", "Mensagem copiada");
+      const fallback = () => {
+        const t = document.createElement("textarea");
+        t.value = text; t.setAttribute("readonly", ""); t.style.cssText = "position:fixed;top:0;left:0;opacity:0";
+        document.body.appendChild(t); t.select();
+        let ok = false;
+        try { ok = document.execCommand("copy"); } catch (e) { /* sem permissão */ }
+        t.remove();
+        if (ok) copied(); else copyLabel("Não foi possível copiar", "Não foi possível copiar a mensagem");
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(copied, fallback);
+      else fallback();
+    });
+
+    // a altura do card acompanha o passo ativo (os passos inativos saem do fluxo; a transição é mantida)
+    const go = (n, focus = true) => {
+      const h0 = stepsBox.offsetHeight;
+      reviewing = false;
+      stepsBox.hidden = false;
+      review.hidden = true;
+      steps.forEach((s, k) => { s.classList.toggle("is-on", k === n); s.classList.toggle("is-past", k < n); });
+      i = n;
+      progress.style.width = (n + 1) * 25 + "%";
+      back.disabled = n === 0;
+      next.textContent = n === steps.length - 1 ? "Revisar e enviar" : "Continuar";
+      send.hidden = mail.hidden = copy.hidden = true;
+      next.hidden = false;
+      err.textContent = "";
+      const h1 = stepsBox.offsetHeight;
+      if (!reduced && h0 && h0 !== h1) {
+        stepsBox.classList.add("is-sizing");
+        gsap.fromTo(stepsBox, { height: h0 }, { height: h1, duration: 0.5, ease: "power3.out", clearProps: "height", onComplete: () => stepsBox.classList.remove("is-sizing") });
+      }
+      if (focus) {
+        live.textContent = `Passo ${n + 1} de ${steps.length}`;
+        // a visibilidade do passo entra com transição: tenta o foco a cada quadro até ele ser focável
+        const lg = $("legend", steps[n]);
+        let tries = 0;
+        const tryFocus = () => {
+          lg.focus({ preventScroll: true });
+          if (document.activeElement !== lg && i === n && tries++ < 20) requestAnimationFrame(tryFocus);
+        };
+        requestAnimationFrame(tryFocus);
+        // o card encolhe/cresce: garante que o título do passo continue à vista
+        const r = form.getBoundingClientRect();
+        if (r.top < 0 || r.top > innerHeight * 0.6) window.scrollBy({ top: r.top - 90, behavior: reduced ? "auto" : "smooth" });
+      }
+    };
+
+    // erro por campo: mensagem própria, aria-invalid e ligação por aria-describedby
+    const fieldErr = (input, msg) => {
+      const small = $(`#err-${input.name}`, form);
+      input.setAttribute("aria-invalid", msg ? "true" : "false");
+      input.classList.toggle("err", !!msg);
+      if (small) small.textContent = msg || "";
+    };
+    // telefone brasileiro: 10 ou 11 dígitos, ignorando espaços, parênteses, hífen e +55
+    const phoneOk = (v) => {
+      v = v.trim();
+      if (!/^\+?[0-9()\-\s.]+$/.test(v)) return false;
+      let d = v.replace(/\D/g, "");
+      if ((v.startsWith("+55") || d.length >= 12) && d.startsWith("55")) d = d.slice(2);
+      return d.length === 10 || d.length === 11;
+    };
+    const validators = [
+      () => picked("categoria").length || "Escolha pelo menos uma categoria.",
+      () => picked("modelo").length || "Escolha um modelo (ou “Ainda não sei”).",
+      () => picked("volume").length || "Escolha uma faixa de volume.",
+      () => {
+        const f = (n) => form.elements[n];
+        const checks = [
+          [f("nome"), (v) => v.trim().length >= 2, "Informe seu nome (mínimo 2 letras)."],
+          [f("telefone"), phoneOk, "Informe um telefone com DDD, por exemplo (11) 98153-1188."],
+          [f("email"), (v) => /^[^\s@]+@([A-Za-z0-9-]+\.)+[A-Za-z]{2,}$/.test(v.trim()), "Informe um e-mail válido, como nome@empresa.com.br."],
+        ];
+        let first = null;
+        checks.forEach(([input, test, msg]) => {
+          const good = test(input.value);
+          fieldErr(input, good ? "" : msg);
+          if (!good && !first) first = input;
+        });
+        if (first) { first.focus(); return false; }
+        return true;
+      },
+    ];
+    form.addEventListener("input", (e) => {
+      if (e.target.matches(".field[aria-invalid=true]")) fieldErr(e.target, "");
+    });
+
+    const shake = () => gsap.fromTo(form, { x: -8 }, { x: 0, duration: 0.5, ease: "elastic.out(1,.3)" });
+    next.addEventListener("click", () => {
+      const r = validators[i]();
+      if (r === false || typeof r === "string") { if (typeof r === "string") err.textContent = r; if (!reduced) shake(); return; }
+      if (i < steps.length - 1) return go(i + 1);
+      const f = (n) => form.elements[n].value.trim();
+      const empresa = f("empresa") || "ainda não definida";
+      text = [
+        "Olá! Vim pelo site e quero iniciar um projeto 🙂",
+        `Nome: ${f("nome")}`, `Empresa/Marca: ${empresa}`, `Telefone: ${f("telefone")}`, `E-mail: ${f("email")}`,
+        `Categorias: ${picked("categoria").join(", ")}`, `Modelo: ${picked("modelo").join(", ")}`, `Volume: ${picked("volume").join(", ")}`,
+        f("mensagem") ? `Mensagem: ${f("mensagem")}` : "",
+        "Origem: briefing do site",
+      ].filter(Boolean).join("\n");
+      // link real (e não window.open) para funcionar em qualquer navegador e app
+      send.href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`;
+      // alternativa para quem prefere e-mail
+      mail.href = `mailto:contato@garnetcosmeticos.com.br?subject=${encodeURIComponent(`Novo projeto — ${f("empresa") || f("nome")}`)}&body=${encodeURIComponent(text)}`;
+      reviewList.textContent = "";
+      row("Categorias", picked("categoria").join(", "));
+      row("Modelo", picked("modelo").join(", "));
+      row("Volume", picked("volume").join(", "));
+      row("Nome", f("nome"));
+      row("Empresa/Marca", empresa);
+      row("Telefone", f("telefone"));
+      row("E-mail", f("email"));
+      if (f("mensagem")) row("Mensagem", f("mensagem"));
+      reviewing = true;
+      stepsBox.hidden = true;
+      review.hidden = false;
+      send.hidden = mail.hidden = copy.hidden = false;
+      next.hidden = true;
+      back.disabled = false;
+      err.textContent = "";
+      progress.style.width = "100%";
+      live.textContent = "Revisão final. Confira os dados e escolha como enviar.";
+      reviewTitle.focus({ preventScroll: true });
+      window.scrollBy({ top: review.getBoundingClientRect().top - 110, behavior: reduced ? "auto" : "smooth" });
+    });
+
+    // Enter num campo equivale ao botão principal (nada é enviado sozinho para fora)
+    form.addEventListener("submit", (e) => e.preventDefault());
+    form.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" || e.target.tagName !== "INPUT" || e.isComposing) return;
+      e.preventDefault();
+      if (!next.hidden) next.click();
+    });
+    back.addEventListener("click", () => {
+      if (reviewing) return go(steps.length - 1);
+      if (i > 0) go(i - 1);
+    });
+
+    // atalhos de outros pontos do site: [data-brief-cat="Maquiagem"] pré-seleciona a categoria
+    document.addEventListener("click", (e) => {
+      const a = e.target.closest("[data-brief-cat]");
+      if (!a) return;
+      const b = $$('[data-name="categoria"] button', form).find((x) => x.textContent.trim() === a.dataset.briefCat);
+      if (b) setOn(b, true);
+      if (i !== 0 || reviewing) go(0, false);
+    });
   })();
 
   /* ---------- cursor personalizado + botões magnéticos ---------- */

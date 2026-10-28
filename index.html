@@ -431,35 +431,43 @@
         </div>
         <form class="brief__form glass glass--dark" novalidate>
           <div class="brief__progress"><i></i></div>
+          <p class="brief__live" role="status" aria-live="polite"></p>
           <div class="brief__steps">
             <fieldset class="bstep is-on" data-step="0">
-              <legend><span>1/4</span>O que você quer fabricar?</legend>
-              <div class="chips chips--multi" data-name="categoria">
-                <button type="button">Maquiagem</button><button type="button">Lábios</button><button type="button">Perfumaria</button>
-                <button type="button">Skincare</button><button type="button">Corpo</button><button type="button">Outro</button>
+              <legend id="bl-0" tabindex="-1"><span>1/4</span>O que você quer fabricar?</legend>
+              <p class="bstep__hint">Pode marcar mais de uma.</p>
+              <div class="chips chips--multi" data-name="categoria" role="group" aria-labelledby="bl-0">
+                <button type="button" aria-pressed="false">Maquiagem</button><button type="button" aria-pressed="false">Lábios</button><button type="button" aria-pressed="false">Perfumaria</button>
+                <button type="button" aria-pressed="false">Skincare</button><button type="button" aria-pressed="false">Corpo</button><button type="button" aria-pressed="false">Outro</button>
               </div>
+              <a class="brief__quick" href="https://wa.me/5511981531188?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20quero%20iniciar%20um%20projeto.%20Posso%20enviar%20os%20detalhes%20por%20aqui%3F%20%F0%9F%99%82" target="_blank" rel="noopener">Já sabe o que precisa? Fale direto pelo WhatsApp →</a>
             </fieldset>
             <fieldset class="bstep" data-step="1">
-              <legend><span>2/4</span>Qual modelo de produção?</legend>
-              <div class="chips" data-name="modelo">
-                <button type="button">Full Service</button><button type="button">Produção Mista</button><button type="button">Mão de Obra</button>
-                <button type="button">Private Label</button><button type="button">Collab</button><button type="button">Ainda não sei</button>
+              <legend id="bl-1" tabindex="-1"><span>2/4</span>Qual modelo de produção?</legend>
+              <div class="chips chips--desc" data-name="modelo" role="group" aria-labelledby="bl-1">
+                <button type="button" class="chip--first" aria-pressed="false" data-v="Ainda não sei"><b>Ainda não sei</b><small>A equipe indica o melhor formato para o seu projeto.</small></button>
+                <button type="button" aria-pressed="false" data-v="Full Service"><b>Full Service</b><small>A Garnet coordena tudo: fórmula, amostras, embalagem, produção, qualidade e entrega.</small></button>
+                <button type="button" aria-pressed="false" data-v="Produção Mista"><b>Produção Mista</b><small>Dividimos as etapas; sua marca pode fornecer componentes, embalagem ou parceiros homologados.</small></button>
+                <button type="button" aria-pressed="false" data-v="Mão de Obra"><b>Mão de Obra</b><small>Você traz insumos ou fórmula e a Garnet executa a produção, com rastreabilidade.</small></button>
+                <button type="button" aria-pressed="false" data-v="Private Label"><b>Private Label</b><small>Linha personalizada: formulação, identidade e acabamento para acelerar o lançamento.</small></button>
+                <button type="button" aria-pressed="false" data-v="Collabs"><b>Collabs</b><small>Projetos com marcas e influenciadores, com identidade própria.</small></button>
               </div>
             </fieldset>
             <fieldset class="bstep" data-step="2">
-              <legend><span>3/4</span>Volume estimado do primeiro lote</legend>
-              <div class="chips" data-name="volume">
-                <button type="button">A definir</button><button type="button">Até 3 mil un.</button><button type="button">3 a 10 mil un.</button>
-                <button type="button">10 a 50 mil un.</button><button type="button">Mais de 50 mil un.</button>
+              <legend id="bl-2" tabindex="-1"><span>3/4</span>Volume estimado do primeiro lote</legend>
+              <p class="bstep__hint">O pedido mínimo varia por produto; se não souber, escolha “A definir”.</p>
+              <div class="chips" data-name="volume" role="group" aria-labelledby="bl-2">
+                <button type="button" aria-pressed="false">A definir</button><button type="button" aria-pressed="false">Até 3 mil un.</button><button type="button" aria-pressed="false">3 a 10 mil un.</button>
+                <button type="button" aria-pressed="false">10 a 50 mil un.</button><button type="button" aria-pressed="false">Mais de 50 mil un.</button>
               </div>
             </fieldset>
             <fieldset class="bstep" data-step="3">
-              <legend><span>4/4</span>Seus dados</legend>
+              <legend id="bl-3" tabindex="-1"><span>4/4</span>Seus dados</legend>
               <div class="fields">
-                <label>Nome<input class="field" name="nome" autocomplete="name" required maxlength="100" /></label>
-                <label>Empresa ou marca<input class="field" name="empresa" autocomplete="organization" required maxlength="120" /></label>
-                <label>Telefone<input class="field" name="telefone" inputmode="tel" autocomplete="tel" required maxlength="25" /></label>
-                <label>E-mail<input class="field" name="email" type="email" autocomplete="email" required maxlength="255" /></label>
+                <label>Nome<input class="field" name="nome" autocomplete="name" required maxlength="100" aria-describedby="err-nome" /><small class="field__err" id="err-nome" role="alert"></small></label>
+                <label>Empresa ou marca<input class="field" name="empresa" autocomplete="organization" maxlength="120" placeholder="Nome da marca (ou ainda não tenho)" /></label>
+                <label>Telefone<input class="field" name="telefone" type="tel" inputmode="tel" autocomplete="tel" required maxlength="25" aria-describedby="err-telefone" /><small class="field__err" id="err-telefone" role="alert"></small></label>
+                <label>E-mail<input class="field" name="email" type="email" autocomplete="email" required maxlength="255" aria-describedby="err-email" /><small class="field__err" id="err-email" role="alert"></small></label>
                 <label class="full">Conte sobre o projeto<textarea class="field" name="mensagem" rows="3" maxlength="1000"></textarea></label>
               </div>
             </fieldset>
@@ -469,7 +477,7 @@
             <button type="button" class="btn btn--ghost-light brief__back" disabled>Voltar</button>
             <button type="button" class="btn btn--gold magnetic brief__next">Continuar</button>
           </div>
-          <p class="brief__privacy">Seus dados servem só para responder ao seu contato. O site não guarda nada: a mensagem vai direto para o WhatsApp ou o e-mail da Garnet, conforme a LGPD.</p>
+          <p class="brief__privacy">Seus dados servem só para a Garnet responder ao seu contato. O site não guarda nada: a mensagem é enviada pelo seu WhatsApp ou e-mail direto para a equipe da Garnet.</p>
         </form>
       </div>
     </section>
