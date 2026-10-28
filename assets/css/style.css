@@ -510,12 +510,16 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
 .cases { z-index: 2; background: var(--bg); overflow: hidden; }
 .vitrine__filters { margin-bottom: 34px; }
 .chips button small { font-size: 12px; opacity: .6; margin-left: 4px; }
-.vitrine { display: grid; gap: 18px; overflow: hidden; padding-block: 6px 10px; }
+.vitrine { --vcw: clamp(200px, 19vw, 280px); display: grid; gap: 18px; overflow: hidden; padding-block: 6px 10px; }
+/* os cards são montados só perto da tela: reserva a altura das 2 fileiras (foto 4:5) para nada pular */
+.vitrine:not(.is-built) { min-height: calc(var(--vcw) * 2.5 + 34px); }
 .vrow { overflow: hidden; }
 .vrow__track { display: flex; gap: 18px; width: max-content; will-change: transform; }
 /* celular: movimento por animação CSS (roda fora do JavaScript, sem engasgos) */
 .vitrine.is-css .vrow__track { animation: vscroll var(--dur, 60s) linear infinite; }
 .vitrine.is-css .vrow--rev .vrow__track { animation-direction: reverse; }
+/* pausa: botão "Pausar animação", foco de teclado num card e foto aberta (lightbox) */
+.vitrine.is-paused .vrow__track, .vitrine.is-kbfocus .vrow__track, body.lb-open .vitrine .vrow__track { animation-play-state: paused; }
 @keyframes vscroll { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-50%, 0, 0); } }
 .vcard { flex: 0 0 auto; width: clamp(200px, 19vw, 280px); padding: 0; text-align: left; border-radius: 20px; position: relative; transition: transform .5s var(--ease); }
 .vcard__img { display: block; aspect-ratio: 4 / 5; border-radius: 20px; overflow: hidden; background: var(--bg-2); box-shadow: 0 10px 30px rgba(60, 40, 20, .06); transition: box-shadow .5s var(--ease); }
@@ -533,6 +537,10 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
 .vitrine__hint .hint-mouse { display: none; }
 @media (hover: hover) and (pointer: fine) { .vitrine__hint .hint-mouse { display: inline; } .vitrine__hint .hint-touch { display: none; } }
 .vitrine__count { color: var(--ink); font-weight: 500; }
+.vitrine__pause { margin-left: 6px; padding: 6px 14px; border: 1px solid var(--line); border-radius: 999px; font-size: 11px; font-weight: 500; letter-spacing: .08em; color: var(--ink-2); transition: color .3s, border-color .3s, background .3s; }
+.vitrine__pause:hover { color: var(--gold); border-color: var(--gold); }
+.vitrine__pause[aria-pressed="true"] { color: var(--ink); border-color: var(--gold); background: color-mix(in srgb, var(--gold-2) 18%, transparent); }
+.vitrine__pause:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
 .brands li { cursor: pointer; }
 .brands li.on span { color: var(--gold-text); }
 .brands li:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
@@ -552,6 +560,7 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
   .vitrine__filters { flex-wrap: nowrap; overflow-x: auto; margin-inline: calc(var(--pad) * -1); padding: 2px var(--pad) 8px; scrollbar-width: none; }
   .vitrine__filters::-webkit-scrollbar { display: none; }
   .vitrine__filters button { flex: none; }
+  .vitrine { --vcw: 46vw; }
   .vcard { width: 46vw; }
   .vcard__meta { opacity: 1; transform: none; left: 8px; right: 8px; bottom: 8px; padding: 8px 10px; background: rgba(255, 255, 255, .93); -webkit-backdrop-filter: none; backdrop-filter: none; }
   .vcard__img { box-shadow: none; }
@@ -783,6 +792,7 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
 .reduced .story__canvas { position: relative; left: auto; top: auto; transform: none; margin: 0 auto; width: min(80vw, 520px); height: min(80vw, 520px); }
 .reduced .story__halo, .reduced .story__progress, .reduced .scrollhint { display: none; }
 .reduced .trustbar { position: relative; }
+.reduced .vitrine__pause { display: none; }
 .reduced .chapter { position: relative; inset: auto; transform: none; translate: none; opacity: 1; visibility: visible; width: auto; max-width: 720px; }
 .reduced .reveal { opacity: 1; transform: none; }
 .reduced .manifesto__text .w { opacity: 1; }
