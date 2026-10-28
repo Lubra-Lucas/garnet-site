@@ -38,13 +38,21 @@
     return r;
   }
 
+  // celular ou "economizar dados": metade dos frames (pula 1 a cada 2); o frame mais próximo cobre o buraco
+  const lite = window.matchMedia("(max-width: 760px)").matches || !!(navigator.connection && navigator.connection.saveData);
+  const STEP = lite ? 2 : 1;
+  const isLoaded = (k) => !!(images[k] && images[k].complete && images[k].naturalWidth);
+
   function drawFrame(i) {
     i = Math.max(0, Math.min(SEQ.frames - 1, Math.round(i)));
-    let k = i;
-    while (k > 0 && !(images[k] && images[k].complete && images[k].naturalWidth)) k--;
-    if (k === current) return;
+    // usa o frame exato; se ainda não chegou, o carregado mais próximo (sem buracos nem piscadas)
+    let k = -1;
+    for (let d = 0; d < SEQ.frames; d++) {
+      if (i - d >= 0 && isLoaded(i - d)) { k = i - d; break; }
+      if (i + d < SEQ.frames && isLoaded(i + d)) { k = i + d; break; }
+    }
+    if (k < 0 || k === current) return;
     const img = images[k];
-    if (!img || !img.naturalWidth) return;
     current = k;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const s = Math.min(canvas.width / img.naturalWidth, canvas.height / img.naturalHeight);
@@ -53,31 +61,55 @@
   }
 
   function loadFrames(onProgress, onFirst) {
-    let done = 0;
-    // primeiro o frame 0 e alguns "âncoras" espalhados; depois o resto, 6 por vez
-    const order = [0];
-    for (let step = 16; step >= 1; step = Math.floor(step / 2)) {
-      for (let i = 0; i < SEQ.frames; i += step) if (!order.includes(i)) order.push(i);
-      if (step === 1) break;
-    }
+    const KEY = (i) => i % 10 === 0 || i === SEQ.frames - 1;
+    const REDUCED_FRAME = Math.round(SEQ.frames * 0.45); // quadro estático do reduced-motion
+    // quais frames existem neste aparelho
+    const all = [];
+    for (let i = 0; i < SEQ.frames; i++) if (i % STEP === 0 || i === SEQ.frames - 1) all.push(i);
+    // 1ª fase (imediata): abertura (primeiros quadros) + quadros-chave de 10 em 10
+    // reduced-motion: só o frame 0 e o quadro estático, o resto nem é baixado
+    const first = reduced ? [0, REDUCED_FRAME] : all.filter((i) => i < 12 || KEY(i));
+    const rest = reduced ? [] : all.filter((i) => !first.includes(i));
+    const total = first.length + rest.length;
     return new Promise((resolve) => {
-      let next = 0;
-      const pump = () => {
-        if (next >= order.length) return;
-        const i = order[next++];
+      let done = 0, active = 0, nextFirst = 0, idleStarted = false;
+      const settle = (i) => {
+        done++; active--;
+        onProgress(done / total);
+        if (i === 0) onFirst();
+        if (done === total) resolve(); else pump();
+      };
+      const fetchFrame = (i) => {
         const img = new Image();
         img.decoding = "async";
-        img.onload = img.onerror = () => {
-          done++;
-          onProgress(done / SEQ.frames);
-          if (i === 0) onFirst();
-          if (done === SEQ.frames) resolve();
-          else pump();
-        };
+        img.onload = img.onerror = () => settle(i);
+        active++;
         img.src = SEQ.path(i);
         images[i] = img;
       };
-      for (let c = 0; c < 6; c++) pump();
+      // 2ª fase: o resto, 3 por vez, começando pelos mais próximos de onde o scroll está indo
+      const takeRest = () => {
+        const f = seq.f;
+        let best = -1, bestCost = Infinity;
+        rest.forEach((i, n) => { const c = i >= f ? i - f : (f - i) * 3; if (c < bestCost) { bestCost = c; best = n; } });
+        return best < 0 ? null : rest.splice(best, 1)[0];
+      };
+      function pump() {
+        if (nextFirst < first.length) { if (active < 6) fetchFrame(first[nextFirst++]); else return; pump(); return; }
+        if (!idleStarted) return;
+        while (active < 3 && rest.length) fetchFrame(takeRest());
+      }
+      // libera a 2ª fase quando a página terminou de carregar e o navegador está ocioso (ou ao primeiro scroll)
+      const startIdle = () => {
+        if (idleStarted) return;
+        idleStarted = true;
+        window.removeEventListener("scroll", startIdle);
+        pump();
+      };
+      const whenIdle = () => (window.requestIdleCallback ? requestIdleCallback(startIdle, { timeout: 2500 }) : setTimeout(startIdle, 1200));
+      if (document.readyState === "complete") whenIdle(); else window.addEventListener("load", whenIdle, { once: true });
+      window.addEventListener("scroll", startIdle, { passive: true, once: true });
+      pump();
     });
   }
 
@@ -235,6 +267,9 @@
     if (reduced || !finePointer) { c.remove(); return; }
     const g = c.getContext("2d");
     let w = 0, h = 0, parts = [], running = true;
+    // celular/janela estreita (o CSS esconde o canvas) e aba em segundo plano: o laço não desenha
+    const narrow = window.matchMedia("(max-width: 760px)");
+    const active = () => running && !document.hidden && !narrow.matches;
     const make = (anywhere) => ({
       x: Math.random() * w,
       y: anywhere ? Math.random() * h : h + 10,
@@ -256,7 +291,7 @@
     addEventListener("resize", resize);
     ScrollTrigger.create({ trigger: ".story", start: "top bottom", end: "bottom top", onToggle: (s) => { running = s.isActive; c.style.opacity = running ? 1 : 0; } });
     gsap.ticker.add(() => {
-      if (!running) return;
+      if (!active()) return;
       g.clearRect(0, 0, w, h);
       const mx = (mouse.x + 0.5) * w, my = (mouse.y + 0.5) * h;
       for (const p of parts) {
@@ -278,9 +313,18 @@
   (function marquee() {
     const track = $(".marquee__track");
     const row = $(".marquee__row");
-    for (let i = 0; i < 3; i++) track.appendChild(row.cloneNode(true));
-    let x = 0, boost = 0;
+    // cópias só para o laço: fora da leitura de tela e da ordem de Tab
+    for (let i = 0; i < 3; i++) {
+      const copy = row.cloneNode(true);
+      copy.setAttribute("aria-hidden", "true");
+      $$("a, button", copy).forEach((el) => el.setAttribute("tabindex", "-1"));
+      track.appendChild(copy);
+    }
+    let x = 0, boost = 0, onScreen = true;
+    // fora da tela não precisa recalcular a faixa a cada quadro
+    if ("IntersectionObserver" in window) new IntersectionObserver(([en]) => { onScreen = en.isIntersecting; }).observe($(".marquee"));
     gsap.ticker.add(() => {
+      if (!onScreen) return;
       const v = lenis ? lenis.velocity : 0;
       // limita o empurrão: um salto grande (link do menu) jogava a faixa para fora da tela
       boost += (Math.min(Math.abs(v) * 0.35, 40) - boost) * 0.1;
@@ -691,18 +735,25 @@
 
     // fileiras: cada uma recebe metade dos produtos, repetidos até cobrir duas larguras de tela
     const rows = $$(".vrow").map((el, r) => ({ el, track: $(".vrow__track", el), dir: r % 2 ? 1 : -1, x: 0, speed: 1, target: 1, half: 0 }));
-    const card = (it, i) => `<button type="button" class="vcard" data-i="${i}"><span class="vcard__img"><img src="${tile(it.slug)}" alt="${it.name} — ${brandOf[it.brand].label}" loading="lazy" decoding="async" width="720" height="900" /></span><span class="vcard__meta"><b>${it.name}</b><em>${brandOf[it.brand].label}</em></span></button>`;
+    // cópia: a 2ª metade da trilha só existe para o laço; fica fora do Tab e da leitura de tela
+    // pos < 6: as primeiras posições de cada trilha carregam já (eager) para não aparecerem cards vazios
+    const card = (it, i, copy, pos) => `<button type="button" class="vcard" data-i="${i}"${copy ? ' tabindex="-1" aria-hidden="true"' : ""}><span class="vcard__img"><img src="${tile(it.slug)}" alt="${copy ? "" : it.name + " — " + brandOf[it.brand].label}" loading="${pos < 6 ? "eager" : "lazy"}" decoding="async" width="720" height="900" /></span><span class="vcard__meta"><b>${it.name}</b><em>${brandOf[it.brand].label}</em></span></button>`;
+    const vitrineEl = $(".vitrine");
+    function updateCount() {
+      $(".vitrine__count").textContent = `${list.length} ${list.length === 1 ? "foto" : "fotos"} de produtos${current === "all" ? "" : " · " + brandOf[current].label}`;
+    }
     function build() {
       list = itemsFor(current);
+      vitrineEl.classList.add("is-built");
       const groups = rows.map((_, r) => list.map((it, i) => [it, i]).filter((_, k) => list.length < 6 || k % rows.length === r));
       rows.forEach((row, r) => {
         let g = groups[r].length ? groups[r] : groups[0];
-        let html = g.map(([it, i]) => card(it, i)).join("");
         let reps = 1;
         const cardW = Math.min(280, Math.max(200, window.innerWidth * 0.19)) + 18;
         while (g.length * reps * cardW < window.innerWidth * 1.6) reps++;
-        const unit = html.repeat(reps);
-        row.track.innerHTML = unit + unit; // duas cópias idênticas: o laço volta sem emenda
+        const units = (copy) => { let h = ""; for (let n = 0; n < reps; n++) h += g.map(([it, i], k) => card(it, i, copy, n * g.length + k)).join(""); return h; };
+        // duas cópias: o laço volta sem emenda. Só a 1ª é focável e lida; a 2ª é aria-hidden
+        row.track.innerHTML = units(false) + units(true);
         row.x = row.dir > 0 ? -row.track.scrollWidth / 2 : 0;
       });
       requestAnimationFrame(() => rows.forEach((row) => {
@@ -711,7 +762,7 @@
         row.track.style.setProperty("--dur", (row.half / 38).toFixed(1) + "s"); // ~38 px/s no modo CSS
       }));
       // conta fotos (um mesmo produto pode ter mais de uma foto)
-      $(".vitrine__count").textContent = `${list.length} ${list.length === 1 ? "foto" : "fotos"} de produtos${current === "all" ? "" : " · " + brandOf[current].label}`;
+      updateCount();
     }
     const setFilter = (f) => {
       current = f;
@@ -727,9 +778,36 @@
       scrollTo($(".cases .vitrine__filters"));
     });
     $("[data-brands]").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.target.click(); } });
-    build();
+    // a construção dos cards (centenas de nós) espera a vitrine chegar perto da tela; o espaço dela já
+    // está reservado no CSS (.vitrine:not(.is-built)), então nada pula. Contador e filtros funcionam antes.
+    list = itemsFor(current);
+    updateCount();
+    const buildOnce = () => {
+      if (vitrineEl.classList.contains("is-built")) return;
+      const h0 = vitrineEl.offsetHeight;
+      build();
+      if (Math.abs(vitrineEl.offsetHeight - h0) > 1) ScrollTrigger.refresh();
+    };
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); buildOnce(); } }, { rootMargin: "1500px 0px" });
+      io.observe(vitrineEl);
+    } else buildOnce();
     let rw = window.innerWidth;
-    window.addEventListener("resize", () => { if (Math.abs(window.innerWidth - rw) > 40) { rw = window.innerWidth; build(); } });
+    window.addEventListener("resize", () => { if (Math.abs(window.innerWidth - rw) > 40) { rw = window.innerWidth; if (vitrineEl.classList.contains("is-built")) build(); } });
+
+    // pausa do movimento (WCAG 2.2.2): botão, foco de teclado num card e lightbox aberto
+    const pauseBtn = $(".vitrine__pause");
+    let userPaused = false, kbFocus = false;
+    const lbOpen = () => body.classList.contains("lb-open");
+    if (reduced) pauseBtn.hidden = true; // sem movimento, sem o que pausar
+    pauseBtn.addEventListener("click", () => {
+      userPaused = !userPaused;
+      pauseBtn.setAttribute("aria-pressed", String(userPaused));
+      pauseBtn.textContent = userPaused ? "Retomar" : "Pausar animação";
+      vitrineEl.classList.toggle("is-paused", userPaused);
+    });
+    vitrineEl.addEventListener("focusin", (e) => { kbFocus = e.target.matches(":focus-visible"); vitrineEl.classList.toggle("is-kbfocus", kbFocus); });
+    vitrineEl.addEventListener("focusout", () => { kbFocus = false; vitrineEl.classList.remove("is-kbfocus"); });
 
     // movimento contínuo. Com mouse: JavaScript (desacelera no hover, acelera com o scroll).
     // Em telas de toque: animação CSS, que roda fora do JavaScript e não engasga no celular.
@@ -742,7 +820,7 @@
       let visible = false;
       ScrollTrigger.create({ trigger: ".vitrine", start: "top bottom", end: "bottom top", onToggle: (s) => (visible = s.isActive) });
       gsap.ticker.add(() => {
-        if (!visible) return;
+        if (!visible || userPaused || kbFocus || lbOpen()) return;
         const boost = lenis ? Math.min(6, Math.abs(lenis.velocity) * 0.15) : 0;
         rows.forEach((row) => {
           if (!row.half) return;
@@ -892,7 +970,8 @@
 
   /* ---------- cursor personalizado + botões magnéticos ---------- */
   if (finePointer && !reduced) {
-    body.classList.add("has-cursor");
+    // o cursor só aparece depois do primeiro movimento real do mouse (senão ficava parado no canto)
+    let moved = false;
     const cur = $(".cursor"), dot = $(".cursor__dot"), ring = $(".cursor__ring"), label = $(".cursor__label");
     const dx = gsap.quickTo(dot, "x", { duration: 0.08 }), dy = gsap.quickTo(dot, "y", { duration: 0.08 });
     const rx = gsap.quickTo(ring, "x", { duration: 0.45, ease: "power3" }), ry = gsap.quickTo(ring, "y", { duration: 0.45, ease: "power3" });
@@ -908,15 +987,22 @@
       if (t) label.textContent = t.dataset.cursor;
     };
     window.addEventListener("pointermove", (e) => {
+      if (e.pointerType === "touch") return;
       cx = e.clientX; cy = e.clientY;
+      if (!moved) {
+        moved = true;
+        gsap.set([dot, ring], { x: cx, y: cy }); // já nasce sob o mouse, sem deslizar do canto
+        body.classList.add("has-cursor");
+        gsap.set(cur, { opacity: 1 });
+      }
       dx(cx); dy(cy); rx(cx); ry(cy);
       updateCursor();
     }, { passive: true });
     window.addEventListener("scroll", updateCursor, { passive: true });
     // depois de um clique (ex.: abrir a foto da vitrine) o rótulo "ver" não fica preso sobre o que abriu
     window.addEventListener("click", () => requestAnimationFrame(updateCursor));
-    document.addEventListener("pointerleave", () => gsap.to(cur, { opacity: 0, duration: 0.2 }));
-    document.addEventListener("pointerenter", () => gsap.to(cur, { opacity: 1, duration: 0.2 }));
+    document.addEventListener("pointerleave", () => { if (moved) gsap.to(cur, { opacity: 0, duration: 0.2 }); });
+    document.addEventListener("pointerenter", () => { if (moved) gsap.to(cur, { opacity: 1, duration: 0.2 }); });
 
     $$(".magnetic").forEach((m) => {
       const mx = gsap.quickTo(m, "x", { duration: 0.6, ease: "elastic.out(1,.4)" });
