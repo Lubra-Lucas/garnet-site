@@ -341,7 +341,7 @@
       if (!el.hasAttribute("data-count")) return { card, el, bar, seal: true };
       const end = Number(el.dataset.count), pre = el.dataset.prefix || "", suf = el.dataset.suffix || "";
       const plain = el.hasAttribute("data-plain");
-      const from = plain ? 1950 : 0; // o ano "viaja" de 1950 até 1992
+      const from = plain ? end - 7 : Math.round(end * 0.85); // parte de ~85% do valor (o ano, de 1985): nunca mostra "+0" nem 1950
       const unit = suf ? `<small>${suf.trim()}</small>` : ""; // unidade menor, ao lado do número
       const render = (v) => { el.innerHTML = pre + (plain ? Math.round(v) : fmt.format(Math.round(v))) + unit; };
       return { card, el, bar, end, from, render, o: { v: from } };
