@@ -19,10 +19,12 @@ na página; esta lista registra o que ainda é ilustrativo e deve ser trocado qu
   Blush espiral coral (`garnet-blush-espiral-coral`), Blush rosa em relevo (`garnet-blush-rosa`), Blush com flores (`garnet-blush-flores`),
   Blush monograma G lilás (`garnet-blush-g-lilas`), Iluminador em alto relevo (`garnet-iluminador-alto-relevo`),
   Bronzer folhas de palmeira (`garnet-bronzer-palmeiras`), Pó pôr do sol (`garnet-por-do-sol`) e Batom (`garnet-x-batom-garnet`).
-  Em out/2026 saiu o conceito "Sombra lua e estrelas" (sem foto de estúdio equivalente).
-- Vitrine com 95 fotos de produtos (em out/2026 as fotos passaram a ser de estúdio, fundo branco, recortadas em quadro padronizado 720×900;
-  Boca Rosa, Fran, Alê de Souza × Payot e Estrela Beauty mantêm também as fotos antigas que mostram o cartucho, a pedido da Garnet):
-  Boca Rosa, Karen Bachini Beauty, Fran, John John, Alê de Souza × Payot, Estrela Beauty e linha Garnet. Alice Salazar e Max Weber Beauty continuam
+  Em out/2026 saiu o conceito "Sombra lua e estrelas" (já não aparece na vitrine; sem foto de estúdio equivalente).
+- Vitrine com 91 fotos de produtos (em out/2026 as fotos passaram a ser as de estúdio do dono: fundo branco, produto inteiro, sem recorte nem
+  alteração de cor, em quadro branco 720×900; fotos com pincel foram retiradas. Boca Rosa, Fran, Alê de Souza × Payot e Estrela Beauty mantêm também
+  fotos antigas que mostram o cartucho, depois das de estúdio, a pedido da Garnet):
+  Boca Rosa, Karen Bachini Beauty (só as 3 de estúdio), Fran, John John (só as 2 de estúdio), Alê de Souza × Payot, Estrela Beauty e linha Garnet
+  (novo: "Pó fundo do mar", `garnet-po-fundo-do-mar`). Alice Salazar e Max Weber Beauty continuam
   citadas no texto (faixa do topo e números), mas ficam fora da vitrine por enquanto, a pedido da Garnet
   (linhas comentadas em `assets/js/vitrine-data.js`; foto de estúdio da Alice já gerada).
 - Faixa Vogue, Elle, Forbes, Marie Claire, Sephora e Riachuelo: produtos **fabricados pela Garnet para
