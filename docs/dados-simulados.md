@@ -15,13 +15,16 @@ na página; esta lista registra o que ainda é ilustrativo e deve ser trocado qu
 - **1.000 m²** de área fabril, **50 mil unidades por mês**, **+150 marcas atendidas**, **BPF**.
 - 5 categorias (maquiagem, lábios, perfumaria, skincare e corpo), 5 modelos de produção, 8 etapas do processo, FAQ.
   A Garnet não fabrica shampoo nem condicionador: Cabelos saiu do site; o perfume capilar entra em Perfumaria.
-- Vitrine: 7 compactos da Linha Garnet gerados por IA (slugs `garnet-bronzer-palmeiras`, `garnet-iluminador-aneis`,
-  `garnet-por-do-sol`, `garnet-blush-espiral-coral`, `garnet-lua-estrelas`, `garnet-blush-rosa`, `garnet-blush-g-lilas`);
-  a Garnet informou que são da linha Garnet. Trocar por fotos reais quando houver.
-- Vitrine com 98 fotos de produtos (branch `fotos`; em out/2026 saíram 18 fotos duplicadas ou com defeito, sem perder nenhum produto): Boca Rosa, Karen Bachini Beauty, Fran,
-  John John, Alê de Souza × Payot, Estrela Beauty e linha Garnet. Alice Salazar e Max Weber Beauty continuam
+- Vitrine, imagens de conceito da Linha Garnet geradas por IA (a Garnet informou que são da linha Garnet; trocar por fotos reais quando houver):
+  Blush espiral coral (`garnet-blush-espiral-coral`), Blush rosa em relevo (`garnet-blush-rosa`), Blush com flores (`garnet-blush-flores`),
+  Blush monograma G lilás (`garnet-blush-g-lilas`), Iluminador em alto relevo (`garnet-iluminador-alto-relevo`),
+  Bronzer folhas de palmeira (`garnet-bronzer-palmeiras`), Pó pôr do sol (`garnet-por-do-sol`) e Batom (`garnet-x-batom-garnet`).
+  Em out/2026 saiu o conceito "Sombra lua e estrelas" (sem foto de estúdio equivalente).
+- Vitrine com 95 fotos de produtos (em out/2026 as fotos passaram a ser de estúdio, fundo branco, recortadas em quadro padronizado 720×900;
+  Boca Rosa, Fran, Alê de Souza × Payot e Estrela Beauty mantêm também as fotos antigas que mostram o cartucho, a pedido da Garnet):
+  Boca Rosa, Karen Bachini Beauty, Fran, John John, Alê de Souza × Payot, Estrela Beauty e linha Garnet. Alice Salazar e Max Weber Beauty continuam
   citadas no texto (faixa do topo e números), mas ficam fora da vitrine por enquanto, a pedido da Garnet
-  (linhas comentadas em `assets/js/vitrine-data.js`; fotos mantidas).
+  (linhas comentadas em `assets/js/vitrine-data.js`; foto de estúdio da Alice já gerada).
 - Faixa Vogue, Elle, Forbes, Marie Claire, Sephora e Riachuelo: produtos **fabricados pela Garnet para
   marcas de clientes** já estiveram nesses veículos e lojas (não a marca Garnet). O texto da faixa diz isso.
 - Prazo de referência: cerca de 30 dias para a entrega, variando com quantidade e complexidade.
