@@ -34,6 +34,10 @@ na página; esta lista registra o que ainda é ilustrativo e deve ser trocado qu
 - Pedido mínimo (nov/2026): 1.000 peças para compactados e 3.000 peças para perfumaria, loções e skincare.
   Lábios não tem mínimo informado; o site não cita número para essa categoria.
 - Tempo de resposta aos contatos: até 1 dia útil.
+- Amostras e desenvolvimento (nov/2026): só para pessoa jurídica com empresa constituída (CNPJ) e marca registrada
+  ou com protocolo no INPI.
+- Embalagens (nov/2026): a Garnet não fabrica embalagens. Usa o catálogo de parceiros comerciais (só os modelos
+  desse catálogo) ou faz o envase na embalagem do próprio cliente.
 - Seção "Nossa fábrica": 5 fotos reais da fábrica (`assets/img/fabrica/`), com autorização de uso de
   imagem das pessoas que aparecem. A pedido da Garnet, ficam sem legenda e não podem ser ampliadas.
 - Telefone: o mesmo número do WhatsApp, (11) 98153-1188.
