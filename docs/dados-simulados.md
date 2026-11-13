@@ -13,7 +13,8 @@ na página; esta lista registra o que ainda é ilustrativo e deve ser trocado qu
 
 - Fundação em 1992, +30 anos, especialista em maquiagem compactada.
 - **1.000 m²** de área fabril, **50 mil unidades por mês**, **+150 marcas atendidas**, **BPF**.
-- 5 categorias (maquiagem, lábios, perfumaria, skincare e corpo), 5 modelos de produção, 8 etapas do processo, FAQ.
+- 5 categorias (maquiagem, lábios, perfumaria, skincare e corpo), 4 modelos de produção (Full Service, Produção Mista,
+  Private Label e Collabs; em nov/2026 a Garnet informou que não oferece o modelo Mão de Obra, que saiu do site), 8 etapas do processo, FAQ.
   A Garnet não fabrica shampoo nem condicionador: Cabelos saiu do site; o perfume capilar entra em Perfumaria.
 - Vitrine, imagens de conceito da Linha Garnet geradas por IA (a Garnet informou que são da linha Garnet; trocar por fotos reais quando houver):
   Blush espiral coral (`garnet-blush-espiral-coral`), Blush rosa em relevo (`garnet-blush-rosa`), Blush com flores (`garnet-blush-flores`),
@@ -29,8 +30,9 @@ na página; esta lista registra o que ainda é ilustrativo e deve ser trocado qu
   (linhas comentadas em `assets/js/vitrine-data.js`; foto de estúdio da Alice já gerada).
 - Faixa Vogue, Elle, Forbes, Marie Claire, Sephora e Riachuelo: produtos **fabricados pela Garnet para
   marcas de clientes** já estiveram nesses veículos e lojas (não a marca Garnet). O texto da faixa diz isso.
-- Prazo de referência: cerca de 30 dias para a entrega, variando com quantidade e complexidade.
-  Pedido mínimo varia por produto.
+- Prazo de referência: cerca de 45 dias para a entrega (atualizado em nov/2026), variando com quantidade e complexidade.
+- Pedido mínimo (nov/2026): 1.000 peças para compactados e 3.000 peças para perfumaria, loções e skincare.
+  Lábios não tem mínimo informado; o site não cita número para essa categoria.
 - Tempo de resposta aos contatos: até 1 dia útil.
 - Seção "Nossa fábrica": 5 fotos reais da fábrica (`assets/img/fabrica/`), com autorização de uso de
   imagem das pessoas que aparecem. A pedido da Garnet, ficam sem legenda e não podem ser ampliadas.

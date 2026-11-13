@@ -962,7 +962,6 @@
       const dx = e.changedTouches[0].clientX - tx; tx = null;
       if (Math.abs(dx) > 50) show(at + (dx < 0 ? 1 : -1));
     });
-    $(".vitrine").dataset.cursor = "ver";
   })();
 
   /* ---------- FAQ com abertura suave ---------- */
@@ -1196,42 +1195,8 @@
     });
   })();
 
-  /* ---------- cursor personalizado + botões magnéticos ---------- */
+  /* ---------- botões magnéticos (o cursor do sistema fica o padrão) ---------- */
   if (finePointer && !reduced) {
-    // o cursor só aparece depois do primeiro movimento real do mouse (senão ficava parado no canto)
-    let moved = false;
-    const cur = $(".cursor"), dot = $(".cursor__dot"), ring = $(".cursor__ring"), label = $(".cursor__label");
-    const dx = gsap.quickTo(dot, "x", { duration: 0.08 }), dy = gsap.quickTo(dot, "y", { duration: 0.08 });
-    const rx = gsap.quickTo(ring, "x", { duration: 0.45, ease: "power3" }), ry = gsap.quickTo(ring, "y", { duration: 0.45, ease: "power3" });
-    let cx = -1, cy = -1;
-    // estado do cursor pelo elemento sob o ponteiro; refeito também no scroll,
-    // senão o rótulo ("ver", "arraste") fica preso ao rolar sem mexer o mouse
-    const updateCursor = () => {
-      const el = cx < 0 ? null : document.elementFromPoint(cx, cy);
-      const t = el && el.closest("[data-cursor]");
-      const link = el && el.closest("a, button, summary, .chips button, input, label");
-      cur.classList.toggle("is-label", !!t);
-      cur.classList.toggle("is-link", !t && !!link);
-      if (t) label.textContent = t.dataset.cursor;
-    };
-    window.addEventListener("pointermove", (e) => {
-      if (e.pointerType === "touch") return;
-      cx = e.clientX; cy = e.clientY;
-      if (!moved) {
-        moved = true;
-        gsap.set([dot, ring], { x: cx, y: cy }); // já nasce sob o mouse, sem deslizar do canto
-        body.classList.add("has-cursor");
-        gsap.set(cur, { opacity: 1 });
-      }
-      dx(cx); dy(cy); rx(cx); ry(cy);
-      updateCursor();
-    }, { passive: true });
-    window.addEventListener("scroll", updateCursor, { passive: true });
-    // depois de um clique (ex.: abrir a foto da vitrine) o rótulo "ver" não fica preso sobre o que abriu
-    window.addEventListener("click", () => requestAnimationFrame(updateCursor));
-    document.addEventListener("pointerleave", () => { if (moved) gsap.to(cur, { opacity: 0, duration: 0.2 }); });
-    document.addEventListener("pointerenter", () => { if (moved) gsap.to(cur, { opacity: 1, duration: 0.2 }); });
-
     $$(".magnetic").forEach((m) => {
       const mx = gsap.quickTo(m, "x", { duration: 0.6, ease: "elastic.out(1,.4)" });
       const my = gsap.quickTo(m, "y", { duration: 0.6, ease: "elastic.out(1,.4)" });
