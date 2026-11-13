@@ -13,8 +13,9 @@ na página; esta lista registra o que ainda é ilustrativo e deve ser trocado qu
 
 - Fundação em 1992, +30 anos, especialista em maquiagem compactada.
 - **1.000 m²** de área fabril, **50 mil unidades por mês**, **+150 marcas atendidas**, **BPF**.
-- 5 categorias (maquiagem, lábios, perfumaria, skincare e corpo), 4 modelos de produção (Full Service, Produção Mista,
-  Private Label e Collabs; em nov/2026 a Garnet informou que não oferece o modelo Mão de Obra, que saiu do site), 8 etapas do processo, FAQ.
+- 5 categorias (maquiagem, lábios, perfumaria, skincare e corpo), 2 modelos de produção (nov/2026): Full Service e
+  Terceirização por Encomenda (o cliente fornece os demais insumos, como a embalagem, e a Garnet produz o cosmético).
+  Saíram do site: Mão de Obra, Produção Mista (renomeada para Terceirização por Encomenda), Private Label e Collabs, 8 etapas do processo, FAQ.
   A Garnet não fabrica shampoo nem condicionador: Cabelos saiu do site; o perfume capilar entra em Perfumaria.
 - Vitrine, imagens de conceito da Linha Garnet geradas por IA (a Garnet informou que são da linha Garnet; trocar por fotos reais quando houver):
   Blush espiral coral (`garnet-blush-espiral-coral`), Blush rosa em relevo (`garnet-blush-rosa`), Blush com flores (`garnet-blush-flores`),

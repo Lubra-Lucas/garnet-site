@@ -378,10 +378,15 @@
         const nx = (e.clientX - r.left) / r.width, ny = (e.clientY - r.top) / r.height;
         el.style.setProperty("--mx", nx * 100 + "%");
         el.style.setProperty("--my", ny * 100 + "%");
-        el.classList.add("is-tilting");
+        el.classList.remove("is-tilt-volta"); el.classList.add("is-tilting");
         el.style.transform = `perspective(900px) rotateY(${(nx - 0.5) * 2 * max}deg) rotateX(${(0.5 - ny) * 2 * max}deg) translateZ(0)`;
       });
-      el.addEventListener("pointerleave", () => { el.classList.remove("is-tilting"); el.style.transform = ""; });
+      // volta suave ao repouso; a transição só existe nesse intervalo (não interfere no GSAP)
+      let volta;
+      el.addEventListener("pointerleave", () => {
+        el.classList.remove("is-tilting"); el.classList.add("is-tilt-volta"); el.style.transform = "";
+        clearTimeout(volta); volta = setTimeout(() => el.classList.remove("is-tilt-volta"), 550);
+      });
     });
   }
 
