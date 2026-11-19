@@ -257,7 +257,7 @@ body:not(.menu-open) .header:not(.is-scrolled) .header__nav a { color: var(--on-
 .story__sticky { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
 /* fundo de fotos: troca suave (GSAP) entre as modelos; o véu escuro garante a leitura do texto à esquerda */
 .story__bg { position: absolute; inset: 0; z-index: 0; background: var(--dark); overflow: hidden; }
-.story__photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 62% center; opacity: 0; }
+.story__photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 62% var(--fy, 50%); opacity: 0; }
 .story__photo.is-on { opacity: 1; }
 .story__bg::after {
   content: ""; position: absolute; inset: 0; z-index: 3;
