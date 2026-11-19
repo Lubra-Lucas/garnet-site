@@ -25,11 +25,11 @@ index.html              página única com todas as seções
 assets/css/style.css    estilos (tokens no topo, depois uma seção por bloco do site)
 assets/js/main.js       todas as interações, separadas por blocos comentados
 assets/vendor/          GSAP 3.13, ScrollTrigger e Lenis 1.3 (cópias locais)
-assets/seq/             150 frames WebP do estojo (sequência do scroll)
+assets/img/modelos/     fotos de fundo da abertura (trocam suavemente)
 assets/img/vitrine/     quadros padronizados da vitrine (720×900) e full/ com as fotos originais
 assets/js/vitrine-data.js  lista de produtos da vitrine (marca e nome)
 assets/img/site/        logo, favicon e fotos de produto
-tools/render-sequence/  gerador dos frames do estojo (Three.js + Chromium)
+tools/render-sequence/  gerador dos frames do antigo estojo 3D (fora do site desde nov/2026)
 docs/                   referências e lista de dados simulados
 _headers                cache para o Cloudflare Pages
 ```
@@ -38,29 +38,26 @@ _headers                cache para o Cloudflare Pages
 
 | Efeito | Técnica | Bloco em `main.js` |
 |---|---|---|
-| Estojo que gira, abre, muda de cor e se desmonta | Sequência de frames num `<canvas>` controlada pelo scroll (técnica da MBOOM) | "sequência de frames" e "linha do tempo da história" |
+| Abertura com fotos de modelos trocando suavemente | Fotos em tela cheia com troca e zoom lento pelo GSAP; capítulos de texto no scroll | "abertura: capítulos" e "abertura: fotos" |
 | Scroll suave | Lenis | "scroll suave" |
 | Animações no scroll, seções fixadas, scroll horizontal | GSAP + ScrollTrigger | vários |
 | Poeira dourada flutuando | Partículas em canvas (como as "brasas" do Tibidle) | "poeira dourada" |
 | Cards de vidro que inclinam com o mouse e brilham onde o cursor passa | `perspective` + `rotateX/Y` + variáveis CSS `--mx/--my` (tabela de highscore do Tibidle) | "tilt 3D" |
 | Faixa de mídia que acelera com o scroll | Marquee ligado à velocidade do Lenis | "marquee" |
-| Texto que acende palavra por palavra | ScrollTrigger com `scrub` | "manifesto" |
 | Vitrine infinita de produtos | Duas fileiras em laço contínuo, filtro por marca, foto original em tela cheia | "cases: vitrine infinita" |
 | Configurador do compacto | SVG gerado em JS, mensagem pronta para o WhatsApp | "configurador" |
-| Briefing em 4 passos | Formulário guiado, envio pelo WhatsApp | "briefing guiado" |
-| Cursor personalizado e botões magnéticos | GSAP `quickTo` | "cursor personalizado" |
+| Briefing em 5 passos com pré-qualificação | Formulário guiado, classificação A/B/C, envio pelo WhatsApp | "briefing guiado" |
+| Botões magnéticos | GSAP `quickTo` | "botões magnéticos" |
 
 Quem tem "reduzir movimento" ativado no sistema (`prefers-reduced-motion`) recebe uma versão sem
 animações, com todo o conteúdo visível.
 
-## Trocar o estojo pelo render definitivo
+## Fotos da abertura
 
-1. Renderize a animação final (Blender, Cinema 4D ou outro) em **frames quadrados com fundo transparente**.
-2. Salve como `assets/seq/compact-000.webp` … `compact-NNN.webp`.
-3. Ajuste `SEQ.frames` no topo de `assets/js/main.js` para o novo total.
-4. Se o roteiro mudar, ajuste os tempos dos capítulos em "linha do tempo da história".
-
-Para regerar o estojo do protótipo: `cd tools/render-sequence && npm install && npm run render`.
+As fotos de fundo da abertura ficam em `assets/img/modelos/` (WebP, até 1400 px). Para trocar ou
+acrescentar uma, adicione um `<img class="story__photo">` dentro de `.story__bg` no `index.html`:
+a primeira usa `src` (carrega na hora); as outras usam `data-src` (carregam depois da página).
+`--fx` define o ponto do rosto na horizontal para o recorte do celular.
 
 ## Publicação (Cloudflare Pages)
 
