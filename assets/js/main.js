@@ -724,8 +724,8 @@
         `Desenho prensado: ${artName}`,
         hasText ? `${textLabel}: ${reliefText()}` : "",
       ].filter(Boolean).join("\n");
-      $(".cfg-send").href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
-      $(".cfg-mail").href = `mailto:contato@garnetcosmeticos.com.br?subject=${encodeURIComponent("Simulação Monte a sua make")}&body=${encodeURIComponent(msg)}`;
+      // a simulação segue para o briefing (que faz a pré-qualificação) e vai junto na mensagem final
+      $(".cfg-send").dataset.sim = msg.split("\n").slice(1).join(" · ");
       if (animate && !reduced) gsap.fromTo(svg, { scale: 0.97 }, { scale: 1, duration: 0.6, ease: "elastic.out(1, .5)", overwrite: true });
     }
 
@@ -984,7 +984,9 @@
     });
   });
 
-  /* ---------- briefing guiado ---------- */
+  /* ---------- briefing guiado com pré-qualificação ---------- */
+  // A mensagem do WhatsApp chega com a pré-qualificação no topo (A, B ou C), para a equipe saber
+  // de imediato em que ponto o lead está: CNPJ com CNAE de cosméticos + marca no INPI + lote mínimo.
   (function brief() {
     const form = $(".brief__form");
     if (!form) return;
@@ -993,11 +995,45 @@
     const next = $(".brief__next", form), back = $(".brief__back", form), err = $(".brief__err", form);
     const live = $(".brief__live", form);
     const progress = $(".brief__progress i", form);
+    const note = $(".bstep__note", form);
+    const cnpjBox = $(".brief__cnpj", form);
     let i = 0;
     let reviewing = false;
     let text = "";
-    const val = (b) => b.dataset.v || b.textContent;
+    let simulacao = ""; // resumo vindo do "Monte a sua make", quando o lead chega por lá
+    const val = (b) => b.dataset.v || b.textContent.trim();
     const setOn = (b, on) => { b.classList.toggle("on", on); b.setAttribute("aria-pressed", on ? "true" : "false"); };
+    const picked = (name) => $$(`[data-name="${name}"] .on`, form).map(val);
+    const one = (name) => picked(name)[0] || "";
+
+    // requisitos: o que falta para começar o desenvolvimento
+    const avaliar = () => {
+      const cnpj = one("cnpj"), inpi = one("inpi"), lote = one("lote");
+      const temCnpj = cnpj.startsWith("Sim");
+      const pend = [];
+      if (!temCnpj) pend.push("CNPJ");
+      else if (cnpj !== "Sim, com CNAE de cosméticos") pend.push(cnpj === "Sim, mas não sei o CNAE" ? "confirmar o CNAE de cosméticos" : "CNAE de cosméticos no CNPJ");
+      if (inpi === "Ainda não") pend.push("marca registrada ou com protocolo no INPI");
+      if (lote && lote !== "Sim") pend.push(lote === "Não" ? "lote mínimo fora do planejamento" : "lote mínimo a avaliar");
+      const nivel = !temCnpj ? "C" : pend.length ? "B" : "A";
+      return { nivel, pend, temCnpj };
+    };
+    const ROTULO = { A: "🟢 A · requisitos completos", B: "🟡 B · requisitos parciais", C: "🔴 C · requisitos pendentes" };
+
+    // aviso no 1º passo: explica na hora o que falta (sem impedir o envio)
+    const atualizarAviso = () => {
+      const cnpj = one("cnpj"), inpi = one("inpi");
+      const falta = [];
+      if (cnpj === "Ainda não tenho CNPJ") falta.push("uma empresa aberta com CNPJ");
+      else if (cnpj === "Sim, mas o CNAE não inclui cosméticos") falta.push("incluir a atividade de cosméticos no CNAE");
+      if (inpi === "Ainda não") falta.push("o registro ou o protocolo da marca no INPI");
+      note.hidden = !falta.length;
+      note.textContent = falta.length
+        ? `Você pode enviar seu contato, mas o envio de amostras e o desenvolvimento só começam depois de ${falta.join(" e ")}.`
+        : "";
+      cnpjBox.hidden = !cnpj.startsWith("Sim");
+    };
+
     $$(".chips", form).forEach((g) => {
       const multi = g.classList.contains("chips--multi");
       g.addEventListener("click", (e) => {
@@ -1006,23 +1042,34 @@
         if (multi) setOn(b, !b.classList.contains("on"));
         else $$("button", g).forEach((x) => setOn(x, x === b));
         err.textContent = "";
+        if (g.dataset.name === "cnpj" || g.dataset.name === "inpi") atualizarAviso();
       });
     });
-    const picked = (name) => $$(`[data-name="${name}"] .on`, form).map(val);
+    atualizarAviso();
 
     // resumo legível do que será enviado (aparece no lugar dos campos, acima dos botões)
     const review = document.createElement("section");
     review.className = "brief__review";
     review.hidden = true;
     review.setAttribute("aria-labelledby", "brief-review-title");
-    review.innerHTML = '<h3 id="brief-review-title" tabindex="-1">Revise antes de enviar</h3><dl></dl>';
+    review.innerHTML = '<h3 id="brief-review-title" tabindex="-1">Revise antes de enviar</h3><div class="brief__status"><b></b><p></p></div><dl></dl>';
     $(".brief__nav", form).before(review);
     const reviewTitle = $("h3", review), reviewList = $("dl", review);
+    const status = $(".brief__status", review);
     const row = (k, v) => {
+      if (!v) return;
       const dt = document.createElement("dt"), dd = document.createElement("dd");
       dt.textContent = k; dd.textContent = v;
       reviewList.append(dt, dd);
     };
+
+    // simulação do configurador: vai junto na mensagem (o lead pode remover)
+    const simBox = document.createElement("p");
+    simBox.className = "brief__sim";
+    simBox.hidden = true;
+    simBox.innerHTML = '<span>Sua simulação do “Monte a sua make” vai junto na mensagem.</span> <button type="button">Remover</button>';
+    form.insertBefore(simBox, stepsBox);
+    $("button", simBox).addEventListener("click", () => { simulacao = ""; simBox.hidden = true; live.textContent = "Simulação removida"; });
 
     const send = document.createElement("a");
     send.className = "btn btn--gold magnetic brief__send";
@@ -1071,7 +1118,7 @@
       review.hidden = true;
       steps.forEach((s, k) => { s.classList.toggle("is-on", k === n); s.classList.toggle("is-past", k < n); });
       i = n;
-      progress.style.width = (n + 1) * 25 + "%";
+      progress.style.width = ((n + 1) / steps.length) * 100 + "%";
       back.disabled = n === 0;
       next.textContent = n === steps.length - 1 ? "Revisar e enviar" : "Continuar";
       send.hidden = mail.hidden = copy.hidden = true;
@@ -1113,10 +1160,33 @@
       if ((v.startsWith("+55") || d.length >= 12) && d.startsWith("55")) d = d.slice(2);
       return d.length === 10 || d.length === 11;
     };
+    // CNPJ: 12 caracteres (números ou, nos CNPJs novos, letras) + 2 dígitos verificadores (módulo 11)
+    const cnpjLimpo = (v) => v.toUpperCase().replace(/[.\-/\s]/g, "");
+    const cnpjOk = (v) => {
+      const c = cnpjLimpo(v);
+      if (!/^[0-9A-Z]{12}[0-9]{2}$/.test(c) || /^(\d)\1{13}$/.test(c)) return false;
+      const dv = (base) => {
+        let soma = 0, peso = 2;
+        for (let k = base.length - 1; k >= 0; k--) { soma += (base.charCodeAt(k) - 48) * peso; peso = peso === 9 ? 2 : peso + 1; }
+        const r = soma % 11;
+        return r < 2 ? 0 : 11 - r;
+      };
+      const d1 = dv(c.slice(0, 12)), d2 = dv(c.slice(0, 12) + d1);
+      return c.slice(12) === `${d1}${d2}`;
+    };
+    const cnpjFormatado = (v) => {
+      const c = cnpjLimpo(v);
+      return c.length === 14 ? `${c.slice(0, 2)}.${c.slice(2, 5)}.${c.slice(5, 8)}/${c.slice(8, 12)}-${c.slice(12)}` : v.trim();
+    };
+    const exige = (...nomes) => {
+      const falta = nomes.find((n) => !picked(n).length);
+      return falta ? false : true;
+    };
     const validators = [
+      () => exige("cnpj", "inpi", "afe") || "Responda as três perguntas sobre a empresa e a marca.",
       () => picked("categoria").length || "Escolha pelo menos uma categoria.",
       () => picked("modelo").length || "Escolha um modelo (ou “Ainda não sei”).",
-      () => picked("volume").length || "Escolha uma faixa de volume.",
+      () => exige("lote", "mercado") || "Responda se o lote mínimo cabe no seu plano e se você já atua no mercado.",
       () => {
         const f = (n) => form.elements[n];
         const checks = [
@@ -1124,6 +1194,7 @@
           [f("telefone"), phoneOk, "Informe um telefone com DDD, por exemplo (11) 98153-1188."],
           [f("email"), (v) => /^[^\s@]+@([A-Za-z0-9-]+\.)+[A-Za-z]{2,}$/.test(v.trim()), "Informe um e-mail válido, como nome@empresa.com.br."],
         ];
+        if (!cnpjBox.hidden) checks.splice(1, 0, [f("cnpj"), cnpjOk, "Informe um CNPJ válido, com 14 caracteres."]);
         let first = null;
         checks.forEach(([input, test, msg]) => {
           const good = test(input.value);
@@ -1144,27 +1215,59 @@
       if (r === false || typeof r === "string") { if (typeof r === "string") err.textContent = r; if (!reduced) shake(); return; }
       if (i < steps.length - 1) return go(i + 1);
       const f = (n) => form.elements[n].value.trim();
-      const empresa = f("empresa") || "ainda não definida";
+      const { nivel, pend, temCnpj } = avaliar();
+      const marca = f("empresa") || "ainda não definida";
+      const cnpjTxt = temCnpj ? `${one("cnpj")} (${cnpjFormatado(f("cnpj"))})` : one("cnpj");
+      const L = (k, v) => (v ? `${k}: ${v}` : null); // linha vazia = null (some da mensagem); "" = separador de bloco
       text = [
         "Olá! Vim pelo site e quero iniciar um projeto 🙂",
-        `Nome: ${f("nome")}`, `Empresa/Marca: ${empresa}`, `Telefone: ${f("telefone")}`, `E-mail: ${f("email")}`,
-        `Categorias: ${picked("categoria").join(", ")}`, `Modelo: ${picked("modelo").join(", ")}`, `Volume: ${picked("volume").join(", ")}`,
-        f("mensagem") ? `Mensagem: ${f("mensagem")}` : "",
+        "",
+        `Pré-qualificação: ${ROTULO[nivel]}`,
+        pend.length ? `Pendências: ${pend.join("; ")}` : null,
+        "",
+        "EMPRESA",
+        L("CNPJ", cnpjTxt), L("Marca no INPI", one("inpi")), L("AFE Anvisa", one("afe")), L("Já atua no mercado", one("mercado")),
+        "",
+        "PROJETO",
+        L("Categorias", picked("categoria").join(", ")), L("Modelo", one("modelo")),
+        L("Lote mínimo cabe no plano", one("lote")), L("Lançamento", one("lancamento")), L("Canais de venda", picked("canais").join(", ")),
+        L("Orçamento previsto", f("orcamento")), L("Produtos para começar", f("mensagem")),
+        simulacao ? `Simulação do site: ${simulacao}` : null,
+        "",
+        "CONTATO",
+        L("Nome", f("nome")), L("Marca", marca), L("Telefone", f("telefone")), L("E-mail", f("email")),
+        "",
         "Origem: briefing do site",
-      ].filter(Boolean).join("\n");
+      ].filter((l) => l !== null).join("\n").replace(/\n{3,}/g, "\n\n").trim();
       // link real (e não window.open) para funcionar em qualquer navegador e app
       send.href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`;
       // alternativa para quem prefere e-mail
-      mail.href = `mailto:contato@garnetcosmeticos.com.br?subject=${encodeURIComponent(`Novo projeto — ${f("empresa") || f("nome")}`)}&body=${encodeURIComponent(text)}`;
+      mail.href = `mailto:contato@garnetcosmeticos.com.br?subject=${encodeURIComponent(`Novo projeto [${nivel}] — ${f("empresa") || f("nome")}`)}&body=${encodeURIComponent(text)}`;
+
+      // situação mostrada ao próprio lead antes de enviar (transparente: ele vê o que falta)
+      status.dataset.nivel = nivel;
+      $("b", status).textContent = nivel === "A" ? "Seu projeto atende aos requisitos iniciais." : "Antes do desenvolvimento, falta:";
+      $("p", status).textContent = nivel === "A"
+        ? "A equipe da Garnet recebe seu briefing completo e responde em até 1 dia útil."
+        : `${pend.join("; ")}. Você pode enviar mesmo assim: a equipe responde e orienta os próximos passos.`;
+
       reviewList.textContent = "";
+      row("CNPJ", cnpjTxt);
+      row("Marca no INPI", one("inpi"));
+      row("AFE Anvisa", one("afe"));
       row("Categorias", picked("categoria").join(", "));
-      row("Modelo", picked("modelo").join(", "));
-      row("Volume", picked("volume").join(", "));
+      row("Modelo", one("modelo"));
+      row("Lote mínimo cabe no plano", one("lote"));
+      row("Já atua no mercado", one("mercado"));
+      row("Lançamento", one("lancamento"));
+      row("Canais de venda", picked("canais").join(", "));
       row("Nome", f("nome"));
-      row("Empresa/Marca", empresa);
+      row("Marca", marca);
       row("Telefone", f("telefone"));
       row("E-mail", f("email"));
-      if (f("mensagem")) row("Mensagem", f("mensagem"));
+      row("Orçamento previsto", f("orcamento"));
+      row("Produtos para começar", f("mensagem"));
+      row("Simulação", simulacao);
       reviewing = true;
       stepsBox.hidden = true;
       review.hidden = false;
@@ -1190,13 +1293,22 @@
       if (i > 0) go(i - 1);
     });
 
-    // atalhos de outros pontos do site: [data-brief-cat="Maquiagem"] pré-seleciona a categoria
+    // atalhos de outros pontos do site levam ao briefing (e não direto ao WhatsApp):
+    // [data-brief-cat="Maquiagem"] pré-seleciona a categoria; .cfg-send traz a simulação junto
     document.addEventListener("click", (e) => {
+      const sim = e.target.closest(".cfg-send");
+      if (sim && sim.dataset.sim) {
+        simulacao = sim.dataset.sim;
+        simBox.hidden = false;
+        const mk = $$('[data-name="categoria"] button', form).find((x) => x.textContent.trim() === "Maquiagem");
+        if (mk) setOn(mk, true);
+      }
       const a = e.target.closest("[data-brief-cat]");
-      if (!a) return;
-      const b = $$('[data-name="categoria"] button', form).find((x) => x.textContent.trim() === a.dataset.briefCat);
-      if (b) setOn(b, true);
-      if (i !== 0 || reviewing) go(0, false);
+      if (a) {
+        const b = $$('[data-name="categoria"] button', form).find((x) => x.textContent.trim() === a.dataset.briefCat);
+        if (b) setOn(b, true);
+      }
+      if ((sim || a) && (i !== 0 || reviewing)) go(0, false);
     });
   })();
 
