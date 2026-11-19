@@ -7,7 +7,7 @@ na página; esta lista registra o que ainda é ilustrativo e deve ser trocado qu
 |---|---|---|
 | O que fabricamos | Todas as imagens (Maquiagem: blush com flores; Lábios: batom; Perfumaria: perfume e perfume capilar; Skincare: sérum; Corpo: loção) são imagens de conceito da linha Garnet geradas por IA, de produtos que a Garnet confirmou que consegue fabricar | Fotos dos produtos depois de fabricados |
 | Depoimentos | **Fora do ar.** O bloco está comentado em `index.html` (os textos antigos não eram de clientes reais) | Depoimentos reais com autorização; depois é só descomentar e trocar os textos |
-| Abertura (fundo) | 5 fotos de modelos enviadas pela Garnet em nov/2026 (`assets/img/modelos/`), no lugar do antigo estojo 3D. Imagens ilustrativas **geradas por IA** (confirmado pela Garnet); não são pessoas reais | Fotos de campanha reais, se desejarem |
+| Abertura (fundo) | 4 fotos de modelos enviadas pela Garnet em nov/2026 (`assets/img/modelos/`), no lugar do antigo estojo 3D. Imagens ilustrativas **geradas por IA** (confirmado pela Garnet); não são pessoas reais | Fotos de campanha reais, se desejarem |
 
 ## Dados confirmados pela Garnet
 
