@@ -1,7 +1,7 @@
 /* =========================================================
    Garnet Cosméticos — interações do protótipo
    GSAP + ScrollTrigger (animações no scroll), Lenis (scroll suave),
-   canvas (sequência de frames + poeira dourada) e JS puro.
+   canvas (poeira dourada) e JS puro.
    ========================================================= */
 (() => {
   "use strict";
@@ -20,115 +20,6 @@
   if (reduced) document.documentElement.classList.add("reduced");
   gsap.registerPlugin(ScrollTrigger);
 
-  /* ---------- sequência de frames (técnica da MBOOM) ---------- */
-  const SEQ = { frames: 150, path: (i) => `assets/seq/compact-${String(i).padStart(3, "0")}.webp` };
-  const images = new Array(SEQ.frames);
-  const canvas = $(".story__canvas");
-  const ctx = canvas.getContext("2d");
-  let current = -1;
-
-  function sizeCanvas() {
-    const r = canvas.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    // a largura pode estar escalada pelo transform; usa o tamanho de layout
-    const w = canvas.offsetWidth, h = canvas.offsetHeight;
-    canvas.width = Math.round(w * dpr);
-    canvas.height = Math.round(h * dpr);
-    current = -1;
-    return r;
-  }
-
-  // celular ou "economizar dados": metade dos frames (pula 1 a cada 2); o frame mais próximo cobre o buraco
-  const lite = window.matchMedia("(max-width: 760px)").matches || !!(navigator.connection && navigator.connection.saveData);
-  const STEP = lite ? 2 : 1;
-  const isLoaded = (k) => !!(images[k] && images[k].complete && images[k].naturalWidth);
-
-  function drawFrame(i) {
-    i = Math.max(0, Math.min(SEQ.frames - 1, Math.round(i)));
-    // usa o frame exato; se ainda não chegou, o carregado mais próximo (sem buracos nem piscadas)
-    let k = -1;
-    for (let d = 0; d < SEQ.frames; d++) {
-      if (i - d >= 0 && isLoaded(i - d)) { k = i - d; break; }
-      if (i + d < SEQ.frames && isLoaded(i + d)) { k = i + d; break; }
-    }
-    if (k < 0 || k === current) return;
-    const img = images[k];
-    current = k;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const s = Math.min(canvas.width / img.naturalWidth, canvas.height / img.naturalHeight);
-    const w = img.naturalWidth * s, h = img.naturalHeight * s;
-    ctx.drawImage(img, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
-  }
-
-  function loadFrames(onProgress, onFirst) {
-    const KEY = (i) => i % 10 === 0 || i === SEQ.frames - 1;
-    const REDUCED_FRAME = Math.round(SEQ.frames * 0.45); // quadro estático do reduced-motion
-    // quais frames existem neste aparelho
-    const all = [];
-    for (let i = 0; i < SEQ.frames; i++) if (i % STEP === 0 || i === SEQ.frames - 1) all.push(i);
-    // 1ª fase (imediata): abertura (primeiros quadros) + quadros-chave de 10 em 10
-    // reduced-motion: só o frame 0 e o quadro estático, o resto nem é baixado
-    const first = reduced ? [0, REDUCED_FRAME] : all.filter((i) => i < 12 || KEY(i));
-    const rest = reduced ? [] : all.filter((i) => !first.includes(i));
-    const total = first.length + rest.length;
-    return new Promise((resolve) => {
-      let done = 0, active = 0, nextFirst = 0, idleStarted = false;
-      const settle = (i) => {
-        done++; active--;
-        onProgress(done / total);
-        if (i === 0) onFirst();
-        if (done === total) resolve(); else pump();
-      };
-      const fetchFrame = (i) => {
-        const img = new Image();
-        img.decoding = "async";
-        img.onload = img.onerror = () => settle(i);
-        active++;
-        img.src = SEQ.path(i);
-        images[i] = img;
-      };
-      // 2ª fase: o resto, 3 por vez, começando pelos mais próximos de onde o scroll está indo
-      const takeRest = () => {
-        const f = seq.f;
-        let best = -1, bestCost = Infinity;
-        rest.forEach((i, n) => { const c = i >= f ? i - f : (f - i) * 3; if (c < bestCost) { bestCost = c; best = n; } });
-        return best < 0 ? null : rest.splice(best, 1)[0];
-      };
-      function pump() {
-        if (nextFirst < first.length) { if (active < 6) fetchFrame(first[nextFirst++]); else return; pump(); return; }
-        if (!idleStarted) return;
-        while (active < 3 && rest.length) fetchFrame(takeRest());
-      }
-      // libera a 2ª fase quando a página terminou de carregar e o navegador está ocioso (ou ao primeiro scroll)
-      const startIdle = () => {
-        if (idleStarted) return;
-        idleStarted = true;
-        window.removeEventListener("scroll", startIdle);
-        pump();
-      };
-      const whenIdle = () => (window.requestIdleCallback ? requestIdleCallback(startIdle, { timeout: 2500 }) : setTimeout(startIdle, 1200));
-      if (document.readyState === "complete") whenIdle(); else window.addEventListener("load", whenIdle, { once: true });
-      window.addEventListener("scroll", startIdle, { passive: true, once: true });
-      pump();
-    });
-  }
-
-  /* ---------- entrada (sem tela de espera) ---------- */
-  // o texto da abertura aparece na hora; o estojo entra assim que o frame 0 chega
-  // e os outros frames continuam carregando em segundo plano
-  let started = false;
-  function start() {
-    if (started) return;
-    started = true;
-    sizeCanvas();
-    drawFrame(0);
-    if (reduced) return;
-    // anima a escala pelo objeto pos (e não pelo transform do canvas, que é controlado pelo scroll)
-    gsap.fromTo(pos, { s: 0.86 }, { s: 1, duration: 1.3, ease: "expo.out" });
-    gsap.fromTo(canvas, { opacity: 0 }, { opacity: 1, duration: 0.8, ease: "power2.out" });
-  }
-  const framesReady = loadFrames(() => {}, start);
-  sizeCanvas();
   if (document.fonts) document.fonts.ready.then(() => ScrollTrigger.refresh());
 
   /* ---------- scroll suave (Lenis) ---------- */
@@ -214,26 +105,13 @@
     items[next].focus();
   });
 
-  /* ---------- linha do tempo da história ---------- */
+  /* ---------- abertura: capítulos no scroll ---------- */
   const chapters = $$(".chapter");
-  const swatchItems = $$(".swatches li");
-  const pos = { x: 0, y: 0, s: 1 };
-  const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
-  const seq = { f: 0 };
+  const mouse = { x: 0, y: 0, tx: 0, ty: 0 }; // posição suavizada do mouse (usada pela poeira dourada)
 
-  if (reduced) {
-    // sem scroll animado: mostra o estojo aberto e colorido
-    const showStatic = () => { sizeCanvas(); drawFrame(Math.round(SEQ.frames * 0.45)); };
-    framesReady.then(showStatic);
-    window.addEventListener("resize", showStatic);
-  } else {
+  if (!reduced) {
     const mm = gsap.matchMedia();
-    mm.add({ desktop: "(min-width: 761px)", mobile: "(max-width: 760px)" }, (c) => {
-      const { desktop } = c.conditions;
-      const W = () => window.innerWidth, H = () => window.innerHeight;
-      const side = (k) => () => (desktop ? W() * k : 0);
-      pos.x = desktop ? W() * 0.2 : 0; pos.y = 0; pos.s = 1;
-
+    mm.add({ desktop: "(min-width: 761px)", mobile: "(max-width: 760px)" }, () => {
       const tl = gsap.timeline({
         defaults: { ease: "none" },
         scrollTrigger: {
@@ -245,25 +123,14 @@
           onUpdate(self) { $(".story__progress").style.setProperty("--p", self.progress); },
         },
       });
-      tl.to(seq, { f: SEQ.frames - 1, duration: 1 }, 0);
-
-      // posição do estojo acompanha o lado livre de cada capítulo
-      // o estojo atravessa a tela só quando nenhum texto está visível
-      // abertura encurtada: 3 capítulos depois da capa (antes eram 4, em quase o dobro de rolagem)
-      tl.fromTo(pos, { x: side(0.2), s: 1, y: 0 }, { x: side(-0.2), duration: 0.08, ease: "power2.inOut" }, 0.08)
-        .to(pos, { x: side(0.2), duration: 0.06, ease: "power2.inOut" }, 0.31)
-        .to(pos, { x: 0, y: () => (desktop ? -H() * 0.13 : -H() * 0.04), s: desktop ? 0.72 : 0.9, duration: 0.07, ease: "power2.inOut" }, 0.68);
-
+      tl.to({}, { duration: 1 }, 0); // a linha do tempo ocupa toda a rolagem da seção
       const show = (el, at, dur = 0.05) => tl.fromTo(el, { autoAlpha: 0, y: 50 }, { autoAlpha: 1, y: 0, duration: dur, ease: "power2.out" }, at);
       const hide = (el, at, dur = 0.05) => tl.fromTo(el, { autoAlpha: 1, y: 0 }, { autoAlpha: 0, y: -50, duration: dur, ease: "power2.in", immediateRender: false }, at);
       hide(chapters[0], 0.05, 0.06);
       hide($(".trustbar"), 0.05, 0.06); // faixa de marcas sai junto com a abertura
-      show(chapters[1], 0.15); hide(chapters[1], 0.27, 0.04);
-      // capítulo da cor coincide com a troca de cor do pó (36%–66% dos frames)
-      show(chapters[2], 0.37); hide(chapters[2], 0.63, 0.04);
-      show(chapters[3], 0.76);
-
-      return () => { pos.x = 0; pos.y = 0; pos.s = 1; };
+      show(chapters[1], 0.15); hide(chapters[1], 0.37, 0.04);
+      show(chapters[2], 0.47); hide(chapters[2], 0.69, 0.04);
+      show(chapters[3], 0.78);
     });
 
     if (finePointer) {
@@ -271,28 +138,55 @@
         mouse.tx = e.clientX / window.innerWidth - 0.5;
         mouse.ty = e.clientY / window.innerHeight - 0.5;
       });
+      gsap.ticker.add(() => {
+        mouse.x += (mouse.tx - mouse.x) * 0.06;
+        mouse.y += (mouse.ty - mouse.y) * 0.06;
+      });
     }
-
-    let lastSw = -1;
-    gsap.ticker.add((time) => {
-      drawFrame(seq.f);
-      mouse.x += (mouse.tx - mouse.x) * 0.06;
-      mouse.y += (mouse.ty - mouse.y) * 0.06;
-      const idle = seq.f < 2 ? Math.sin(time * 1.4) * 8 : 0; // flutua parado no topo
-      canvas.style.setProperty("--cx", (pos.x + mouse.x * 24).toFixed(1) + "px");
-      canvas.style.setProperty("--cy", (pos.y + mouse.y * 18 + idle).toFixed(1) + "px");
-      canvas.style.setProperty("--cs", pos.s.toFixed(3));
-
-      // destaca a cor atual enquanto o pó troca de cor (36%–66% da animação)
-      const t = seq.f / (SEQ.frames - 1);
-      const sw = t < 0.36 ? 0 : t > 0.66 ? 4 : Math.round(((t - 0.36) / 0.3) * 4);
-      if (sw !== lastSw) {
-        swatchItems.forEach((li, i) => li.classList.toggle("on", i === sw));
-        lastSw = sw;
-      }
-    });
   }
-  window.addEventListener("resize", () => { sizeCanvas(); drawFrame(seq.f); });
+
+  /* ---------- abertura: fotos das modelos trocando suavemente ---------- */
+  // a 1ª foto vem no HTML; as outras carregam depois da página (data-src) para não atrasar a abertura.
+  // Movimento reduzido: fica só a 1ª foto, parada (as outras nem são baixadas).
+  (function storyPhotos() {
+    const photos = $$(".story__photo");
+    if (photos.length < 2 || reduced) return;
+    const loadRest = () => photos.forEach((p) => {
+      if (!p.dataset.src) return;
+      p.src = p.dataset.src;
+      p.removeAttribute("data-src");
+    });
+    if (document.readyState === "complete") loadRest();
+    else window.addEventListener("load", loadRest, { once: true });
+
+    const ready = (p) => p.complete && p.naturalWidth > 0 && !p.dataset.src;
+    const zoom = (p) => gsap.fromTo(p, { scale: 1.08 }, { scale: 1, duration: 8, ease: "none", overwrite: "auto" });
+    let at = 0, visible = true;
+    photos.forEach((p, k) => gsap.set(p, { opacity: k === 0 ? 1 : 0, zIndex: k === 0 ? 2 : 1 }));
+    zoom(photos[0]);
+    const nextPhoto = () => {
+      // pula fotos que ainda não carregaram (conexão lenta): nunca mostra um quadro vazio
+      let k = at;
+      for (let n = 0; n < photos.length - 1; n++) {
+        k = (k + 1) % photos.length;
+        if (ready(photos[k])) break;
+      }
+      if (k === at || !ready(photos[k])) return;
+      const cur = photos[at], nx = photos[k];
+      at = k;
+      gsap.set(cur, { zIndex: 1 });
+      gsap.set(nx, { zIndex: 2 });
+      zoom(nx);
+      gsap.fromTo(nx, { opacity: 0 }, { opacity: 1, duration: 1.8, ease: "power2.inOut", onComplete: () => gsap.set(cur, { opacity: 0 }) });
+    };
+    // pausa fora da tela e com a aba em segundo plano
+    ScrollTrigger.create({ trigger: ".story", start: "top bottom", end: "bottom top", onToggle: (s) => { visible = s.isActive; } });
+    const loop = () => {
+      if (visible && !document.hidden) nextPhoto();
+      gsap.delayedCall(5.5, loop);
+    };
+    gsap.delayedCall(5.5, loop);
+  })();
 
   /* ---------- poeira dourada (inspirado nas "brasas" do Tibidle) ---------- */
   (function dust() {
@@ -801,12 +695,11 @@
 
     // filtros e índice de marcas
     const filters = $("[data-vfilter]");
-    const count = (id) => data.items.filter((it) => it.brand === id).length;
-    filters.innerHTML = `<button type="button" data-v="all" class="on">Todas <small>${data.items.length}</small></button>` +
-      data.brands.map((b) => `<button type="button" data-v="${b.id}">${b.short} <small>${count(b.id)}</small></button>`).join("");
+    filters.innerHTML = `<button type="button" data-v="all" class="on">Todas</button>` +
+      data.brands.map((b) => `<button type="button" data-v="${b.id}">${b.short}</button>`).join("");
     $("[data-brands]").innerHTML = data.brands.filter((b) => b.id !== "garnet").map((b) => {
       const names = [...new Set(data.items.filter((it) => it.brand === b.id).map((it) => it.name))].slice(0, 4).join(" · ");
-      return `<li data-brand="${b.id}" tabindex="0" role="button"><span>${b.label}</span><em>${names}</em><i>${String(count(b.id)).padStart(2, "0")}</i></li>`;
+      return `<li data-brand="${b.id}" tabindex="0" role="button"><span>${b.label}</span><em>${names}</em></li>`;
     }).join("");
 
     // fileiras: cada uma recebe metade dos produtos, repetidos até cobrir duas larguras de tela

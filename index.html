@@ -26,7 +26,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@1,400;1,500&display=swap" rel="stylesheet" />
-  <link rel="preload" as="image" href="assets/seq/compact-000.webp" />
+  <link rel="preload" as="image" href="assets/img/modelos/modelo-luz-dourada.webp" fetchpriority="high" />
   <link rel="stylesheet" href="assets/css/style.css" />
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"Organization","name":"Garnet Cosméticos","legalName":"Garnet Indústria de Cosméticos","description":"Indústria de cosméticos em São Paulo desde 1992: desenvolvimento e fabricação de maquiagem compactada, lábios, perfumaria, skincare e corpo para marcas de terceiros, em full service ou terceirização por encomenda.","foundingDate":"1992","url":"https://garnetcosmeticos.com.br","logo":"https://garnetcosmeticos.com.br/assets/img/site/garnet-logo.png","image":"https://garnetcosmeticos.com.br/assets/img/og.jpg","email":"contato@garnetcosmeticos.com.br","telephone":"+55-11-98153-1188","contactPoint":[{"@type":"ContactPoint","contactType":"sales","telephone":"+55-11-98153-1188","email":"contato@garnetcosmeticos.com.br","availableLanguage":"pt-BR","areaServed":"BR"}],"sameAs":["https://www.instagram.com/garnetcosmeticos/"],"address":{"@type":"PostalAddress","streetAddress":"Av. Fagundes Filho, 300","addressLocality":"São Paulo","addressRegion":"SP","postalCode":"04340-030","addressCountry":"BR"}}
@@ -68,19 +68,24 @@
   <main id="topo">
     <span id="conteudo" tabindex="-1"></span>
 
-    <!-- ============ HISTÓRIA COM SEQUÊNCIA DE FRAMES (técnica MBOOM) ============ -->
-    <section class="story" id="sobre" aria-label="Apresentação">
+    <!-- ============ ABERTURA: fotos de modelos em tela cheia, trocando suavemente ============ -->
+    <section class="story dark" id="sobre" aria-label="Apresentação">
       <div class="story__sticky">
-        <div class="story__halo" aria-hidden="true"></div>
-        <canvas class="story__canvas" aria-label="Estojo de pó compacto Garnet girando, abrindo e mudando de cor" role="img"></canvas>
+        <div class="story__bg" aria-hidden="true">
+          <img class="story__photo is-on" src="assets/img/modelos/modelo-luz-dourada.webp" width="1400" height="933" alt="" fetchpriority="high" decoding="async" style="--fx:58%" />
+          <img class="story__photo" data-src="assets/img/modelos/modelo-bronze.webp" width="1400" height="1050" alt="" decoding="async" style="--fx:62%" />
+          <img class="story__photo" data-src="assets/img/modelos/modelo-sombra-rosa.webp" width="1400" height="1050" alt="" decoding="async" style="--fx:60%" />
+          <img class="story__photo" data-src="assets/img/modelos/modelo-sombra-cobre.webp" width="1400" height="1050" alt="" decoding="async" style="--fx:58%" />
+          <img class="story__photo" data-src="assets/img/modelos/modelo-batom-vermelho.webp" width="1233" height="1139" alt="" decoding="async" style="--fx:62%" />
+        </div>
 
         <div class="chapter chapter--hero is-active" data-ch="0">
-          <span class="eyebrow">Desde 1992 transformando ideias em produtos</span>
+          <span class="eyebrow eyebrow--gold">Desde 1992 transformando ideias em produtos</span>
           <h1 class="display">Desenvolvemos e fabricamos <em>cosméticos</em> para a sua marca</h1>
-          <p class="lead"><span class="lead-full">Especialista histórica em maquiagem compactada, a Garnet hoje também desenvolve perfumaria, skincare, corpo e produtos para os lábios.</span><span class="lead-short">Especialista em maquiagem compactada. Também fabricamos lábios, perfumaria, skincare e corpo para a sua marca.</span></p>
+          <p class="lead"><span class="lead-full">Especialista histórica em maquiagem compactada, a Garnet hoje também desenvolve perfumaria e skincare.</span><span class="lead-short">Especialista em maquiagem compactada. Hoje também desenvolvemos perfumaria e skincare.</span></p>
           <div class="actions">
-            <a href="#contato" class="btn btn--dark magnetic">Inicie seu projeto</a>
-            <a href="#fabricamos" class="btn btn--ghost magnetic">Conheça o que fabricamos</a>
+            <a href="#contato" class="btn btn--gold magnetic">Inicie seu projeto</a>
+            <a href="#fabricamos" class="btn btn--ghost-light magnetic">Conheça o que fabricamos</a>
           </div>
         </div>
 
@@ -89,14 +94,14 @@
           <div class="trustbar__viewport"><div class="trustbar__track"><p><a href="#cases">Boca Rosa</a><i>✦</i><a href="#cases">Karen Bachini</a><i>✦</i><a href="#cases">Alice Salazar</a><i>✦</i><a href="#cases">Max Weber</a><i>✦</i><a href="#cases">Alê de Souza</a><i>✦</i><a href="#cases">Estrela Beauty</a><i>✦</i><a href="#cases">John John</a><i>✦</i><a href="#cases">Fran</a><i>✦</i></p><p aria-hidden="true"><a href="#cases" tabindex="-1">Boca Rosa</a><i>✦</i><a href="#cases" tabindex="-1">Karen Bachini</a><i>✦</i><a href="#cases" tabindex="-1">Alice Salazar</a><i>✦</i><a href="#cases" tabindex="-1">Max Weber</a><i>✦</i><a href="#cases" tabindex="-1">Alê de Souza</a><i>✦</i><a href="#cases" tabindex="-1">Estrela Beauty</a><i>✦</i><a href="#cases" tabindex="-1">John John</a><i>✦</i><a href="#cases" tabindex="-1">Fran</a><i>✦</i></p></div></div>
         </div>
 
-        <div class="chapter chapter--right" data-ch="1">
-          <span class="eyebrow">01 · Nossa origem</span>
+        <div class="chapter chapter--left" data-ch="1">
+          <span class="eyebrow eyebrow--gold">01 · Nossa origem</span>
           <h2 class="display">Especialistas em <em>compactados</em></h2>
           <p class="lead">Pós, blushes, sombras e iluminadores prensados com relevos, logo gravado, desenhos e paletas sob medida. É aqui que a Garnet construiu sua reputação.</p>
         </div>
 
         <div class="chapter chapter--left" data-ch="2">
-          <span class="eyebrow">02 · Cor</span>
+          <span class="eyebrow eyebrow--gold">02 · Cor</span>
           <h2 class="display">Uma fórmula, <em>infinitas</em> cores</h2>
           <p class="lead">Desenvolvemos cores exclusivas a partir do seu briefing, com amostras para aprovar textura, tom e acabamento.</p>
           <ul class="swatches" aria-label="Cores de exemplo">
@@ -109,11 +114,11 @@
         </div>
 
         <div class="chapter chapter--center" data-ch="3">
-          <span class="eyebrow">03 · Sua marca</span>
+          <span class="eyebrow eyebrow--gold">03 · Sua marca</span>
           <h2 class="display">Pronto para levar <em>o seu nome</em></h2>
           <div class="actions">
-            <a href="#contato" class="btn btn--dark magnetic">Inicie seu projeto</a>
-            <a href="#personalize" class="btn btn--ghost magnetic">Monte a sua make</a>
+            <a href="#contato" class="btn btn--gold magnetic">Inicie seu projeto</a>
+            <a href="#personalize" class="btn btn--ghost-light magnetic">Monte a sua make</a>
           </div>
         </div>
 
@@ -221,8 +226,6 @@
         </div>
         <div class="factory__grid reveal">
           <figure class="factory__ph factory__ph--a"><img src="assets/img/fabrica/embalagem.webp?v=2" draggable="false" width="1400" height="1050" alt="Equipe paramentada montando e embalando produtos de maquiagem em bancadas de aço inox e esteira" loading="lazy" /></figure>
-          <figure class="factory__ph factory__ph--b"><img src="assets/img/fabrica/entrada.webp" draggable="false" width="1050" height="1400" alt="Entrada da área de produção da Garnet, com portas abertas para o salão de máquinas" loading="lazy" /></figure>
-          <figure class="factory__ph factory__ph--c"><img src="assets/img/fabrica/fachada.webp" draggable="false" width="1050" height="1400" alt="Fachada do prédio da fábrica da Garnet com jardim iluminado" loading="lazy" /></figure>
           <figure class="factory__ph factory__ph--d"><img src="assets/img/fabrica/producao-maquinas.webp" draggable="false" width="1400" height="1050" alt="Operadores em máquinas de prensagem e envase na linha de produção" loading="lazy" /></figure>
           <figure class="factory__ph factory__ph--e"><img src="assets/img/fabrica/conferencia.webp" draggable="false" width="1400" height="1050" alt="Equipe conferindo bases, batons e compactos antes da embalagem" loading="lazy" /></figure>
         </div>
@@ -236,8 +239,8 @@
         <div class="hscroll__intro">
           <span class="eyebrow">Portfólio multicategoria</span>
           <h2 class="display">O que podemos <em>fabricar</em> para sua marca</h2>
-          <p class="lead">Role para conhecer as cinco categorias.</p>
-          <p class="hscroll__note">Imagens ilustrativas de conceito.</p>
+          <p class="lead">Role para conhecer as categorias.</p>
+          <p class="hscroll__note">Imagens meramente ilustrativas.</p>
         </div>
         <div class="hscroll__track">
           <article class="cat" style="--bg:#efe3d6">
@@ -277,7 +280,7 @@
           </div>
         </div>
         <div class="hscroll__bar"><i></i></div>
-        <span class="swipe-hint hscroll__hint" aria-hidden="true">Deslize para ver as 5 categorias →</span>
+        <span class="swipe-hint hscroll__hint" aria-hidden="true">Deslize para ver as categorias →</span>
       </div>
     </section>
 
