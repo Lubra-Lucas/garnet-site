@@ -456,15 +456,6 @@
     ScrollTrigger.create({ trigger: ".stats", start: "top 68%", end: "bottom 20%", onEnter: play, onEnterBack: play });
   })();
 
-  /* ---------- manifesto palavra por palavra ---------- */
-  (function manifesto() {
-    const p = $("[data-words]");
-    const gold = ["ideias", "indústria", "cria."];
-    p.innerHTML = p.textContent.trim().split(/\s+/).map((w) => `<span class="w${gold.includes(w) ? " gold" : ""}">${w}</span>`).join(" ");
-    if (reduced) return;
-    gsap.to($$(".w", p), { opacity: 1, stagger: 0.1, ease: "none", scrollTrigger: { trigger: p, start: "top 78%", end: "bottom 45%", scrub: true } });
-  })();
-
   /* ---------- "o que fabricamos": scroll horizontal fixado (desktop) ou carrossel de deslizar (celular) ---------- */
   if (!reduced) {
     const pin = $(".hscroll__pin"), track = $(".hscroll__track"), section = $(".hscroll"), bar = $(".hscroll__bar i");
