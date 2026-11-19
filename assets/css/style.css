@@ -610,6 +610,20 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
 .brief__err { min-height: 22px; margin: 18px 0 0; font-size: 13px; color: var(--err); }
 .brief__live { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .bstep__hint { margin: -12px 0 18px; font-size: 13px; color: var(--on-dark-muted); }
+/* perguntas agrupadas dentro de um passo (pré-qualificação) */
+.bgroup + .bgroup { margin-top: 18px; }
+.bgroup__q { margin: 0 0 10px; font-size: 14px; color: var(--on-dark); }
+.bgroup__q small, .fields label small { color: var(--on-dark-muted); font-size: 12px; }
+.chips--col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.chips--col button { text-align: left; border-radius: 14px; }
+.bstep__note { margin: 18px 0 0; padding: 12px 14px; border-left: 2px solid var(--gold-2); border-radius: 0 10px 10px 0; background: rgba(217, 188, 136, .08); font-size: 13px; line-height: 1.5; color: var(--on-dark); }
+.brief__sim { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: -14px 0 22px; font-size: 13px; color: var(--gold-2); }
+.brief__sim button { min-height: 32px; color: var(--on-dark-muted); text-decoration: underline; font-size: 12px; }
+.brief__status { margin: 0 0 22px; padding: 14px 16px; border: 1px solid rgba(255, 255, 255, .14); border-left: 3px solid var(--gold-2); border-radius: 12px; }
+.brief__status[data-nivel="B"] { border-left-color: var(--gold); }
+.brief__status[data-nivel="C"] { border-left-color: var(--err); }
+.brief__status b { display: block; font-weight: 600; font-size: 14px; }
+.brief__status p { margin: 6px 0 0; font-size: 13px; line-height: 1.5; color: var(--on-dark-muted); }
 .brief .chips button[aria-pressed] { min-height: 44px; }
 /* passo 2: cada modelo com uma linha de apoio; "Ainda não sei" em destaque na primeira posição */
 .chips--desc { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -618,8 +632,6 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
 .brief .chips--desc button small { margin: 0; opacity: .75; font-size: 12px; line-height: 1.4; font-weight: 400; }
 .brief .chips--desc button.on small { opacity: .85; }
 .chips--desc .chip--first { grid-column: 1 / -1; border-color: var(--gold-2); background: rgba(217,188,136,.1); }
-.brief__quick { display: inline-flex; align-items: center; min-height: 44px; margin-top: 18px; color: var(--gold-2); border-bottom: 1px solid transparent; font-size: 13px; font-weight: 500; }
-.brief__quick:hover { border-bottom-color: currentColor; }
 .brief__review { margin: 4px 0 26px; }
 .brief__review h3 { margin: 0 0 18px; font-size: clamp(22px, 2.2vw, 30px); font-weight: 300; letter-spacing: -.015em; }
 .brief__review h3:focus { outline: none; }
@@ -749,7 +761,7 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
   .swipe-hint { display: block; margin-top: 14px; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
   .dark .swipe-hint { color: var(--on-dark-muted); }
   .brief__send, .brief__mail, .brief__copy { flex: 1 1 100%; letter-spacing: .08em; }
-  .chips--desc { grid-template-columns: 1fr; }
+  .chips--desc, .chips--col { grid-template-columns: 1fr; }
   .brief__review dl { grid-template-columns: 1fr; gap: 2px; }
   .brief__review dd { margin-bottom: 10px; }
   .swatch-pick button, .swatch-custom { width: 44px; height: 44px; }
