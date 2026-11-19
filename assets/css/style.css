@@ -357,11 +357,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* fotos fixas: sem zoom, sem arrastar e sem o menu de "abrir imagem" no toque longo */
 .factory__ph img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 
-/* ---------- manifesto ---------- */
-.manifesto { padding-block: clamp(120px, 18vw, 240px); position: relative; z-index: 2; }
-.manifesto__text { margin: 0; font-weight: 300; font-size: clamp(30px, 4.4vw, 66px); line-height: 1.15; letter-spacing: -.02em; max-width: 1100px; }
-.manifesto__text .w { opacity: .14; transition: opacity .2s; }
-.manifesto__text .w.gold { font-family: var(--serif); font-style: italic; color: var(--gold-2); }
 
 /* ---------- scroll horizontal ---------- */
 .hscroll { position: relative; z-index: 2; background: var(--bg); }
@@ -792,7 +787,6 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
 .reduced .vitrine__pause { display: none; }
 .reduced .chapter { position: relative; inset: auto; transform: none; translate: none; opacity: 1; visibility: visible; width: auto; max-width: 720px; }
 .reduced .reveal { opacity: 1; transform: none; }
-.reduced .manifesto__text .w { opacity: 1; }
 .reduced .steps li { opacity: 1; }
 .reduced .steps__line line { stroke-dashoffset: 0; }
 .reduced .hscroll__pin { height: auto; display: block; padding: 120px 0 60px; }
