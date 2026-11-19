@@ -126,11 +126,11 @@
       tl.to({}, { duration: 1 }, 0); // a linha do tempo ocupa toda a rolagem da seção
       const show = (el, at, dur = 0.05) => tl.fromTo(el, { autoAlpha: 0, y: 50 }, { autoAlpha: 1, y: 0, duration: dur, ease: "power2.out" }, at);
       const hide = (el, at, dur = 0.05) => tl.fromTo(el, { autoAlpha: 1, y: 0 }, { autoAlpha: 0, y: -50, duration: dur, ease: "power2.in", immediateRender: false }, at);
-      hide(chapters[0], 0.05, 0.06);
-      hide($(".trustbar"), 0.05, 0.06); // faixa de marcas sai junto com a abertura
-      show(chapters[1], 0.15); hide(chapters[1], 0.37, 0.04);
-      show(chapters[2], 0.47); hide(chapters[2], 0.69, 0.04);
-      show(chapters[3], 0.78);
+      // 3 telas (abertura, compactados, sua marca) em pouca rolagem: as marcas chegam mais rápido
+      hide(chapters[0], 0.04, 0.08);
+      hide($(".trustbar"), 0.04, 0.08); // faixa de marcas sai junto com a abertura
+      show(chapters[1], 0.16, 0.08); hide(chapters[1], 0.5, 0.08);
+      show(chapters[2], 0.62, 0.08);
     });
 
     if (finePointer) {
