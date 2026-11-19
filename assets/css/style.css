@@ -275,16 +275,17 @@ body:not(.menu-open) .header:not(.is-scrolled) .header__nav a { color: var(--on-
 .chapter--hero { left: var(--pad); width: min(560px, 40vw); }
 .chapter--hero .display { font-size: clamp(32px, min(3.7vw, 6.6vh), 58px); }
 .chapter--hero .lead { font-size: 15px; }
-.chapter--hero { top: 46%; }
+/* textos no canto inferior esquerdo (estilo editorial): o rosto das modelos fica livre no centro e no alto */
+.chapter--hero { top: auto; bottom: calc(96px + 4vh); translate: none; }
 .lead-short { display: none; }
 /* a abertura nasce visível: não depende de nenhuma animação para aparecer */
 .chapter.chapter--hero { opacity: 1; visibility: visible; }
 @media (max-height: 780px) and (min-width: 761px) { .chapter--hero .lead { margin-top: 16px; font-size: 15px; } .chapter--hero .actions { margin-top: 24px; } .scrollhint { display: none; } }
 .chapter:not(.chapter--hero) .display { font-size: clamp(30px, min(3.4vw, 6.4vh), 52px); }
 .chapter .lead { margin-top: 20px; }
-.chapter--left { left: var(--pad); width: min(460px, 36vw); }
+.chapter--left { left: var(--pad); width: min(460px, 36vw); top: auto; bottom: 12vh; translate: none; }
 .chapter--right { right: var(--axis); }
-.chapter--center { left: var(--pad); top: 50%; translate: 0 -50%; width: min(460px, 36vw); }
+.chapter--center { left: var(--pad); top: auto; bottom: 12vh; translate: none; width: min(460px, 36vw); }
 .chapter--center .btn { margin-top: 30px; }
 .chapter--center .actions { margin-top: 30px; }
 .chapter--center .actions .btn { margin-top: 0; }
