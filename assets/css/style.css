@@ -229,9 +229,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   box-shadow: 0 10px 40px rgba(60, 40, 20, .08);
 }
 .header.is-hidden { transform: translate(-50%, -140%); }
-/* no topo, o cabeçalho transparente fica sobre as fotos escuras da abertura: logo e menu claros */
-body:not(.menu-open) .header:not(.is-scrolled) .header__logo img { filter: invert(1); }
-body:not(.menu-open) .header:not(.is-scrolled) .header__nav a { color: var(--on-dark); }
 .header__logo img { height: 22px; width: auto; }
 .header__cta { white-space: nowrap; flex: none; }
 .header__nav { display: flex; gap: clamp(12px, 1.4vw, 26px); margin-left: auto; }
@@ -255,25 +252,28 @@ body:not(.menu-open) .header:not(.is-scrolled) .header__nav a { color: var(--on-
 /* ---------- história com sequência ---------- */
 .story { position: relative; height: 340vh; z-index: 2; }
 .story__sticky { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
-/* fundo de fotos: troca suave (GSAP) entre as modelos; o véu escuro garante a leitura do texto à esquerda */
-.story__bg { position: absolute; inset: 0; z-index: 0; background: var(--dark); overflow: hidden; }
-.story__photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 62% center; opacity: 0; }
-.story__photo.is-on { opacity: 1; }
-.story__bg::after {
-  content: ""; position: absolute; inset: 0; z-index: 3;
-  background:
-    linear-gradient(90deg, rgba(18, 16, 14, .9) 0%, rgba(18, 16, 14, .66) 34%, rgba(18, 16, 14, .18) 64%, rgba(18, 16, 14, .3) 100%),
-    linear-gradient(0deg, rgba(18, 16, 14, .85) 0%, transparent 34%);
+/* fotos das modelos: duas colunas de cartões subindo sem parar (GSAP), à direita do texto */
+.story__photos {
+  position: absolute; z-index: 1; top: 92px; bottom: 0; /* começa abaixo do cabeçalho */
+  right: max(var(--pad), calc((100vw - 1280px) / 2 + var(--pad))); width: min(38vw, 540px);
+  display: flex; gap: 18px; overflow: hidden;
+  -webkit-mask-image: linear-gradient(transparent, #000 12%, #000 80%, transparent);
+  mask-image: linear-gradient(transparent, #000 12%, #000 80%, transparent);
 }
+.story__col { flex: 1; min-width: 0; }
+.story__col--b .story__track { margin-top: -38%; }
+.story__track { display: flex; flex-direction: column; will-change: transform; }
+/* margem (e não gap) entre os cartões: assim meia trilha é exatamente uma cópia e o laço não pula */
+.story__card { display: block; flex: none; width: 100%; height: auto; aspect-ratio: 4 / 5; margin-bottom: 18px; object-fit: cover; object-position: var(--fx, 60%) center; border-radius: var(--r); background: var(--bg-2); box-shadow: 0 18px 40px rgba(60, 40, 20, .12); }
 .chapter {
   position: absolute; z-index: 3;
   /* centralização pela propriedade `translate`: o GSAP anima `transform` (y) sem apagar este deslocamento */
   top: 50%; translate: 0 -50%;
-  width: min(520px, 40vw);
+  width: min(500px, 40vw);
   opacity: 0; visibility: hidden;
 }
-.chapter--hero { left: var(--axis); width: min(640px, 46vw); }
-.chapter--hero .display { font-size: clamp(36px, min(5.4vw, 8.4vh), 86px); }
+.chapter--hero { left: var(--axis); width: min(560px, 42vw); }
+.chapter--hero .display { font-size: clamp(36px, min(4.6vw, 8vh), 74px); }
 .chapter--hero { top: 46%; }
 .lead-short { display: none; }
 /* a abertura nasce visível: não depende de nenhuma animação para aparecer */
@@ -292,24 +292,24 @@ body:not(.menu-open) .header:not(.is-scrolled) .header__nav a { color: var(--on-
 .scrollhint span { width: 1px; height: 46px; background: var(--line); position: relative; overflow: hidden; }
 .scrollhint span::after { content: ""; position: absolute; left: 0; top: -40%; width: 1px; height: 40%; background: var(--gold); animation: drip 1.8s var(--ease) infinite; }
 @keyframes drip { to { top: 110%; } }
-.trustbar { position: absolute; z-index: 4; left: 0; right: 0; bottom: 0; display: flex; align-items: center; gap: 24px; padding: 18px 250px 18px var(--axis); border-top: 1px solid rgba(255, 255, 255, .12); background: linear-gradient(transparent, rgba(18, 16, 14, .6) 40%); }
-.trustbar__label { flex: none; font-size: 12px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--gold-2); }
+.trustbar { position: absolute; z-index: 4; left: 0; right: 0; bottom: 0; display: flex; align-items: center; gap: 24px; padding: 18px 250px 18px var(--axis); border-top: 1px solid var(--line); background: linear-gradient(transparent, rgba(247, 244, 239, .92) 40%); }
+.trustbar__label { flex: none; font-size: 12px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--gold-text); }
 .trustbar__viewport { flex: 1; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
 .trustbar__track { display: flex; width: max-content; animation: trust 38s linear infinite; }
 .trustbar:hover .trustbar__track { animation-play-state: paused; }
 .trustbar__track p { margin: 0; display: flex; align-items: center; gap: clamp(18px, 2.4vw, 36px); padding-right: clamp(18px, 2.4vw, 36px); white-space: nowrap; }
-.trustbar__track a { font-family: var(--serif); font-style: italic; font-size: clamp(22px, 2.3vw, 36px); color: var(--on-dark); transition: color .3s; }
-.trustbar__track a:hover { color: var(--gold-2); }
+.trustbar__track a { font-family: var(--serif); font-style: italic; font-size: clamp(22px, 2.3vw, 36px); color: var(--ink); transition: color .3s; }
+.trustbar__track a:hover { color: var(--gold); }
 .trustbar__track i { font-style: normal; font-size: 11px; color: var(--gold); }
 @keyframes trust { to { transform: translateX(-50%); } }
 .swatches { list-style: none; padding: 0; margin: 34px 0 0; display: flex; flex-wrap: wrap; gap: 10px; }
-.swatches li { display: flex; align-items: center; gap: 8px; padding: 7px 14px 7px 7px; border: 1px solid rgba(255, 255, 255, .18); background: rgba(18, 16, 14, .35); border-radius: 99px; font-size: 12px; font-weight: 500; transition: background-color .4s, border-color .4s, transform .4s var(--ease); }
+.swatches li { display: flex; align-items: center; gap: 8px; padding: 7px 14px 7px 7px; border: 1px solid var(--line); background: rgba(247, 244, 239, .7); border-radius: 99px; font-size: 12px; font-weight: 500; transition: background-color .4s, border-color .4s, transform .4s var(--ease); }
 .swatches li i { width: 20px; height: 20px; border-radius: 50%; background: var(--c); box-shadow: inset 0 -3px 6px rgba(0,0,0,.18); }
 .layers { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 10px; }
 .layers li { padding: 10px 0 10px 22px; border-left: 1px solid var(--gold-2); color: var(--muted); font-size: 14px; }
 .layers b { display: block; color: var(--ink); font-weight: 500; font-size: 18px; margin-bottom: 2px; }
-.story__progress { position: absolute; z-index: 4; right: 26px; top: 50%; width: 2px; height: 120px; transform: translateY(-50%); background: rgba(255, 255, 255, .15); }
-.story__progress i { position: absolute; inset: 0; background: var(--gold-2); transform-origin: top; transform: scaleY(var(--p, 0)); }
+.story__progress { position: absolute; z-index: 4; right: 26px; top: 50%; width: 2px; height: 120px; transform: translateY(-50%); background: var(--line); }
+.story__progress i { position: absolute; inset: 0; background: var(--gold); transform-origin: top; transform: scaleY(var(--p, 0)); }
 
 /* ---------- marquee ---------- */
 .marquee { position: relative; z-index: 2; background: var(--bg); border-block: 1px solid var(--line); padding: 30px 0; overflow: hidden; }
@@ -678,9 +678,11 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
   .trustbar { top: 84px; bottom: auto; flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 0 10px 20px; padding-right: 0; border-top: 0; background: none; }
   .trustbar__viewport { width: 100%; }
   .trustbar__track a { font-size: 19px; }
-  /* celular: o rosto fica no alto e o texto embaixo, sobre o véu */
-  .story__photo { object-position: var(--fx, 60%) 30%; }
-  .story__bg::after { background: linear-gradient(180deg, rgba(18, 16, 14, .6) 0%, rgba(18, 16, 14, .12) 26%, rgba(18, 16, 14, .5) 50%, rgba(18, 16, 14, .94) 76%); }
+  /* celular: as fotos correm numa faixa horizontal acima do texto */
+  .story__photos { top: 168px; bottom: auto; left: 0; right: 0; width: auto; height: clamp(90px, calc(100svh - 560px), 220px); -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+  .story__col--b { display: none; }
+  .story__track { flex-direction: row; width: max-content; height: 100%; }
+  .story__card { width: auto; height: 100%; margin: 0 12px 0 0; border-radius: 16px; }
   .chapter, .chapter--hero, .chapter--left, .chapter--right {
     left: 20px; right: 20px; width: auto; top: auto; bottom: 7vh; translate: none;
   }
@@ -781,6 +783,7 @@ textarea.field { height: auto; padding: 14px 18px; resize: vertical; }
 .reduced .story { height: auto; }
 .reduced .story__sticky { position: relative; height: auto; min-height: 100vh; padding: 140px var(--pad) 80px; display: grid; gap: 70px; }
 .reduced .story__progress, .reduced .scrollhint { display: none; }
+.reduced .story__photos { position: relative; inset: auto; width: auto; height: min(60vw, 420px); }
 .reduced .trustbar { position: relative; }
 .reduced .vitrine__pause { display: none; }
 .reduced .chapter { position: relative; inset: auto; transform: none; translate: none; opacity: 1; visibility: visible; width: auto; max-width: 720px; }

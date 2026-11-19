@@ -38,7 +38,7 @@ _headers                cache para o Cloudflare Pages
 
 | Efeito | Técnica | Bloco em `main.js` |
 |---|---|---|
-| Abertura com fotos de modelos trocando suavemente | Fotos em tela cheia com troca e zoom lento pelo GSAP; capítulos de texto no scroll | "abertura: capítulos" e "abertura: fotos" |
+| Abertura com fotos de modelos correndo | Duas colunas de cartões em laço contínuo (GSAP) ao lado do texto; no celular, uma faixa acima do texto | "abertura: capítulos" e "abertura: fotos" |
 | Scroll suave | Lenis | "scroll suave" |
 | Animações no scroll, seções fixadas, scroll horizontal | GSAP + ScrollTrigger | vários |
 | Poeira dourada flutuando | Partículas em canvas (como as "brasas" do Tibidle) | "poeira dourada" |
@@ -54,10 +54,10 @@ animações, com todo o conteúdo visível.
 
 ## Fotos da abertura
 
-As fotos de fundo da abertura ficam em `assets/img/modelos/` (WebP, até 1400 px). Para trocar ou
-acrescentar uma, adicione um `<img class="story__photo">` dentro de `.story__bg` no `index.html`:
-a primeira usa `src` (carrega na hora); as outras usam `data-src` (carregam depois da página).
-`--fx` define o ponto do rosto na horizontal para o recorte do celular.
+As fotos da abertura ficam em `assets/img/modelos/` (WebP, até 1400 px) e aparecem em duas colunas
+(`.story__col`) dentro de `.story__photos` no `index.html`. Cada coluna repete a mesma lista duas vezes,
+para o laço contínuo não ter emenda: ao trocar ou acrescentar uma foto, mude as duas cópias.
+`--fx` define o ponto do rosto na horizontal para o recorte do cartão.
 
 ## Publicação (Cloudflare Pages)
 

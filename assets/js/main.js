@@ -145,47 +145,24 @@
     }
   }
 
-  /* ---------- abertura: fotos das modelos trocando suavemente ---------- */
-  // a 1ª foto vem no HTML; as outras carregam depois da página (data-src) para não atrasar a abertura.
-  // Movimento reduzido: fica só a 1ª foto, parada (as outras nem são baixadas).
+  /* ---------- abertura: fotos das modelos correndo ---------- */
+  // computador: duas colunas de cartões subindo sem parar, em velocidades diferentes;
+  // celular: uma faixa correndo para a esquerda acima do texto. Cada trilha tem duas cópias
+  // da lista, então andar meia trilha volta ao início sem emenda. Movimento reduzido: fotos paradas.
   (function storyPhotos() {
-    const photos = $$(".story__photo");
-    if (photos.length < 2 || reduced) return;
-    const loadRest = () => photos.forEach((p) => {
-      if (!p.dataset.src) return;
-      p.src = p.dataset.src;
-      p.removeAttribute("data-src");
+    const tracks = $$(".story__track");
+    if (!tracks.length || reduced) return;
+    gsap.matchMedia().add({ desktop: "(min-width: 761px)", mobile: "(max-width: 760px)" }, (c) => {
+      const tweens = tracks.map((t, k) => (c.conditions.desktop
+        ? gsap.fromTo(t, { yPercent: 0 }, { yPercent: -50, duration: k ? 52 : 42, ease: "none", repeat: -1 })
+        : gsap.fromTo(t, { xPercent: 0 }, { xPercent: -50, duration: 36, ease: "none", repeat: -1 })));
+      // pausa quando a abertura sai da tela
+      const st = ScrollTrigger.create({
+        trigger: ".story", start: "top bottom", end: "bottom top",
+        onToggle: (s) => tweens.forEach((tw) => (s.isActive ? tw.play() : tw.pause())),
+      });
+      return () => st.kill();
     });
-    if (document.readyState === "complete") loadRest();
-    else window.addEventListener("load", loadRest, { once: true });
-
-    const ready = (p) => p.complete && p.naturalWidth > 0 && !p.dataset.src;
-    const zoom = (p) => gsap.fromTo(p, { scale: 1.08 }, { scale: 1, duration: 8, ease: "none", overwrite: "auto" });
-    let at = 0, visible = true;
-    photos.forEach((p, k) => gsap.set(p, { opacity: k === 0 ? 1 : 0, zIndex: k === 0 ? 2 : 1 }));
-    zoom(photos[0]);
-    const nextPhoto = () => {
-      // pula fotos que ainda não carregaram (conexão lenta): nunca mostra um quadro vazio
-      let k = at;
-      for (let n = 0; n < photos.length - 1; n++) {
-        k = (k + 1) % photos.length;
-        if (ready(photos[k])) break;
-      }
-      if (k === at || !ready(photos[k])) return;
-      const cur = photos[at], nx = photos[k];
-      at = k;
-      gsap.set(cur, { zIndex: 1 });
-      gsap.set(nx, { zIndex: 2 });
-      zoom(nx);
-      gsap.fromTo(nx, { opacity: 0 }, { opacity: 1, duration: 1.8, ease: "power2.inOut", onComplete: () => gsap.set(cur, { opacity: 0 }) });
-    };
-    // pausa fora da tela e com a aba em segundo plano
-    ScrollTrigger.create({ trigger: ".story", start: "top bottom", end: "bottom top", onToggle: (s) => { visible = s.isActive; } });
-    const loop = () => {
-      if (visible && !document.hidden) nextPhoto();
-      gsap.delayedCall(5.5, loop);
-    };
-    gsap.delayedCall(5.5, loop);
   })();
 
   /* ---------- poeira dourada (inspirado nas "brasas" do Tibidle) ---------- */
