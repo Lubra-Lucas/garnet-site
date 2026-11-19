@@ -32,8 +32,7 @@ na página; esta lista registra o que ainda é ilustrativo e deve ser trocado qu
 - Faixa Vogue, Elle, Forbes, Marie Claire, Sephora e Riachuelo: produtos **fabricados pela Garnet para
   marcas de clientes** já estiveram nesses veículos e lojas (não a marca Garnet). O texto da faixa diz isso.
 - Prazo de referência: cerca de 45 dias para a entrega (atualizado em nov/2026), variando com quantidade e complexidade.
-- Pedido mínimo (nov/2026): 1.000 unidades por cor para compactados e 3.000 unidades para perfumaria, loções e skincare.
-  Lábios não tem mínimo informado; o site não cita número para essa categoria.
+- Pedido mínimo (nov/2026): 1.000 unidades por cor para compactados e 3.000 unidades para os demais produtos.
 - Tempo de resposta aos contatos: até 1 dia útil.
 - Amostras e desenvolvimento (nov/2026): só para pessoa jurídica com empresa constituída (CNPJ) e marca registrada
   ou com protocolo no INPI.
